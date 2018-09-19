@@ -108,6 +108,7 @@ venv.bak/
 
 # VSC config
 .vscode
+.idea
 
 # Virtualenv
 kaizenenv/
