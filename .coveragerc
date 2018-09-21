@@ -1,0 +1,18 @@
+[run]
+source =
+  post_registration
+  templates
+omit =
+    env/*
+    */test*
+    manage.py
+    post_registration/wsgi.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def setUp
+    def test_
+    return raw_input
+    print
+    if __name__ == '__main__':
