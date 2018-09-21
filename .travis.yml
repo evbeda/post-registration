@@ -1,0 +1,25 @@
+language: python
+python:
+  - "3.6.5"
+
+services: postgresql
+
+env:
+  global:
+# - DJANGO="x.y.z"
+  - DJANGO_SETTINGS_MODULE="post_registration.settings"
+  - PYTHONPATH="/home/travis/build/evbeda/post-registration"
+  - PIP_USE_MIRRORS=true
+
+install:
+  - pip install -r requirements.txt
+
+before_script:
+  - psql -c 'create database travisdb;' -U postgres
+
+script:
+ - python manage.py migrate
+ - coverage run manage.py test
+
+#after_success:
+  #- coveralls
