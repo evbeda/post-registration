@@ -19,8 +19,15 @@ before_script:
 script:
 - python manage.py migrate
 - coverage run manage.py test
+- sonar-scanner
 
 after_success:
 - coveralls
 sudo: false
 cache: pip
+dist: trusty
+addons:
+  sonarcloud:
+    organization: "leonardxfce-github"
+    token:
+      secure: $SONAR_TOKEN
