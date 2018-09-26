@@ -1,5 +1,6 @@
 [run]
 source =
+  documentsManager
   post_registration
   templates
 omit =

@@ -2,8 +2,8 @@ from django.views.generic.base import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from social_django.models import UserSocialAuth
 from eventbrite import Eventbrite
+from documentsManager.views import get_auth_token
 
 
 @method_decorator(login_required, name='dispatch')
@@ -19,21 +19,6 @@ class HomeView(TemplateView, LoginRequiredMixin):
         context['user'] = self.request.user
         token = get_auth_token(self.request.user)
         eventbrite = Eventbrite(token)
-        context['events'] = eventbrite.get('/users/me/events/')['events']
+        context['events'] = eventbrite.get('/users/me/events/').get('events', [])
         # import ipdb; ipdb.set_trace()
         return context
-
-
-def get_auth_token(user):
-
-    """
-    This method will receive an user and
-    return its repesctive social_auth token
-    """
-    try:
-        token = user.social_auth.get(
-            provider='eventbrite'
-        ).access_token
-    except UserSocialAuth.DoesNotExist:
-        print('UserSocialAuth does not exists!')
-    return token
