@@ -1,8 +1,13 @@
-from django.core.urlresolvers import resolve
+from django.apps import apps
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import resolve
 from django.test import TestCase
 from social_django.models import UserSocialAuth
-from unittest.mock import patch
+
+from documentsManager.apps import DocumentsmanagerConfig
+from documentsManager.views import get_auth_token
+from post_registration.settings import get_env_variable
 
 
 class TestBase(TestCase):
@@ -14,8 +19,6 @@ class TestBase(TestCase):
             is_staff=True,
             is_superuser=True
         )
-        # self.user.set_password('hello')
-        # self.user.save()
         self.auth = UserSocialAuth.objects.create(
             user=self.user,
             provider='eventbrite',
@@ -24,10 +27,10 @@ class TestBase(TestCase):
         return login
 
 
-class DocFormTest(TestBase):
+class TemplatesTest(TestBase):
 
     def setUp(self):
-        super(DocFormTest, self).setUp()
+        super(TemplatesTest, self).setUp()
 
     def test_doc_from_exist(self):
         view = resolve('/docs_form/')
@@ -57,3 +60,41 @@ class DocFormTest(TestBase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
+
+class DocumentsmanagerConfigTest(TestCase):
+    def test_apps(self):
+        self.assertEqual(DocumentsmanagerConfig.name, 'documentsManager')
+        self.assertEqual(apps.get_app_config('documentsManager').name, 'documentsManager')
+
+
+class SettingsTest(TestCase):
+    def test_env_exists(self):
+        env_var = 'SOCIAL_AUTH_EVENTBRITE_KEY'
+        result = get_env_variable(env_var)
+        self.assertTrue(result)
+
+    def test_env_not_exists(self):
+        env_var = 'SOCIAL_AUTH_EVENTBRITE_KEY_FALSE'
+        with self.assertRaises(ImproperlyConfigured) as context:
+            get_env_variable(env_var)
+        expected = 'Set the SOCIAL_AUTH_EVENTBRITE_KEY_FALSE environment variable'
+        self.assertTrue(expected in str(context.exception))
+
+
+class AuthTokenTest(TestCase):
+    def test_error(self):
+        self.user = get_user_model().objects.create_user(
+            username='mike',
+            password='genius',
+            is_active=True,
+            is_staff=True,
+            is_superuser=True
+        )
+        self.auth = UserSocialAuth.objects.create(
+            user=self.user,
+            provider='kaizenbrite',
+        )
+        with self.assertRaises(Exception) as context:
+            get_auth_token(self.user)
+        self.assertTrue(
+            'UserSocialAuth does not exists!' in str(context.exception))
