@@ -5,7 +5,6 @@ services: postgresql
 
 env:
   global:
-  # - DJANGO="x.y.z"
   - DJANGO_SETTINGS_MODULE="post_registration.settings"
   - PYTHONPATH="/home/travis/build/evbeda/post-registration"
   - PIP_USE_MIRRORS=true
@@ -18,9 +17,29 @@ before_script:
 
 script:
 - python manage.py migrate
+- coverage erase
 - coverage run manage.py test
-
-after_success:
+- coverage xml -i
 - coveralls
+- sonar-scanner
 sudo: false
-cache: pip
+
+cache:
+  directories:
+  - $HOME/.cache/pip
+  - $HOME/.sonar
+  - $HOME/jvm
+  - $HOME/.gradle/caches/
+  - $HOME/.gradle/wrapper/
+before_cache:
+- rm -f $HOME/.cache/pip/log/debug.log
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+- rm -fr $HOME/.gradle/caches/*/fileHashes/
+- rm -fr $HOME/.gradle/caches/*/scripts/
+dist: trusty
+addons:
+  sonarcloud:
+    organization: "leonardxfce-github"
+    token:
+      secure: $SONAR_TOKEN
