@@ -45,11 +45,22 @@ class DocFormView(TemplateView, LoginRequiredMixin):
         context['user'] = self.request.user
         token = get_auth_token(self.request.user)
         eventbrite = Eventbrite(token)
-        pepito = self.request.GET['id']
-        pepe = '/events/{}/'.format(pepito)
-        context['event'] = eventbrite.get(pepe)
+        url = '/events/{}/'.format(self.kwargs['event_id'])
+        context['event'] = eventbrite.get(url)
         return context
 
+@method_decorator(login_required, name='dispatch')
+class DocsView(TemplateView, LoginRequiredMixin):
+    template_name = 'docs.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(DocsView, self).get_context_data(**kwargs)
+        context['user'] = self.request.user
+        token = get_auth_token(self.request.user)
+        eventbrite = Eventbrite(token)
+        url = '/events/{}/'.format(self.kwargs['event_id'])
+        context['event'] = eventbrite.get(url)
+        return context
 
 def get_auth_token(user):
     """
