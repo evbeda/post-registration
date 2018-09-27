@@ -16,31 +16,10 @@
             <p class="lead">Fecha Inicio Evento {{ event.start.utc }}</p>
         </div>
     </div>
-    <form action="">
-        <div class="form-group">
-            <label for="">Nombre del Archivo</label>
-            <input class="form-control" type="text">
-            <label for="">Tipo</label>
-            <select class="form-control" name="" id="">
-                <option value="">DOC</option>
-                <option value="">PDF</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <button class="btn btn-primary">+</button>
-        </div>
-        <div class="form-group">
-            <label for="">Fecha de Inicio de Submisiones</label>
-            <input class="form-control" type="date">
-        </div>
-        <div class="form-group">
-            <label for="">Fecha de Fin de Submisiones</label>
-            <input class="form-control" type="date">
-        </div>
-        <div class="form-group">
-            <button class="btn btn-primary">OK</button>
-            <button class="btn btn-primary">Cancelar</button>
-        </div>
+    <form action="" method='post'>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type='submit' value="Submit" class="btn btn-primary" />
     </form>
 </div>
 </body>
