@@ -21,6 +21,7 @@ script:
 - coverage run manage.py test
 - coverage xml -i
 - coveralls
+- which pylint
 - sonar-scanner
 sudo: false
 
