@@ -33,8 +33,12 @@ class TemplatesTest(TestBase):
         super(TemplatesTest, self).setUp()
 
     def test_doc_from_exist(self):
-        view = resolve('/docs_form/')
+        view = resolve('/doc_form/49213916148/')
         self.assertEqual(view.view_name, 'doc_form')
+
+    def test_docs_from_exist(self):
+        view = resolve('/docs/49213916148/')
+        self.assertEqual(view.view_name, 'docs')
 
     def test_home_url_resolves_home_view(self):
         view = resolve('/')
@@ -48,12 +52,16 @@ class TemplatesTest(TestBase):
         response = self.client.get('/accounts/login/')
         self.assertEqual(response.status_code, 200)
 
+    def test_docs_redirect(self):
+        response = self.client.get('/docs/49213916148/')
+        self.assertEqual(response.status_code, 200)
+
     def test_events_redirect(self):
         response = self.client.get('/events/')
         self.assertEqual(response.status_code, 200)
 
-    def test_doc_redirect(self):
-        response = self.client.get('/docs_form/?id=49213916148')
+    def test_doc_form_redirect(self):
+        response = self.client.get('/doc_form/49213916148/')
         self.assertEqual(response.status_code, 200)
 
     def test_homepage_redirect(self):
@@ -64,7 +72,8 @@ class TemplatesTest(TestBase):
 class DocumentsmanagerConfigTest(TestCase):
     def test_apps(self):
         self.assertEqual(DocumentsmanagerConfig.name, 'documentsManager')
-        self.assertEqual(apps.get_app_config('documentsManager').name, 'documentsManager')
+        self.assertEqual(apps.get_app_config(
+            'documentsManager').name, 'documentsManager')
 
 
 class SettingsTest(TestCase):

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+</head>
+<body>
+
+<div class="container">
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">{{ event.name.text }}</h1>
+            <p class="lead">Fecha Inicio Evento {{ event.start.utc }}</p>
+        </div>
+    </div>
+    <div class="text-right">
+        <a class="btn btn-primary" href="/doc_form/?id={{ event.id }}" role="button">+Add</a>    
+    </div>
+    <div class="row">
+        <div class="col" style="border-bottom: 1px solid gray">
+            <h2>Documentacion</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Nombre</th>
+                      <th scope="col">Tipo</th>
+                      <th scope="col"></th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                   {% for doc in docs %}
+                        <tr>
+                            <td>                                
+                                <h5>{{ doc.name }}</h5>
+                            </td>
+                            <td>
+                                {{ doc.file_type }}
+                            </td>
+                            <td>
+                                
+                            </td>
+                            <td>
+                                <a href="/doc_form/?id={{ event.id }}" class="list-group-item list-group-item-action">
+                                    Editar
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+            
+            </table>
+        </div>
+    </div>
+    
+</div>
+</body>
+</html>
