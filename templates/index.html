@@ -1,2 +1,25 @@
-<p>{{user}}</p>
-<p>{{events}}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+</head>
+<body>
+
+<div class="container">
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">Post Registration</h1>
+            <p class="lead">by: Kaizen Devs</p>
+        </div>
+    </div>
+    <div class="text-right">
+        <a class="btn btn-primary" href="{% url 'events' %}" role="button">Add new Event</a>
+    </div>
+</div>
+</body>
+</html>
