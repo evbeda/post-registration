@@ -41,6 +41,19 @@ class EventsView(TemplateView, LoginRequiredMixin):
             events.append(view_event)
         return events
 
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.method == 'GET' and 'eb_event_id' in self.kwargs.keys():
+            eb_event_id = self.kwargs['eb_event_id']
+            new_event = self.add_event(eb_event_id)
+            return HttpResponseRedirect(reverse('docs', kwargs={'event_id': new_event.id}))
+
+        return super(EventsView, self).dispatch(request, *args, **kwargs)
+
+    def add_event(self, eb_event_id):
+        new_event = Event(eb_event_id=eb_event_id)
+        new_event.save()
+        return new_event
+
 
 @method_decorator(login_required, name='dispatch')
 class DocFormView(FormView, LoginRequiredMixin):
@@ -69,9 +82,7 @@ class DocFormView(FormView, LoginRequiredMixin):
 
     def form_valid(self, form):
         new_doc = self.add_doc(form, self.kwargs['event_id'])
-        # , args=( new_doc.id,)
-        return HttpResponseRedirect(reverse('docs', args=( self.kwargs['event_id'],)))
-
+        return HttpResponseRedirect(reverse('docs', kwargs={'event_id': new_doc.id}))
 
     def add_doc(self, form, event_id):
         new_doc = form.save(commit=False)
@@ -93,6 +104,7 @@ class DocFormView(FormView, LoginRequiredMixin):
         new_doc.save()
         return new_doc
 
+
 @method_decorator(login_required, name='dispatch')
 class DocsView(TemplateView, LoginRequiredMixin):
     template_name = 'docs.html'
@@ -105,6 +117,7 @@ class DocsView(TemplateView, LoginRequiredMixin):
         url = '/events/{}/'.format(self.kwargs['event_id'])
         context['event'] = eventbrite.get(url)
         return context
+
 
 def get_auth_token(user):
     """

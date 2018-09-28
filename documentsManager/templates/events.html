@@ -20,7 +20,7 @@
         <ul class="list-group">
             {% for event in events %}
             <li>
-                <a href="/docs/{{ event.id }}/" class="list-group-item list-group-item-action">
+                <a href="{% url 'events' event.id %}" class="list-group-item list-group-item-action">
                     <h5>{{ event.name }}</h5>
                     <small>{{ event.start.day }}/{{ event.start.month }}/{{ event.start.year }}</small>
                     - 
