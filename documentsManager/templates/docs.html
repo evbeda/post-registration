@@ -13,16 +13,17 @@
 <div class="container">
     <div class="jumbotron jumbotron-fluid">
         <div class="container">
-            <h1 class="display-4">{{ event.name.text }}</h1>
-            <p class="lead">Fecha Inicio Evento {{ event.start.utc }}</p>
+            <h1 class="display-4">{{ event.name }}</h1>
+            <p class="lead">Fecha Inicio Evento {{ event.start }}</p>
+            <p class="lead">Fecha Fin Evento {{ event.end }}</p>
         </div>
     </div>
     <div class="text-right">
-        <a class="btn btn-primary" href="/doc_form/{{ event.id }}/" role="button">+Add</a>    
+        <a class="btn btn-primary" href="{% url 'doc_form' event.id %}" role="button">+Add</a>    
     </div>
     <div class="row">
         <div class="col" style="border-bottom: 1px solid gray">
-            <h2>Documentacion</h2>
+            <h2>Documentación</h2>
         </div>
     </div>
     <div class="row">

@@ -52,17 +52,17 @@ class TemplatesTest(TestBase):
         response = self.client.get('/accounts/login/')
         self.assertEqual(response.status_code, 200)
 
-    def test_docs_redirect(self):
-        response = self.client.get('/docs/49213916148/')
-        self.assertEqual(response.status_code, 200)
+    # def test_docs_redirect(self):
+    #     response = self.client.get('/docs/49213916148/')
+    #     self.assertEqual(response.status_code, 200)
 
     def test_events_redirect(self):
         response = self.client.get('/events/')
         self.assertEqual(response.status_code, 200)
 
-    def test_doc_form_redirect(self):
-        response = self.client.get('/doc_form/49213916148/')
-        self.assertEqual(response.status_code, 200)
+    # def test_doc_form_redirect(self):
+    #     response = self.client.get('/doc_form/49213916148/')
+    #     self.assertEqual(response.status_code, 200)
 
     def test_homepage_redirect(self):
         response = self.client.get('/')

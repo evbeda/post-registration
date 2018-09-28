@@ -4,7 +4,7 @@ from django.db import models
 
 
 class Event(models.Model):
-    eb_event_id = models.TextField()
+    eb_event_id = models.TextField(unique=True)
     init_submission = models.DateField(default=datetime.date.today)
     end_submission = models.DateField(blank=True, null=True)
 
