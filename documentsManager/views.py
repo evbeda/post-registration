@@ -61,7 +61,7 @@ class DocFormView(FormView, LoginRequiredMixin):
     form_class = DocForm
 
     def get_queryset(self):
-        eb_event_id = self.kwargs['event_id']
+        event_id = self.kwargs['event_id']
         return Doc.objects.filter(event_id__eb_event_id=event_id)
 
     def get_context_data(self, **kwargs):
@@ -75,7 +75,7 @@ class DocFormView(FormView, LoginRequiredMixin):
         eb_event = eventbrite.get(url)
         view_event = {
             'id': event.id,
-            'eb_id': eb_event['id'], # TODO review this
+            'eb_id': eb_event['id'],
             'name': eb_event['name']['text'],
             # 2018-11-01T22:00:00Z
             'start': datetime.strptime(eb_event['start']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
@@ -118,13 +118,13 @@ class DocsView(TemplateView, LoginRequiredMixin):
         context['user'] = self.request.user
         token = get_auth_token(self.request.user)
         eventbrite = Eventbrite(token)
-        event_id = self.kwargs['event_id'] # 22 WTF?
+        event_id = self.kwargs['event_id']
         event = Event.objects.get(id=event_id)
         url = '/events/{}/'.format(event.eb_event_id)
         eb_event = eventbrite.get(url)
         view_event = {
             'id': event.id,
-            'eb_id': eb_event['id'], # TODO review this
+            'eb_id': eb_event['id'],
             'name': eb_event['name']['text'],
             # 2018-11-01T22:00:00Z
             'start': datetime.strptime(eb_event['start']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
