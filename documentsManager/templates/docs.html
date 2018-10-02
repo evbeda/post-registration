@@ -43,7 +43,11 @@
                                 <h5>{{ doc.name }}</h5>
                             </td>
                             <td>
-                                {{ doc.file_type }}
+                                {% for file_type in doc.file_types %}
+                                <ul>
+                                  <li>{{ file_type }}</li>
+                                </ul>
+                                {% endfor %}
                             </td>
                             <td>
                                 {{ doc.is_optional }}

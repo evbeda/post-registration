@@ -76,6 +76,7 @@ class DocFormView(FormView, LoginRequiredMixin):
         event = Event.objects.get(id=event_id)
         new_doc.event = event
         new_doc.save()
+        form.save_m2m() # needed since using commit=False
         return new_doc
 
 
