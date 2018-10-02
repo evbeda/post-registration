@@ -1,6 +1,6 @@
 import datetime
-
 from django.db import models
+from django import forms
 
 
 class Event(models.Model):
@@ -13,21 +13,25 @@ class Event(models.Model):
 
 
 class FileType(models.Model):
-    name = models.CharField(max_length=5)
+    name = models.CharField(max_length=20)
     description = models.CharField(max_length=100, blank=True)
 
     class Meta:
         db_table = 'FileType'
 
     def __str__(self):
-        return self.name
+        return self.description
 
 
 class Doc(models.Model):
-    name = models.CharField(max_length=100)
-    file_type = models.ForeignKey(FileType)
+    name = models.CharField(max_length=100, blank=False, unique=True)
+    file_type = models.ManyToManyField(FileType)
     is_optional = models.BooleanField(default=True)
     event = models.ForeignKey(Event, blank=True)
+
+    @property
+    def file_types(self):
+        return self.file_type.all()
 
     class Meta:
         db_table = 'Doc'
