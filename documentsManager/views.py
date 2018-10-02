@@ -21,16 +21,10 @@ class EventsView(TemplateView, LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         context = super(EventsView, self).get_context_data(**kwargs)
         context['user'] = self.request.user
-        token = get_auth_token(self.request.user)
-        eventbrite = Eventbrite(token)
-        api_events = eventbrite.get('/users/me/events/').get('events', [])
+        api_events = get_all_events_api(get_auth_token(self.request.user))
         eb_events = parse_events(api_events)
         events_id_list = Event.objects.all().values_list('eb_event_id', flat=True)
-        print(events_id_list)
-        view_events = []
-        for eb_event in eb_events:
-            if (eb_event['eb_id'] not in events_id_list):
-                view_events.append(eb_event)
+        view_events = filter_no_managed_event(eb_events, events_id_list)
         context['events'] = view_events
         return context
 
@@ -53,29 +47,16 @@ class DocFormView(FormView, LoginRequiredMixin):
     template_name = 'doc_form.html'
     form_class = DocForm
 
-    def get_queryset(self):
-        event_id = self.kwargs['event_id']
-        return Doc.objects.filter(event_id__eb_event_id=event_id)
-
     def get_context_data(self, **kwargs):
         context = super(DocFormView, self).get_context_data(**kwargs)
         context['user'] = self.request.user
-        token = get_auth_token(self.request.user)
-        eventbrite = Eventbrite(token)
         event_id = self.kwargs['event_id']
         event = Event.objects.get(id=event_id)
-        url = '/events/{}/'.format(event.eb_event_id)
-        eb_event = eventbrite.get(url)
-        view_event = {
-            'id': event.id,
-            'eb_id': eb_event['id'],
-            'name': eb_event['name']['text'],
-            # 2018-11-01T22:00:00Z
-            'start': datetime.strptime(eb_event['start']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
-            # 2018-11-01T22:00:00Z
-            'end': datetime.strptime(eb_event['end']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
-        }
-        context['event'] = view_event
+        eb_event = get_one_event_api(get_auth_token(self.request.user), event.eb_event_id)
+        view_event = parse_events(eb_event)
+        event = view_event[0]
+        event['id'] = event_id
+        context['event'] = event
         return context
 
     def post(self, request, *args, **kwargs):
@@ -86,7 +67,7 @@ class DocFormView(FormView, LoginRequiredMixin):
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        new_doc = self.add_doc(form, self.kwargs['event_id'])
+        self.add_doc(form, self.kwargs['event_id'])
         return HttpResponseRedirect(reverse('docs', kwargs={'event_id': self.kwargs['event_id']}))
 
     def add_doc(self, form, event_id):
@@ -102,30 +83,32 @@ class DocFormView(FormView, LoginRequiredMixin):
 class DocsView(TemplateView, LoginRequiredMixin):
     template_name = 'docs.html'
 
-    def get_queryset(self):
-        event_id = self.kwargs['event_id']
-        return Doc.objects.filter(event_id__=event_id)
-
     def get_context_data(self, **kwargs):
         context = super(DocsView, self).get_context_data(**kwargs)
         context['user'] = self.request.user
-        token = get_auth_token(self.request.user)
-        eventbrite = Eventbrite(token)
         event_id = self.kwargs['event_id']
         event = Event.objects.get(id=event_id)
-        url = '/events/{}/'.format(event.eb_event_id)
-        eb_event = eventbrite.get(url)
-        view_event = {
-            'id': event.id,
-            'eb_id': eb_event['id'],
-            'name': eb_event['name']['text'],
-            # 2018-11-01T22:00:00Z
-            'start': datetime.strptime(eb_event['start']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
-            # 2018-11-01T22:00:00Z
-            'end': datetime.strptime(eb_event['end']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
-        }
-        context['event'] = view_event
+        eb_event = get_one_event_api(get_auth_token(self.request.user), event.eb_event_id)
+        view_event = parse_events(eb_event)
+        event = view_event[0]
+        event['id'] = event_id
+        context['event'] = event
         context['docs'] = Doc.objects.filter(event__id=event_id)
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class HomeView(TemplateView, LoginRequiredMixin):
+    template_name = 'home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(HomeView, self).get_context_data(**kwargs)
+        context['user'] = self.request.user
+        api_events = get_all_events_api(get_auth_token(self.request.user))
+        parse_api_events = parse_events(api_events)
+        docs_events_list = Event.objects.all().values_list('eb_event_id', 'id')
+        events = filter_managed_event(parse_api_events, docs_events_list)
+        context['events'] = events
         return context
 
 
@@ -135,9 +118,7 @@ def parse_events(api_events):
         view_event = {
             'eb_id': event['id'],
             'name': event['name']['text'],
-            # 2018-11-01T22:00:00Z
             'start': datetime.strptime(event['start']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
-            # 2018-11-01T22:00:00Z
             'end': datetime.strptime(event['end']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
         }
         events.append(view_event)
@@ -145,10 +126,6 @@ def parse_events(api_events):
 
 
 def get_auth_token(user):
-    """
-    This method will receive an user and
-    return its repesctive social_auth token
-    """
     try:
         token = user.social_auth.get(
             provider='eventbrite'
@@ -157,3 +134,32 @@ def get_auth_token(user):
         error_msg = 'UserSocialAuth does not exists!'
         raise Exception(error_msg)
     return token
+
+
+def get_all_events_api(token):
+    eventbrite = Eventbrite(token)
+    return eventbrite.get('/users/me/events/').get('events', [])
+
+
+def get_one_event_api(token, eb_event_id):
+    eventbrite = Eventbrite(token)
+    one_event = [eventbrite.get('/events/{}/'.format(eb_event_id))]
+    return one_event
+
+
+def filter_managed_event(api_events, model_events):
+    events = []
+    for api_event in api_events:
+        for docs_event in model_events:
+            if api_event['eb_id'] in docs_event[0]:
+                api_event['id'] = docs_event[1]
+                events.append(api_event)
+    return events
+
+
+def filter_no_managed_event(api_events, model_events):
+    events = []
+    for eb_event in api_events:
+        if eb_event['eb_id'] not in model_events:
+            events.append(eb_event)
+    return events
