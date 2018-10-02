@@ -1,17 +1,17 @@
 from datetime import datetime
+from django.http import HttpResponseRedirect
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from eventbrite import Eventbrite
-from social_django.models import UserSocialAuth
 
 from .forms import DocForm
-from .models import Event, Doc
+from .models import Doc, Event
+from eventbrite import Eventbrite
+from social_django.models import UserSocialAuth
 
 
 @method_decorator(login_required, name='dispatch')
@@ -23,23 +23,16 @@ class EventsView(TemplateView, LoginRequiredMixin):
         context['user'] = self.request.user
         token = get_auth_token(self.request.user)
         eventbrite = Eventbrite(token)
-        context['events'] = self.get_user_events(eventbrite)
-        return context
-
-    def get_user_events(self, eventbrite):
-        events = []
         api_events = eventbrite.get('/users/me/events/').get('events', [])
-        for event in api_events:
-            view_event = {
-                'id': event['id'],
-                'name': event['name']['text'],
-                # 2018-11-01T22:00:00Z
-                'start': datetime.strptime(event['start']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
-                # 2018-11-01T22:00:00Z
-                'end': datetime.strptime(event['end']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
-            }
-            events.append(view_event)
-        return events
+        eb_events = parse_events(api_events)
+        events_id_list = Event.objects.all().values_list('eb_event_id', flat=True)
+        print(events_id_list)
+        view_events = []
+        for eb_event in eb_events:
+            if (eb_event['eb_id'] not in events_id_list):
+                view_events.append(eb_event)
+        context['events'] = view_events
+        return context
 
     def dispatch(self, request, *args, **kwargs):
         if self.request.method == 'GET' and 'eb_event_id' in self.kwargs.keys():
@@ -134,6 +127,21 @@ class DocsView(TemplateView, LoginRequiredMixin):
         context['event'] = view_event
         context['docs'] = Doc.objects.filter(event__id=event_id)
         return context
+
+
+def parse_events(api_events):
+    events = []
+    for event in api_events:
+        view_event = {
+            'eb_id': event['id'],
+            'name': event['name']['text'],
+            # 2018-11-01T22:00:00Z
+            'start': datetime.strptime(event['start']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
+            # 2018-11-01T22:00:00Z
+            'end': datetime.strptime(event['end']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
+        }
+        events.append(view_event)
+    return events
 
 
 def get_auth_token(user):
