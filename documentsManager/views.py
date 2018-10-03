@@ -1,17 +1,17 @@
 from datetime import datetime
-from django.http import HttpResponseRedirect
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import FormView
-
-from .forms import DocForm
-from .models import Doc, Event
 from eventbrite import Eventbrite
+from multi_form_view import MultiFormView
 from social_django.models import UserSocialAuth
+
+from .forms import FileDocForm, TextDocForm
+from .models import FileDoc, Event, TextDoc
 
 
 @method_decorator(login_required, name='dispatch')
@@ -43,9 +43,12 @@ class EventsView(TemplateView, LoginRequiredMixin):
 
 
 @method_decorator(login_required, name='dispatch')
-class DocFormView(FormView, LoginRequiredMixin):
+class DocFormView(MultiFormView, LoginRequiredMixin):
     template_name = 'doc_form.html'
-    form_class = DocForm
+    form_classes = {
+        'file_doc': FileDocForm,
+        'text_doc': TextDocForm,
+    }
 
     def get_context_data(self, **kwargs):
         context = super(DocFormView, self).get_context_data(**kwargs)
@@ -60,7 +63,10 @@ class DocFormView(FormView, LoginRequiredMixin):
         return context
 
     def post(self, request, *args, **kwargs):
-        form = DocForm(request.POST)
+        if request.POST.get('submit_file'):
+            form = FileDocForm(request.POST)
+        elif request.POST.get('submit_text'):
+            form = TextDocForm(request.POST)
         if form.is_valid():
             return self.form_valid(form)
         else:
@@ -76,7 +82,8 @@ class DocFormView(FormView, LoginRequiredMixin):
         event = Event.objects.get(id=event_id)
         new_doc.event = event
         new_doc.save()
-        form.save_m2m() # needed since using commit=False
+        if 'submit_file' in form.data.keys():
+            form.save_m2m()  # needed since using commit=False
         return new_doc
 
 
@@ -94,7 +101,8 @@ class DocsView(TemplateView, LoginRequiredMixin):
         event = view_event[0]
         event['id'] = event_id
         context['event'] = event
-        context['docs'] = Doc.objects.filter(event__id=event_id)
+        context['docs_file'] = FileDoc.objects.filter(event__id=event_id)
+        context['docs_text'] = TextDoc.objects.filter(event__id=event_id)
         return context
 
 

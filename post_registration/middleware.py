@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from social_django.middleware import SocialAuthExceptionMiddleware
 from social_core.exceptions import AuthCanceled
+from social_django.middleware import SocialAuthExceptionMiddleware
 
 
 class SocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
@@ -11,5 +11,3 @@ class SocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
                 "registration/authcanceled.html",
                 {},
             )
-        else:
-            pass
