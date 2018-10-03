@@ -1,6 +1,6 @@
 import datetime
+
 from django.db import models
-from django import forms
 
 
 class Event(models.Model):
@@ -8,7 +8,7 @@ class Event(models.Model):
     init_submission = models.DateField(default=datetime.date.today)
     end_submission = models.DateField(blank=True, null=True)
 
-    class Meta:
+    class Meta(object):
         db_table = 'Event'
 
 
@@ -16,22 +16,42 @@ class FileType(models.Model):
     name = models.CharField(max_length=20)
     description = models.CharField(max_length=100, blank=True)
 
-    class Meta:
+    class Meta(object):
         db_table = 'FileType'
 
     def __str__(self):
-        return self.description
+        return self.name
 
 
-class Doc(models.Model):
+class FileDoc(models.Model):
     name = models.CharField(max_length=100, blank=False, unique=True)
     file_type = models.ManyToManyField(FileType)
-    is_optional = models.BooleanField(default=True)
+    is_optional = models.BooleanField(default=False)
     event = models.ForeignKey(Event, blank=True)
 
     @property
     def file_types(self):
         return self.file_type.all()
 
-    class Meta:
-        db_table = 'Doc'
+    class Meta(object):
+        db_table = 'FileDoc'
+
+
+class TextDoc(models.Model):
+    MEASUREMENT_CHOICE = (
+        ('WORDS', 'Words'),
+        ('CHARS', 'Chars'),
+    )
+    name = models.CharField(max_length=100, blank=False, unique=True)
+    is_optional = models.BooleanField(default=False)
+    measure = models.CharField(
+        max_length=5,
+        choices=MEASUREMENT_CHOICE,
+        default='WORDS',
+    )
+    max = models.IntegerField(default=500)
+    min = models.IntegerField(default=0)
+    event = models.ForeignKey(Event, blank=True)
+
+    class Meta(object):
+        db_table = 'TextDoc'

@@ -8,7 +8,7 @@ from django.test import TestCase
 from social_django.models import UserSocialAuth
 
 from documentsManager.apps import DocumentsmanagerConfig
-from documentsManager.models import Event
+from documentsManager.models import Event, TextDoc, FileType
 from documentsManager.views import (
     get_auth_token,
     filter_managed_event,
@@ -225,3 +225,19 @@ class AuthTokenTest(TestCase):
             get_auth_token(self.user)
         self.assertTrue(
             'UserSocialAuth does not exists!' in str(context.exception))
+
+
+class ModelsTest(TestCase):
+    def test_model_text_exist(self):
+        new_event = Event.objects.create(eb_event_id=1)
+        text_doc = TextDoc.objects.create(event=new_event)
+        self.assertEqual(text_doc.id, 1)
+        self.assertEqual(text_doc.measure, 'WORDS')
+        self.assertEqual(text_doc.max, 500)
+        self.assertEqual(text_doc.min, 0)
+        self.assertEqual(text_doc.is_optional, False)
+
+    def test_model_file_type(self):
+        new_event = FileType.objects.create(name='PDF')
+        result = str(new_event)
+        self.assertEqual(result, 'PDF')
