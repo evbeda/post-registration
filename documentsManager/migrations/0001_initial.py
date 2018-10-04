@@ -18,7 +18,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Event',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('eb_event_id', models.TextField(unique=True)),
                 ('init_submission', models.DateField(default=datetime.date.today)),
                 ('end_submission', models.DateField(blank=True, null=True)),
@@ -30,10 +31,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FileDoc',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100, unique=True)),
                 ('is_optional', models.BooleanField(default=False)),
-                ('event', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='documentsManager.Event')),
+                ('event', models.ForeignKey(
+                    blank=True, on_delete=django.db.models.deletion.CASCADE, to='documentsManager.Event')),
             ],
             options={
                 'db_table': 'FileDoc',
@@ -42,7 +45,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FileType',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=20)),
                 ('description', models.CharField(blank=True, max_length=100)),
             ],
@@ -53,13 +57,16 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TextDoc',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100, unique=True)),
                 ('is_optional', models.BooleanField(default=False)),
-                ('measure', models.CharField(choices=[('WORDS', 'Words'), ('CHARS', 'Chars')], default='WORDS', max_length=5)),
+                ('measure', models.CharField(choices=[
+                 ('WORDS', 'Words'), ('CHARS', 'Chars')], default='WORDS', max_length=5)),
                 ('max', models.IntegerField(default=500)),
                 ('min', models.IntegerField(default=0)),
-                ('event', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='documentsManager.Event')),
+                ('event', models.ForeignKey(
+                    blank=True, on_delete=django.db.models.deletion.CASCADE, to='documentsManager.Event')),
             ],
             options={
                 'db_table': 'TextDoc',
