@@ -14,6 +14,7 @@ import os
 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 
 def get_env_variable(var_name):

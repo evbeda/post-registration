@@ -13,9 +13,11 @@
             <li class="nav-item active">
                 <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
             </li>
+            {% comment %} {% if event %} {% endcomment %}
             <li class="nav-item">
-                <a class="nav-link" href="/dashboard">Dashboard</a>
+                <a class="nav-link" href="/dashboard/{{event.id}}">Dashboard</a>
             </li>
+            {% comment %} {% endif %} {% endcomment %}
             <li class="nav-item">
                 <a class="nav-link" href="/docs_form">Manage</a>
             </li>
@@ -29,4 +31,18 @@
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
         </form> {% endcomment %}
     </div>
+    <ul class="nav navbar-nav navbar-right ml-auto">
+        <li class="nav-item open">
+            <div class="navbar__avatar" data-toggle="dropdown" id="navbarDropdown">
+                <img class="navbar__avatar-img" src="{% static 'images/avatar-icon.png' %}" alt="Avatar">
+            </div>
+            <ul class="dropdown-menu form-wrapper" aria-labelledby="navbarDropdown">
+                <li class="dropdown-item">
+                    <a href="{% url 'logout' %}" class="nav-link">
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </ul>
 </nav>

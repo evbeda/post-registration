@@ -12,7 +12,9 @@
 </head>
 
 <body>
-    {% include "navbar.html" %}
+    <div class="container-fluid">
+        {% include "navbar.html" %}
+    </div>
     <div class="content">
         {% block content %} {% endblock content %}
     </div>
