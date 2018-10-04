@@ -10,93 +10,119 @@
     <div class="text-right">
         <a class="btn btn-primary" href="{% url 'doc_form' event.id %}" role="button">Add</a>
     </div>
-    <div class="row">
-        <div class="col">
-            <h2 class="doc-list__title">File Documentation</h2>
+    <div class="container">    
+        <div class="row">
+            <div class="col">
+                <h2 class="doc-list__title">File Documentation</h2>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Format</th>
-                    <th scope="col">Optional</th>
-                    <th scope="col">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for doc in docs_file %}
-                <tr>
-                    <td>
-                        <h5>{{ doc.name }}</h5>
-                    </td>
-                    <td>
-                        {% for file_type in doc.file_types %}
-                        <ul>
-                            <li>{{ file_type }}</li>
-                        </ul>
-                        {% endfor %}
-                    </td>
-                    <td>
-                        {{ doc.is_optional }}
-                    </td>
-                    <td>
-                        <a href="/doc_form/?id={{ event.id }}" class="btn btn-info">
-                            Edit
-                        </a>
-                        <a href="/doc_form/?id={{ event.id }}" class="btn btn-danger">
-                            Delete
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-                </tbody>
+        <div class="row">
+            <div class="col">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Title of the Document</th>
+                        <th scope="col">File types Accepted</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Is Required</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for doc in docs_file %}
+                    <tr>
+                        <td>
+                            <h5>{{ doc.name }}</h5>
+                        </td>
+                        <td>
+                            {% for file_type in doc.file_types %}
+                            <ul>
+                                <li>{{ file_type }}</li>
+                            </ul>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <h5>{{ doc.quantity}}</h5>
+                        </td>
+                        <td>
+                            {% if doc.is_optional %}
+                                <h5>Optional</h5>
+                            {% else %}
+                                <h5>Mandatory</h5>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/doc_form/?id={{ event.id }}" class="btn btn-info disabled" disable>
+                                Edit
+                            </a>
+                            <a href="/doc_form/?id={{ event.id }}" class="btn btn-danger disabled" disable>
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
 
-            </table>
+                </table>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <h2 class="doc-list__title">Text Documentation</h2>
+        <div class="row">
+            <div class="col">
+                <h2 class="doc-list__title">Text Documentation</h2>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Measure</th>
-                    <th scope="col">Optional</th>
-                    <th scope="col">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for doc in docs_text %}
-                <tr>
-                    <td>
-                        <h5>{{ doc.name }}</h5>
-                    </td>
-                    <td>
-                        <h5>{{ doc.measure }}</h5>
-                    </td>
-                    <td>
-                        {{ doc.is_optional }}
-                    </td>
-                    <td>
-                        <a href="/doc_form/?id={{ event.id }}" class="btn btn-info">
-                            Edit
-                        </a>
-                        <a href="/doc_form/?id={{ event.id }}" class="btn btn-danger">
-                            Delete
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+        <div class="row">
+            <div class="col">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Title of the Document</th>
+                        <th scope="col">Type of Limitation</th>
+                        <th scope="col">Min</th>
+                        <th scope="col">Max</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Is Required</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for doc in docs_text %}
+                    <tr>
+                        <td>
+                            <h5>{{ doc.name }}</h5>
+                        </td>
+                        <td>
+                            <h5>{{ doc.measure }}</h5>
+                        </td>
+                        <td>
+                            <h5>{{ doc.min }}</h5>
+                        </td>
+                        <td>
+                            <h5>{{ doc.max }}</h5>
+                        </td>
+                        <td>
+                            <h5>{{ doc.quantity}}</h5>
+                        </td>
+                        <td>
+                            {% if doc.is_optional %}
+                                <h5>Optional</h5>
+                            {% else %}
+                                <h5>Mandatory</h5>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/doc_form/?id={{ event.id }}" class="btn btn-info disabled">
+                                Edit
+                            </a>
+                            <a href="/doc_form/?id={{ event.id }}" class="btn btn-danger disabled">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

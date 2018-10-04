@@ -232,7 +232,7 @@ class ModelsTest(TestCase):
         new_event = Event.objects.create(eb_event_id=1)
         text_doc = TextDoc.objects.create(event=new_event)
         self.assertEqual(text_doc.id, 1)
-        self.assertEqual(text_doc.measure, 'WORDS')
+        self.assertEqual(text_doc.measure, 'Words')
         self.assertEqual(text_doc.max, 500)
         self.assertEqual(text_doc.min, 0)
         self.assertEqual(text_doc.is_optional, False)

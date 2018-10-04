@@ -40,15 +40,15 @@ class FileDoc(models.Model):
 
 class TextDoc(models.Model):
     MEASUREMENT_CHOICE = (
-        ('WORDS', 'Words'),
-        ('CHARS', 'Chars'),
+        ('Words', 'Words'),
+        ('Chars', 'Chars'),
     )
     name = models.CharField(max_length=100, blank=False)
     is_optional = models.BooleanField(default=False)
     measure = models.CharField(
         max_length=5,
         choices=MEASUREMENT_CHOICE,
-        default='WORDS',
+        default='Words',
     )
     max = models.IntegerField(default=500)
     min = models.IntegerField(default=0)
