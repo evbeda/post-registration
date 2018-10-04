@@ -1,7 +1,57 @@
 body {
     font-family: 'Roboto', sans-serif;
+    color: color: #39364f;
 }
 
-h1 {
-    color: #FCA205;
+.content {
+    min-height: 70vh;
+    padding-bottom: 50px;
+}
+
+.footer {
+    background-color: #1E0A3C;
+    min-height: 150px;
+}
+
+.footer__copyright {
+    color: #6f7287;
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.btn-primary {
+    /* background-color: #F05537; */
+    color: white;
+}
+
+.navbar {
+    height: 59px;
+    border-bottom: 1px solid #eeedf2;
+    display: flex;
+    justify-content: space-between;
+}
+
+.navbar__brand {
+    width: 100px;
+}
+
+.jumbotron {
+    background-color: #1E0A3C;
+    color: white;
+}
+
+.card {
+    border-color: transparent;
+    padding: 24px;
+}
+
+.card:hover {
+    box-shadow: 0 4px 15px 0 rgba(40,44,53,.06), 0 2px 2px 0 rgba(40,44,53,.08);
+    background-color: #fff;
+    border-radius: 4px;
+    z-index: 3;
+}
+
+.card-text {
+    color: #6f7287;
 }

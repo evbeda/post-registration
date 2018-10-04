@@ -24,7 +24,7 @@ class FileType(models.Model):
 
 
 class FileDoc(models.Model):
-    name = models.CharField(max_length=100, blank=False, unique=True)
+    name = models.CharField(max_length=100, blank=False)
     file_type = models.ManyToManyField(FileType)
     is_optional = models.BooleanField(default=False)
     event = models.ForeignKey(Event, blank=True)
@@ -42,7 +42,7 @@ class TextDoc(models.Model):
         ('WORDS', 'Words'),
         ('CHARS', 'Chars'),
     )
-    name = models.CharField(max_length=100, blank=False, unique=True)
+    name = models.CharField(max_length=100, blank=False)
     is_optional = models.BooleanField(default=False)
     measure = models.CharField(
         max_length=5,

@@ -55,7 +55,8 @@ class DocFormView(MultiFormView, LoginRequiredMixin):
         context['user'] = self.request.user
         event_id = self.kwargs['event_id']
         event = Event.objects.get(id=event_id)
-        eb_event = get_one_event_api(get_auth_token(self.request.user), event.eb_event_id)
+        eb_event = get_one_event_api(get_auth_token(
+            self.request.user), event.eb_event_id)
         view_event = parse_events(eb_event)
         event = view_event[0]
         event['id'] = event_id
@@ -96,7 +97,8 @@ class DocsView(TemplateView, LoginRequiredMixin):
         context['user'] = self.request.user
         event_id = self.kwargs['event_id']
         event = Event.objects.get(id=event_id)
-        eb_event = get_one_event_api(get_auth_token(self.request.user), event.eb_event_id)
+        eb_event = get_one_event_api(get_auth_token(
+            self.request.user), event.eb_event_id)
         view_event = parse_events(eb_event)
         event = view_event[0]
         event['id'] = event_id
@@ -125,10 +127,12 @@ def parse_events(api_events):
     events = []
     for event in api_events:
         view_event = {
-            'eb_id': event['id'],
-            'name': event['name']['text'],
+            'eb_id': event.get('id', None),
+            'name': event.get('name', {}).get('text', 'Unnamed'),
             'start': datetime.strptime(event['start']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
             'end': datetime.strptime(event['end']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
+            'description': event.get('description', {}).get('text', 'No description'),
+            'logo': (event.get('logo', {}) or {}).get('original', {}).get('url', None),
         }
         events.append(view_event)
     return events
