@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve
 from django.test import TestCase
+from django.db.utils import DataError
 from social_django.models import UserSocialAuth
 
 from documentsManager.apps import DocumentsmanagerConfig
@@ -13,6 +14,7 @@ from documentsManager.models import (
     Event,
     TextDoc,
     FileType,
+    FileDoc,
 )
 from documentsManager.views import (
     add_event,
@@ -253,9 +255,10 @@ class AuthTokenTest(TestCase):
 
 class ModelsTest(TestCase):
     def test_model_text_exist(self):
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=3)
         text_doc = TextDoc.objects.create(event=new_event)
-        self.assertEqual(text_doc.id, 1)
+        self.assertEqual(text_doc.name, '')
+        self.assertEqual(text_doc.id, 3)
         self.assertEqual(text_doc.measure, 'Words')
         self.assertEqual(text_doc.max, 500)
         self.assertEqual(text_doc.min, 0)
@@ -265,3 +268,75 @@ class ModelsTest(TestCase):
         new_event = FileType.objects.create(name='PDF')
         result = str(new_event)
         self.assertEqual(result, 'PDF')
+
+    def test_model_text_error_max_word(self):
+        new_event = Event.objects.create(eb_event_id=1)
+        text_doc = TextDoc.objects.create(event=new_event)
+        text_doc.max = 'asd'
+        result = isinstance(text_doc.max, int)
+        self.assertFalse(result)
+
+    def test_model_text_max_word(self):
+        new_event = Event.objects.create(eb_event_id=1)
+        text_doc = TextDoc.objects.create(event=new_event)
+        text_doc.max = 237
+        result = isinstance(text_doc.max, int)
+        self.assertTrue(result)
+
+    def test_model_text_error_max_word_2(self):
+        new_event = Event.objects.create(eb_event_id=1)
+        text_doc = TextDoc.objects.create(event=new_event)
+        text_doc.min = 'asd'
+        result = isinstance(text_doc.min, int)
+        self.assertFalse(result)
+
+    def test_model_text_max_word_2(self):
+        new_event = Event.objects.create(eb_event_id=1)
+        text_doc = TextDoc.objects.create(event=new_event)
+        text_doc.min = 4560
+        result = isinstance(text_doc.min, int)
+        self.assertTrue(result)
+
+    def test_model_file_quantity_false(self):
+        new_event = Event.objects.create(eb_event_id=1)
+        file_doc = FileDoc.objects.create(event=new_event)
+        file_doc.quantity = 'asd'
+        result = isinstance(file_doc.quantity, int)
+        self.assertFalse(result)
+
+    def test_model_file_quantity_true(self):
+        new_event = Event.objects.create(eb_event_id=1)
+        file_doc = FileDoc.objects.create(event=new_event)
+        file_doc.quantity = 123
+        result = isinstance(file_doc.quantity, int)
+        self.assertTrue(result)
+
+    def test_model_file_name_submission_invalid(self):
+        new_event = Event.objects.create(eb_event_id=1)
+        with self.assertRaises(DataError) as data_error:
+            FileDoc.objects.create(
+                event=new_event,
+                name='asd' * 50,
+            )
+        self.assertEqual(data_error.exception.args, ('value too long for type character varying(100)\n',))
+
+    def test_model_file_name_submission_valid(self):
+        new_event = Event.objects.create(eb_event_id=1)
+        file_doc = FileDoc.objects.create(event=new_event)
+        file_doc.name = ('Documento')
+        self.assertEqual(file_doc.name, 'Documento')
+
+    def test_model_text_doc_name_submission_invalid(self):
+        new_event = Event.objects.create(eb_event_id=1)
+        with self.assertRaises(DataError) as data_error:
+            TextDoc.objects.create(
+                event=new_event,
+                name='asd' * 50,
+            )
+        self.assertEqual(data_error.exception.args, ('value too long for type character varying(100)\n',))
+
+    def test_model_text_doc_name_submission_valid(self):
+        new_event = Event.objects.create(eb_event_id=1)
+        file_doc = FileDoc.objects.create(event=new_event)
+        file_doc.name = ('Foto')
+        self.assertEqual(file_doc.name, 'Foto')
