@@ -17,11 +17,14 @@
 				<img class="card-img-top" src="{{ event.logo }}" alt="Card image cap">
 				<div class="card-body">
 					<h5 class="card-title">{{ event.name }}</h5>
+					<i>
+						
 					<p class="card-text">
 						{% if event.description %} {{ event.description }} {% else %}
 						<i>No description</i>
 						{% endif %}
 					</p>
+					</i>
 					<a href="{% url 'docs' event.id %}" class="btn btn-link pl-0">Edit Documentation</a>
 				</div>
 			</div>
