@@ -1,9 +1,11 @@
 {% extends "base.html" %} {% block content %}
 
-<div class="container">
-    <div class="row">
-        <h1>Your Events</h1>
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <h1 class="display-4">Your Unmanaged Events</h1>
     </div>
+</div>
+<div class="container">
     {% if not events %}
     <div class="alert alert-warning" role="alert">
         It seems that all your events are being handled in our app! :D

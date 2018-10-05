@@ -1,45 +1,42 @@
 {% extends "base.html" %} {% block content %}
-
-<div class="container-fluid">
-    <div class="jumbotron jumbotron-fluid">
-        <div class="container">
-            <h1 class="display-4">{{ event.name }}</h1>
-            <p class="lead">Fecha Inicio Evento {{ event.start }}</p>
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <h1 class="display-4">{{ event.name }}</h1>
+        <p class="lead">Fecha Inicio Evento {{ event.start }}</p>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <h3>Type of Submission:</h3>
+</div>
+<div class="row justify-content-center m-3">
+    <ul>
+        <li>
+            <label for="id_switcher">Submission by file</label>
+            <input type="radio" name="doc_switcher" value="file" id="id_switcher">
+        </li>
+        <li>
+            <label for="id_switcher2"> Submission by form / text</label>
+            <input type="radio" name="doc_switcher" value="plain_text" id="id_switcher2">
+        </li>
+    </ul>
+</div>
+<div class="row justify-content-center m-3">
+    <form action="" method='post'>
+        {% csrf_token %}
+        <div class="doc_req_file">
+            {{ forms.file_doc.as_p }}
+            <input type='submit' name='submit_file' class="btn btn-primary"/>
         </div>
-    </div>
-    <div class="row justify-content-center">
-        <h3>Type of Submission:</h3>
-    </div>
-    <div class="row justify-content-center m-3">
-        <ul>
-            <li>
-                <label for="id_switcher">Submission by file</label>
-                <input type="radio" name="doc_switcher" value="file" id="id_switcher">
-            </li>
-            <li>
-                <label for="id_switcher2"> Submission by form / text</label>
-                <input type="radio" name="doc_switcher" value="plain_text" id="id_switcher2">
-            </li>
-        </ul>
-    </div>
-    <div class="row justify-content-center m-3">
-        <form action="" method='post'>
-            {% csrf_token %}
-            <div class="doc_req_file">
-                {{ forms.file_doc.as_p }}
-                <input type='submit' name='submit_file' class="btn btn-primary"/>
-            </div>
-        </form>
-    </div>
-    <div class="row justify-content-center m-3">
-        <form action="" method='post'>
-            {% csrf_token %}
-            <div class="doc_req_text">
-                {{ forms.text_doc.as_p }}
-                <input type='submit' name='submit_text' class="btn btn-primary"/>
-            </div>
-        </form>
-    </div>
+    </form>
+</div>
+<div class="row justify-content-center m-3">
+    <form action="" method='post'>
+        {% csrf_token %}
+        <div class="doc_req_text">
+            {{ forms.text_doc.as_p }}
+            <input type='submit' name='submit_text' class="btn btn-primary"/>
+        </div>
+    </form>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
