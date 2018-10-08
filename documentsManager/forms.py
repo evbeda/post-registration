@@ -39,7 +39,6 @@ class TextDocForm(ModelForm):
             'measure',
             'min',
             'max',
-            'quantity',
         ]
         labels = {
             'name': _('Name'),
@@ -47,8 +46,4 @@ class TextDocForm(ModelForm):
             'measure': _('Measure'),
             'min': _('Minimum'),
             'max': _('Maximum'),
-            'quantity': _('Quantity'),
-        }
-        widgets = {
-            'quantity': TextInput(attrs={'min': '1', 'max': '100', 'type': 'number'}),
         }
