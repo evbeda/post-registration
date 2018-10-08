@@ -52,7 +52,6 @@ class TextDoc(models.Model):
     )
     max = models.IntegerField(default=500)
     min = models.IntegerField(default=0)
-    quantity = models.CharField(max_length=3, blank=False)
     event = models.ForeignKey(Event, blank=True)
 
     class Meta(object):
