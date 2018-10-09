@@ -6,16 +6,20 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve
 from django.test import TestCase
-from django.utils.datetime_safe import datetime
 from social_django.models import UserSocialAuth
 
 from documentsManager.apps import DocumentsmanagerConfig
-from documentsManager.models import Event, TextDoc, FileType
+from documentsManager.models import (
+    Event,
+    TextDoc,
+    FileType,
+)
 from documentsManager.views import (
+    add_event,
     get_auth_token,
     filter_managed_event,
     filter_no_managed_event,
-    substract_days)
+)
 from post_registration.settings import get_env_variable
 
 MOCK_EVENTS_API = {
@@ -84,12 +88,16 @@ MOCK_EVENTS_API = {
             'height': 262
         },
         'original': {
-            'url': 'https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F50285339%2F226660633266%2F1%2Foriginal.jpg?auto=compress&s=76bcc2208a37ed4a6cf52ec9d204fe1c',
+            'url': 'https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2F'
+                   'images%2F50285339%2F226660633266%2F1%2Foriginal.jpg?'
+                   'auto=compress&s=76bcc2208a37ed4a6cf52ec9d204fe1c',
             'width': 525,
             'height': 350
         },
         'id': '50285339',
-        'url': 'https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F50285339%2F226660633266%2F1%2Foriginal.jpg?h=200&w=450&auto=compress&rect=0%2C43%2C524%2C262&s=393615fb1d44a82eb37a2cb2fafa9ac7',
+        'url': 'https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages'
+               '%2F50285339%2F226660633266%2F1%2Foriginal.jpg?h=200&w=450&'
+               'auto=compress&rect=0%2C43%2C524%2C262&s=393615fb1d44a82eb37a2cb2fafa9ac7',
         'aspect_ratio': '2',
         'edge_color': '#6b7384',
         'edge_color_set': True
@@ -162,10 +170,6 @@ class ViewTest(TestBase):
         response = self.client.get('/doc_form/{}/'.format(new_event.id))
         self.assertEqual(response.status_code, 200)
 
-    def test_events_redirect(self):
-        response = self.client.get('/events/')
-        self.assertEqual(response.status_code, 200)
-
     def test_homepage_redirect(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
@@ -182,12 +186,6 @@ class ViewTest(TestBase):
         result = filter_no_managed_event(api_events, model_events)
         self.assertEqual(len(result), 1)
 
-    def test_subtract_date(self):
-        date = datetime.strptime('2018-11-03T23:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
-        result = substract_days(date, 5)
-        expect = datetime.strptime('2018-10-29T23:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
-        self.assertEqual(result, expect)
-
     @patch('documentsManager.views.Eventbrite.get')
     def test_create_and_save_event(self, mock_api_evb):
         mock_api_evb.return_value = MOCK_EVENTS_API
@@ -196,21 +194,21 @@ class ViewTest(TestBase):
         expect = '/docs/{}/'.format(event.id)
         self.assertEqual(response.url, expect)
 
-    # def test_modify_event_dates(self):
-    #     EVB_ID = 1
-    #     new_event = add_event(EVB_ID, '2017-02-03')
-    #     r = {
-    #         'POST': {
-    #             'init_submission': '2018-02-01',
-    #             'end_submission': '2018-02-03',
-    #         }
-    #     }
-    #     result_redirect = update_dates(request, new_event.id)
-    #     response = self.client.post('events/{}/dates/'.format(new_event.id))
-    #     result = Event.objects.get(id=new_event.id)
-    #     expected = datetime.strptime('2018-02-01', '%Y-%m-%d').date()
-    #     self.assertEqual(result.init_submission, expected)
-    #     self.assertEqual(result_redirect.url, '/docs/1/')
+    def test_modify_event_dates(self):
+        EVB_ID = 1234
+        new_event = add_event(EVB_ID, '2017-02-03')
+        r = {
+            'init_submission': '2018-02-01',
+            'end_submission': '2018-02-03',
+        }
+        response = self.client.post(
+            '/events/{}/dates/'.format(new_event.id),
+            r,
+        )
+        result = Event.objects.get(id=new_event.id)
+        expected = datetime.strptime('2018-02-01', '%Y-%m-%d').date()
+        self.assertEqual(result.init_submission, expected)
+        self.assertEqual(response.url, '/docs/{}/'.format(new_event.id))
 
 
 class DocumentsmanagerConfigTest(TestCase):
