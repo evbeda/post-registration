@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -27,19 +27,6 @@ class EventsView(TemplateView, LoginRequiredMixin):
         view_events = filter_no_managed_event(eb_events, events_id_list)
         context['events'] = view_events
         return context
-
-    def dispatch(self, request, *args, **kwargs):
-        if self.request.method == 'GET' and 'eb_event_id' in self.kwargs.keys():
-            eb_event_id = self.kwargs['eb_event_id']
-            new_event = self.add_event(eb_event_id)
-            return HttpResponseRedirect(reverse('docs', kwargs={'event_id': new_event.id}))
-
-        return super(EventsView, self).dispatch(request, *args, **kwargs)
-
-    def add_event(self, eb_event_id):
-        new_event = Event(eb_event_id=eb_event_id)
-        new_event.save()
-        return new_event
 
 
 @method_decorator(login_required, name='dispatch')
@@ -176,3 +163,22 @@ def filter_no_managed_event(api_events, model_events):
         if eb_event['eb_id'] not in model_events:
             events.append(eb_event)
     return events
+
+
+def substract_days(init_date, days_to_substract):
+    return init_date - timedelta(days=days_to_substract)
+
+
+def select_event(request, eb_event_id):
+    DEFAULT_DAYS_TO_SUBSTRACT = 2
+    eb_event = get_one_event_api(get_auth_token(request.user), eb_event_id)
+    view_event = parse_events(eb_event)
+    default_end_submission = substract_days(view_event[0]['start'], DEFAULT_DAYS_TO_SUBSTRACT)
+    new_event = add_event(eb_event_id, default_end_submission)
+    return HttpResponseRedirect(reverse('docs', kwargs={'event_id': new_event.id}))
+
+
+def add_event(eb_event_id, end_submission):
+    new_event = Event(eb_event_id=eb_event_id, end_submission=end_submission)
+    new_event.save()
+    return new_event
