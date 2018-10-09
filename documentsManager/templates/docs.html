@@ -2,9 +2,19 @@
 {%include "partials/jumbotron.html" %}
 
 <div class="container">
-<div class="text-right">
-    <a class="btn btn-primary" href="{% url 'doc_form' event.id %}" role="button">      Add</a>
-    </div>    
+
+    <div class="row">
+        <div class="col">
+            <form action="{% url 'update_dates' event.id %}" method="post" class="form-inline">
+                {% csrf_token %}
+                {{ form }}
+                <input class='btn btn-info' type="submit" value="Submit"/>
+            </form>
+        </div>
+        <div class="text-right">
+            <a class="btn btn-primary" href="{% url 'doc_form' event.id %}" role="button"> Add</a>
+        </div>
+    </div>
     <div class="row">
         <div class="col">
             <h2 class="doc-list__title">File Documentation</h2>
@@ -40,9 +50,9 @@
                     </td>
                     <td>
                         {% if doc.is_optional %}
-                            <h5>Optional</h5>
+                        <h5>Optional</h5>
                         {% else %}
-                            <h5>Mandatory</h5>
+                        <h5>Mandatory</h5>
                         {% endif %}
                     </td>
                     <td>
@@ -65,54 +75,54 @@
             <h2 class="doc-list__title">Text Documentation</h2>
         </div>
     </div>
-        <div class="row">
-            <div class="col">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">Title of the Document</th>
-                        <th scope="col">Type of Limitation</th>
-                        <th scope="col">Min</th>
-                        <th scope="col">Max</th>
-                        <th scope="col">Is Required</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for doc in docs_text %}
-                    <tr>
-                        <td>
-                            <h5>{{ doc.name }}</h5>
-                        </td>
-                        <td>
-                            <h5>{{ doc.measure }}</h5>
-                        </td>
-                        <td>
-                            <h5>{{ doc.min }}</h5>
-                        </td>
-                        <td>
-                            <h5>{{ doc.max }}</h5>
-                        </td>
-                        <td>
-                            {% if doc.is_optional %}
-                                <h5>Optional</h5>
-                            {% else %}
-                                <h5>Mandatory</h5>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="/doc_form/?id={{ event.id }}" class="btn btn-info disabled">
-                                Edit
-                            </a>
-                            <a href="/doc_form/?id={{ event.id }}" class="btn btn-danger disabled">
-                                Delete
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <div class="row">
+        <div class="col">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Title of the Document</th>
+                    <th scope="col">Type of Limitation</th>
+                    <th scope="col">Min</th>
+                    <th scope="col">Max</th>
+                    <th scope="col">Is Required</th>
+                    <th scope="col">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for doc in docs_text %}
+                <tr>
+                    <td>
+                        <h5>{{ doc.name }}</h5>
+                    </td>
+                    <td>
+                        <h5>{{ doc.measure }}</h5>
+                    </td>
+                    <td>
+                        <h5>{{ doc.min }}</h5>
+                    </td>
+                    <td>
+                        <h5>{{ doc.max }}</h5>
+                    </td>
+                    <td>
+                        {% if doc.is_optional %}
+                        <h5>Optional</h5>
+                        {% else %}
+                        <h5>Mandatory</h5>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="/doc_form/?id={{ event.id }}" class="btn btn-info disabled">
+                            Edit
+                        </a>
+                        <a href="/doc_form/?id={{ event.id }}" class="btn btn-danger disabled">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
+    </div>
 </div>
 {% endblock content %}

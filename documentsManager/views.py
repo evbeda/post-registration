@@ -5,12 +5,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.views.generic import FormView
 from django.views.generic.base import TemplateView
 from eventbrite import Eventbrite
 from multi_form_view import MultiFormView
 from social_django.models import UserSocialAuth
 
-from .forms import FileDocForm, TextDocForm
+from .forms import FileDocForm, TextDocForm, EventForm
 from .models import FileDoc, Event, TextDoc
 
 
@@ -76,14 +77,19 @@ class DocFormView(MultiFormView, LoginRequiredMixin):
 
 
 @method_decorator(login_required, name='dispatch')
-class DocsView(TemplateView, LoginRequiredMixin):
+class DocsView(FormView, LoginRequiredMixin):
     template_name = 'docs.html'
+    form_class = EventForm
 
     def get_context_data(self, **kwargs):
         context = super(DocsView, self).get_context_data(**kwargs)
         context['user'] = self.request.user
         event_id = self.kwargs['event_id']
         event = Event.objects.get(id=event_id)
+        context['form'] = EventForm(initial={
+            'init_submission': event.init_submission,
+            'end_submission': event.end_submission,
+        })
         eb_event = get_one_event_api(get_auth_token(
             self.request.user), event.eb_event_id)
         view_event = parse_events(eb_event)
@@ -182,3 +188,11 @@ def add_event(eb_event_id, end_submission):
     new_event = Event(eb_event_id=eb_event_id, end_submission=end_submission)
     new_event.save()
     return new_event
+
+
+def update_dates(request, event_id):
+    event = Event.objects.get(id=event_id)
+    event.init_submission = request.POST['init_submission']
+    event.end_submission = request.POST['end_submission']
+    event.save()
+    return HttpResponseRedirect(reverse('docs', kwargs={'event_id': event_id}))
