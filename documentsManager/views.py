@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -11,8 +11,16 @@ from eventbrite import Eventbrite
 from multi_form_view import MultiFormView
 from social_django.models import UserSocialAuth
 
-from .forms import FileDocForm, TextDocForm, EventForm
-from .models import FileDoc, Event, TextDoc
+from .forms import (
+    FileDocForm,
+    TextDocForm,
+    EventForm,
+)
+from .models import (
+    FileDoc,
+    Event,
+    TextDoc,
+)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -171,15 +179,10 @@ def filter_no_managed_event(api_events, model_events):
     return events
 
 
-def substract_days(init_date, days_to_substract):
-    return init_date - timedelta(days=days_to_substract)
-
-
 def select_event(request, eb_event_id):
-    DEFAULT_DAYS_TO_SUBSTRACT = 2
     eb_event = get_one_event_api(get_auth_token(request.user), eb_event_id)
     view_event = parse_events(eb_event)
-    default_end_submission = substract_days(view_event[0]['start'], DEFAULT_DAYS_TO_SUBSTRACT)
+    default_end_submission = view_event[0]['start']
     new_event = add_event(eb_event_id, default_end_submission)
     return HttpResponseRedirect(reverse('docs', kwargs={'event_id': new_event.id}))
 
