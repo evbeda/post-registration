@@ -170,6 +170,10 @@ class ViewTest(TestBase):
         response = self.client.get('/doc_form/{}/'.format(new_event.id))
         self.assertEqual(response.status_code, 200)
 
+    def test_events_redirect2(self):
+        response = self.client.get('/events/')
+        self.assertEqual(response.status_code, 200)
+
     def test_homepage_redirect(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)

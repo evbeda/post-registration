@@ -14,6 +14,7 @@ import os
 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
+
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 
@@ -46,6 +47,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -66,6 +68,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'post_registration.middleware.SocialAuthExceptionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'post_registration.urls'
@@ -163,6 +166,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DB_FROM_ENV = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(DB_FROM_ENV)
 LOGIN_REDIRECT_URL = '/'
