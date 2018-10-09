@@ -1,11 +1,12 @@
-from unittest.mock import patch
 from datetime import datetime
+from unittest.mock import patch
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve
 from django.test import TestCase
+from django.utils.datetime_safe import datetime
 from social_django.models import UserSocialAuth
 
 from documentsManager.apps import DocumentsmanagerConfig
@@ -14,8 +15,7 @@ from documentsManager.views import (
     get_auth_token,
     filter_managed_event,
     filter_no_managed_event,
-    substract_days
-)
+    substract_days)
 from post_registration.settings import get_env_variable
 
 MOCK_EVENTS_API = {
@@ -162,6 +162,10 @@ class ViewTest(TestBase):
         response = self.client.get('/doc_form/{}/'.format(new_event.id))
         self.assertEqual(response.status_code, 200)
 
+    def test_events_redirect(self):
+        response = self.client.get('/events/')
+        self.assertEqual(response.status_code, 200)
+
     def test_homepage_redirect(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
@@ -191,6 +195,22 @@ class ViewTest(TestBase):
         event = Event.objects.get(eb_event_id=50285339)
         expect = '/docs/{}/'.format(event.id)
         self.assertEqual(response.url, expect)
+
+    # def test_modify_event_dates(self):
+    #     EVB_ID = 1
+    #     new_event = add_event(EVB_ID, '2017-02-03')
+    #     r = {
+    #         'POST': {
+    #             'init_submission': '2018-02-01',
+    #             'end_submission': '2018-02-03',
+    #         }
+    #     }
+    #     result_redirect = update_dates(request, new_event.id)
+    #     response = self.client.post('events/{}/dates/'.format(new_event.id))
+    #     result = Event.objects.get(id=new_event.id)
+    #     expected = datetime.strptime('2018-02-01', '%Y-%m-%d').date()
+    #     self.assertEqual(result.init_submission, expected)
+    #     self.assertEqual(result_redirect.url, '/docs/1/')
 
 
 class DocumentsmanagerConfigTest(TestCase):

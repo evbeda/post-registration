@@ -1,7 +1,7 @@
 from django.forms import ModelForm, ModelMultipleChoiceField, CheckboxSelectMultiple, TextInput
 from django.utils.translation import gettext_lazy as _
 
-from .models import FileDoc, FileType, TextDoc
+from .models import FileDoc, FileType, TextDoc, Event
 
 
 class FileDocForm(ModelForm):
@@ -46,4 +46,21 @@ class TextDocForm(ModelForm):
             'measure': _('Measure'),
             'min': _('Minimum'),
             'max': _('Maximum'),
+        }
+
+
+class EventForm(ModelForm):
+    class Meta:
+        model = Event
+        fields = [
+            'init_submission',
+            'end_submission',
+        ]
+        labels = {
+            'init_submission': _('Init date of Submissions'),
+            'end_submission': _('End date of Submissions'),
+        }
+        widgets = {
+            'init_submission': TextInput(attrs={'type': 'date', 'class': 'form-control mx-2'}),
+            'end_submission': TextInput(attrs={'type': 'date', 'class': 'form-control mx-2'}),
         }
