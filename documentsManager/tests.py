@@ -1,4 +1,5 @@
 from unittest.mock import patch
+from datetime import datetime
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
@@ -13,7 +14,7 @@ from documentsManager.views import (
     get_auth_token,
     filter_managed_event,
     filter_no_managed_event,
-    EventsView,
+    substract_days
 )
 from post_registration.settings import get_env_variable
 
@@ -143,11 +144,9 @@ class ViewTest(TestBase):
         response = self.client.get('/accounts/login/')
         self.assertEqual(response.status_code, 200)
 
-    @patch(
-        'documentsManager.views.Eventbrite.get',
-        return_value=MOCK_EVENTS_API,
-    )
+    @patch('documentsManager.views.Eventbrite.get')
     def test_docs_redirect(self, mock_eventbrite_get):
+        mock_eventbrite_get.return_value = MOCK_EVENTS_API
         new_event = Event.objects.create(eb_event_id=1)
         response = self.client.get('/docs/{}/'.format(new_event.id))
         self.assertEqual(response.status_code, 200)
@@ -156,11 +155,9 @@ class ViewTest(TestBase):
         response = self.client.get('/events/')
         self.assertEqual(response.status_code, 200)
 
-    @patch(
-        'documentsManager.views.Eventbrite.get',
-        return_value=MOCK_EVENTS_API,
-    )
+    @patch('documentsManager.views.Eventbrite.get')
     def test_doc_form_redirect(self, mock_api_evb):
+        mock_api_evb.return_value = MOCK_EVENTS_API
         new_event = Event.objects.create(eb_event_id=1)
         response = self.client.get('/doc_form/{}/'.format(new_event.id))
         self.assertEqual(response.status_code, 200)
@@ -181,10 +178,19 @@ class ViewTest(TestBase):
         result = filter_no_managed_event(api_events, model_events)
         self.assertEqual(len(result), 1)
 
-    def test_add_event(self):
-        view = EventsView()
-        result = view.add_event('1')
-        self.assertTrue(isinstance(result, Event))
+    def test_subtract_date(self):
+        date = datetime.strptime('2018-11-03T23:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+        result = substract_days(date, 5)
+        expect = datetime.strptime('2018-10-29T23:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+        self.assertEqual(result, expect)
+
+    @patch('documentsManager.views.Eventbrite.get')
+    def test_create_and_save_event(self, mock_api_evb):
+        mock_api_evb.return_value = MOCK_EVENTS_API
+        response = self.client.get('/events/50285339/')
+        event = Event.objects.get(eb_event_id=50285339)
+        expect = '/docs/{}/'.format(event.id)
+        self.assertEqual(response.url, expect)
 
 
 class DocumentsmanagerConfigTest(TestCase):
