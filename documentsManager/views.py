@@ -46,6 +46,10 @@ class DocFormView(MultiFormView, LoginRequiredMixin):
         'text_doc': TextDocForm,
     }
 
+    def get_initial(self):
+        self.file_form = False
+        return super(DocFormView, self).get_initial()
+
     def get_context_data(self, **kwargs):
         context = super(DocFormView, self).get_context_data(**kwargs)
         context['user'] = self.request.user
@@ -57,12 +61,15 @@ class DocFormView(MultiFormView, LoginRequiredMixin):
         event = view_event[0]
         event['id'] = event_id
         context['event'] = event
+        context['file_form'] = self.file_form
         return context
 
     def post(self, request, *args, **kwargs):
         if request.POST.get('submit_file'):
+            self.file_form = True
             form = FileDocForm(request.POST)
         elif request.POST.get('submit_text'):
+            self.file_form = False
             form = TextDocForm(request.POST)
         if form.is_valid():
             return self.form_valid(form)

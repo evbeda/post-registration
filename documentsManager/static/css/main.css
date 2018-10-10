@@ -1,6 +1,6 @@
 body {
     font-family: 'Roboto', sans-serif;
-    color: color: #39364f;
+    color: #39364f;
 }
 
 .content {
@@ -20,7 +20,6 @@ body {
 }
 
 .btn-primary {
-    /* background-color: #F05537; */
     color: white;
 }
 

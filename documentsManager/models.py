@@ -1,5 +1,5 @@
 import datetime
-
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
@@ -26,7 +26,9 @@ class FileType(models.Model):
 class FileDoc(models.Model):
     name = models.CharField(max_length=100, blank=False)
     file_type = models.ManyToManyField(FileType)
-    quantity = models.CharField(max_length=3, blank=False)
+    quantity = models.PositiveSmallIntegerField(default=1, validators=[
+        MaxValueValidator(99)
+    ])
     is_optional = models.BooleanField(default=False)
     event = models.ForeignKey(Event, blank=True)
 
@@ -49,9 +51,10 @@ class TextDoc(models.Model):
         max_length=5,
         choices=MEASUREMENT_CHOICE,
         default='Words',
+        # validators=[is_greater()]
     )
-    max = models.IntegerField(default=500)
-    min = models.IntegerField(default=0)
+    max = models.PositiveSmallIntegerField(default=500)
+    min = models.PositiveSmallIntegerField(default=10)
     event = models.ForeignKey(Event, blank=True)
 
     class Meta(object):
