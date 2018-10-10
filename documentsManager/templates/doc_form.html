@@ -6,16 +6,16 @@
 
             <h5>Type of Submission:</h5>
             <div class="form-group form-check">
-                <input type="radio" name="doc_switcher" value="file" id="fileRadio" 
-                    class="form-check-input" 
-                    {% if file_form %} checked {% endif %}>
+                <input type="radio" name="doc_switcher" value="file" id="fileRadio"
+                       class="form-check-input"
+                       {% if file_form %} checked {% endif %}>
                 <label class="form-check-label" for="fileRadio">
                     File Submission
                 </label>
             </div>
             <div class="form-group form-check">
-                <input type="radio" name="doc_switcher" value="text" id="textRadio" class="form-check-input" 
-                {% if not file_form %} checked {% endif %}>
+                <input type="radio" name="doc_switcher" value="text" id="textRadio" class="form-check-input"
+                       {% if not file_form %} checked {% endif %}>
                 <label class="form-check-label" for="textRadio">
                     Form/Text Submission
                 </label>
@@ -24,14 +24,16 @@
                 {% csrf_token %}
                 <div class="doc_req_file">
                     {{ forms.file_doc.as_p }}
-                    <input type='submit' name='submit_file' class="btn btn-primary" />
+                    <input type='submit' name='submit_file' class="btn btn-success"/>
+                    <a href="{% url 'docs' event.id %}" class="btn btn-primary">Cancel</a>
                 </div>
             </form>
             <form action="" method='post'>
                 {% csrf_token %}
                 <div class="doc_req_text">
                     {{ forms.text_doc.as_p }}
-                    <input type='submit' name='submit_text' class="btn btn-primary" />
+                    <input type='submit' name='submit_text' class="btn btn-success"/>
+                    <a href="{% url 'docs' event.id %}" class="btn btn-primary">Cancel</a>
                 </div>
             </form>
         </div>
