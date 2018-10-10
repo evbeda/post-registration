@@ -1,6 +1,12 @@
 <div class="jumbotron jumbotron-fluid">
-        <div class="container">
-            <h1 class="display-4">{{ event.name }}</h1>
-            <p class="lead">Date Start Event {{ event.start }}</p>
-        </div>
+    <div class="container">
+        <h1 class="display-4">{{ event.name }}</h1>
+        <p class="lead">Date Start Event {{ event.start }}</p>
+        <hr>
+        {% if not pr_event_id %}
+        <a href="{% url 'home' %}" class="text-light"> << Back to Managed Events</a>
+        {% else %}
+        <a href="{% url 'docs' pr_event_id %}" class="text-light"> << Back to Event Submissions</a>
+        {% endif %}
     </div>
+</div>

@@ -55,6 +55,7 @@ class DocFormView(MultiFormView, LoginRequiredMixin):
         context['user'] = self.request.user
         event_id = self.kwargs['event_id']
         event = Event.objects.get(id=event_id)
+        context['pr_event_id'] = event.id
         eb_event = get_one_event_api(get_auth_token(
             self.request.user), event.eb_event_id)
         view_event = parse_events(eb_event)
