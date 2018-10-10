@@ -261,7 +261,7 @@ class ModelsTest(TestCase):
         self.assertEqual(text_doc.id, 3)
         self.assertEqual(text_doc.measure, 'Words')
         self.assertEqual(text_doc.max, 500)
-        self.assertEqual(text_doc.min, 0)
+        self.assertEqual(text_doc.min, 10)
         self.assertEqual(text_doc.is_optional, False)
 
     def test_model_file_type(self):
@@ -297,14 +297,14 @@ class ModelsTest(TestCase):
         result = isinstance(text_doc.min, int)
         self.assertTrue(result)
 
-    def test_model_file_quantity_false(self):
+    def test_model_file_quantity_only_recieve_ints(self):
         new_event = Event.objects.create(eb_event_id=1)
         file_doc = FileDoc.objects.create(event=new_event)
         file_doc.quantity = 'asd'
-        result = isinstance(file_doc.quantity, int)
-        self.assertFalse(result)
+        with self.assertRaises(ValueError):
+            file_doc.save()
 
-    def test_model_file_quantity_true(self):
+    def test_model_file_quantity_is_int(self):
         new_event = Event.objects.create(eb_event_id=1)
         file_doc = FileDoc.objects.create(event=new_event)
         file_doc.quantity = 123
@@ -318,7 +318,8 @@ class ModelsTest(TestCase):
                 event=new_event,
                 name='asd' * 50,
             )
-        self.assertEqual(data_error.exception.args, ('value too long for type character varying(100)\n',))
+        self.assertEqual(data_error.exception.args,
+                         ('value too long for type character varying(100)\n',))
 
     def test_model_file_name_submission_valid(self):
         new_event = Event.objects.create(eb_event_id=1)
@@ -333,7 +334,8 @@ class ModelsTest(TestCase):
                 event=new_event,
                 name='asd' * 50,
             )
-        self.assertEqual(data_error.exception.args, ('value too long for type character varying(100)\n',))
+        self.assertEqual(data_error.exception.args,
+                         ('value too long for type character varying(100)\n',))
 
     def test_model_text_doc_name_submission_valid(self):
         new_event = Event.objects.create(eb_event_id=1)

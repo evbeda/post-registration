@@ -1,10 +1,19 @@
-from django.forms import ModelForm, ModelMultipleChoiceField, CheckboxSelectMultiple, TextInput
+from django.forms import (
+    CheckboxSelectMultiple,
+    ModelForm,
+    ModelMultipleChoiceField,
+    TextInput,
+    ValidationError
+)
 from django.utils.translation import gettext_lazy as _
 
 from .models import FileDoc, FileType, TextDoc, Event
 
 
 class FileDocForm(ModelForm):
+    # error_css_class = 'error'
+    # required_css_class = 'required'
+
     file_type = ModelMultipleChoiceField(
         queryset=FileType.objects.all(),
         required=False,
@@ -31,6 +40,18 @@ class FileDocForm(ModelForm):
 
 
 class TextDocForm(ModelForm):
+    # error_css_class = 'error'
+    # required_css_class = 'required'
+
+    def is_valid(self):
+        valid = super(TextDocForm, self).is_valid()
+        if not valid:
+            return valid
+        if (self.cleaned_data['min'] >= self.cleaned_data['max']):
+            self.add_error('max', 'Max cannot be less than min.')
+            return False
+        return True
+
     class Meta:
         model = TextDoc
         fields = [

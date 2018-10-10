@@ -1,78 +1,49 @@
-{% extends "base.html" %} {% block content %}
-{%include "partials/jumbotron.html" %}
+{% extends "base.html" %} {% block content %} {% include "partials/jumbotron.html" %}
+<div class="container">
 
-<div class="row justify-content-center">
-    <h3>Type of Submission:</h3>
-</div>
-<div class="row justify-content-center m-3">
-    <ul>
-        <li>
-            <label for="id_switcher">Submission by file</label>
-            <input type="radio" name="doc_switcher" value="file" id="id_switcher">
-        </li>
-        <li>
-            <label for="id_switcher2"> Submission by form / text</label>
-            <input type="radio" name="doc_switcher" value="plain_text" id="id_switcher2">
-        </li>
-    </ul>
-</div>
-<div class="row justify-content-center m-3">
-    <form action="" method='post'>
-        {% csrf_token %}
-        <div class="doc_req_file">
-            {{ forms.file_doc.as_p }}
-            <input type='submit' name='submit_file' class="btn btn-primary"/>
+    <div class="row justify-content-center">
+        <div class="col-8 col-md-6">
+
+            <h5>Type of Submission:</h5>
+            <div class="form-group form-check">
+                <input type="radio" name="doc_switcher" value="file" id="fileRadio" 
+                    class="form-check-input" 
+                    {% if file_form %} checked {% endif %}>
+                <label class="form-check-label" for="fileRadio">
+                    File Submission
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <input type="radio" name="doc_switcher" value="text" id="textRadio" class="form-check-input" 
+                {% if not file_form %} checked {% endif %}>
+                <label class="form-check-label" for="textRadio">
+                    Form/Text Submission
+                </label>
+            </div>
+            <form action="" method='post'>
+                {% csrf_token %}
+                <div class="doc_req_file">
+                    {{ forms.file_doc.as_p }}
+                    <input type='submit' name='submit_file' class="btn btn-primary" />
+                </div>
+            </form>
+            <form action="" method='post'>
+                {% csrf_token %}
+                <div class="doc_req_text">
+                    {{ forms.text_doc.as_p }}
+                    <input type='submit' name='submit_text' class="btn btn-primary" />
+                </div>
+            </form>
         </div>
-    </form>
-</div>
-<div class="row justify-content-center m-3">
-    <form action="" method='post'>
-        {% csrf_token %}
-        <div class="doc_req_text">
-            {{ forms.text_doc.as_p }}
-            <input type='submit' name='submit_text' class="btn btn-primary"/>
-        </div>
-    </form>
-</div>
-<div class="row justify-content-center">
-    <h3>Type of Submission:</h3>
-</div>
-<div class="row justify-content-center m-3">
-    <ul>
-        <li>
-            <label for="id_switcher">Submission by file</label>
-            <input type="radio" name="doc_switcher" value="file" id="id_switcher">
-        </li>
-        <li>
-            <label for="id_switcher2"> Submission by form / text</label>
-            <input type="radio" name="doc_switcher" value="plain_text" id="id_switcher2">
-        </li>
-    </ul>
-</div>
-<div class="row justify-content-center m-3">
-    <form action="" method='post'>
-        {% csrf_token %}
-        <div class="doc_req_file">
-            {{ forms.file_doc.as_p }}
-            <input type='submit' name='submit_file' class="btn btn-primary"/>
-        </div>
-    </form>
-</div>
-<div class="row justify-content-center m-3">
-    <form action="" method='post'>
-        {% csrf_token %}
-        <div class="doc_req_text">
-            {{ forms.text_doc.as_p }}
-            <input type='submit' name='submit_text' class="btn btn-primary"/>
-        </div>
-    </form>
+
+    </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
     const divFiles = $(".doc_req_file");
     const divText = $(".doc_req_text");
     const toggleForms = function (event) {
-        if (event.target.value == 'plain_text') {
+        if (event.target.value == 'text') {
             divFiles.fadeOut('fast', () => divText.fadeIn());
         }
         else {
@@ -81,9 +52,8 @@
     }
     const switcher = function () {
         divFiles.hide();
-        divText.hide();
+        // divText.hide();
         $(":radio").on('change', toggleForms);
     }
     $(document).ready(switcher);
-</script>
-{% endblock content %}
+</script> {% endblock content %}
