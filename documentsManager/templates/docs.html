@@ -4,7 +4,7 @@
     <div class="row pt-2 pb-2">
         <div class="col-md-9">
             <div class='row mb-3'>
-                <div class='col-5'><h3>Star Submissions</h3></div>
+                <div class='col-5'><h3>Start Submissions</h3></div>
                 <div class='col-5'><h3>End Submissions</h3></div>
                 <div class='col-2'></div>
             </div>
@@ -14,13 +14,40 @@
                 <div class='col-2'><button class="btn btn-primary" id='allow_edit'>Edit</button></div>
             </div>
             <div class='row mb-3' id='confirm_edit_div'>
-                <form action="" method="post" class="form-inline w-100">
+                <input type="hidden" value="{{ event.eb_event_start }}" id="eb_event_start">
+                <form action="" method="post" class="form-inline w-100" id="dates_form">
                     {% csrf_token %}
                     {% for field in form %}
                         <div class="col-5">{{ field }}</div>
                     {% endfor %}
-                    <div class="col-2"><input class='btn btn-info' type="submit" value="Save" id='confirm_edit'/></div>
+                    <div class="col-1">
+                        <input class='btn btn-info' type="submit" value="Save" id='confirm_edit'/>
+                    </div>
+                    <div class="col-1">
+                        <button id="cancel_update" class="btn btn-primary">Cancel</button>
+                    </div>
                 </form>
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+                     aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Dates Warning</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" id="modal-body-warning">
+                                The start date is greater than the start date of the event.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger" id="save_warning_dates">Save changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -141,22 +168,7 @@
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script type="text/javascript">
-    const allow_edit = $("#allow_edit");
-    const confirm_edit = $("#confirm_edit");
-    const allow_edit_div = $("#allow_edit_div");
-    const confirm_edit_div = $("#confirm_edit_div");
-    function toggleForms (event) {
-        allow_edit_div.fadeOut('fast', () => confirm_edit_div.fadeIn());
-    }
-    function toggleForms2 (event) {
-        confirm_edit_div.fadeOut('fast', () => allow_edit_div.fadeIn());
-    }
-    function switcher () {
-        confirm_edit_div.hide();
-        allow_edit.on('click', toggleForms);
-        confirm_edit.on('submit', toggleForms2);
-    }
-    $(document).ready(switcher);
-</script> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+{% load static %}
+<script type="text/javascript" src="{% static 'js/docs.js' %}"></script>
 {% endblock content %}
