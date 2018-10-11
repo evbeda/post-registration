@@ -149,16 +149,26 @@ class HomeView(TemplateView, LoginRequiredMixin):
 class FileDocUpdate(UpdateView):
     model = FileDoc
     form_class = FileDocForm
-    template_name = 'partials/filedoc_update_form.html'
-    pk_url_kwarg = 'id'
+    template_name = 'partials/doc_update_form.html'
     success_url = '/'
 
 
 class TextDocUpdate(UpdateView):
     model = TextDoc
     form_class = TextDocForm
-    template_name = 'partials/textdoc_update_form.html'
-    pk_url_kwarg = 'id'
+    template_name = 'partials/doc_update_form.html'
+
+
+class FileDocDelete(DeleteView):
+    model = FileDoc
+    template_name = 'partials/doc_confirm_delete.html'
+    success_url = '/'
+
+
+class TextDocDelete(DeleteView):
+    model = TextDoc
+    success_url = '/'
+    template_name = 'partials/doc_confirm_delete.html'
 
 
 def parse_events(api_events):

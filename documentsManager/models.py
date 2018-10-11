@@ -36,6 +36,9 @@ class FileDoc(models.Model):
     def file_types(self):
         return self.file_type.all()
 
+    def __str__(self):
+        return self.name
+
     class Meta(object):
         db_table = 'FileDoc'
 
@@ -51,11 +54,13 @@ class TextDoc(models.Model):
         max_length=5,
         choices=MEASUREMENT_CHOICE,
         default='Words',
-        # validators=[is_greater()]
     )
     max = models.PositiveSmallIntegerField(default=500)
     min = models.PositiveSmallIntegerField(default=10)
     event = models.ForeignKey(Event, blank=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta(object):
         db_table = 'TextDoc'
