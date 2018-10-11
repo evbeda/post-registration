@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import FormView
 from django.views.generic.base import TemplateView
+from django.views.generic.edit import UpdateView, DeleteView
 from eventbrite import Eventbrite
 from multi_form_view import MultiFormView
 from social_django.models import UserSocialAuth
@@ -47,7 +48,7 @@ class DocFormView(MultiFormView, LoginRequiredMixin):
     }
 
     def get_initial(self):
-        self.file_form = False
+        self.file_form = True
         return super(DocFormView, self).get_initial()
 
     def get_context_data(self, **kwargs):
@@ -142,6 +143,19 @@ class HomeView(TemplateView, LoginRequiredMixin):
         events = filter_managed_event(parse_api_events, docs_events_list)
         context['events'] = events
         return context
+
+
+class FileDocUpdate(UpdateView):
+    model = FileDoc
+    form_class = FileDocForm
+    template_name = 'partials/filedoc_update_form.html'
+    pk_url_kwarg = 'id'
+    success_url = '/'
+
+
+class FileDocDelete(DeleteView):
+    model = FileDoc
+    success_url = 'events'
 
 
 def parse_events(api_events):

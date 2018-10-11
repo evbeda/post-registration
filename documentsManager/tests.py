@@ -269,7 +269,7 @@ class ModelsTest(TestCase):
     def test_model_file_type(self):
         new_event = FileType.objects.create(name='PDF')
         result = str(new_event)
-        self.assertEqual(result, 'PDF')
+        self.assertEqual(result, 'PDF ()')
 
     def test_model_text_error_max_word(self):
         new_event = Event.objects.create(eb_event_id=1)
