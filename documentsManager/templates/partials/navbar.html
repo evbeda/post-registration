@@ -1,7 +1,6 @@
 {% load static %}
 <nav class="navbar navbar-expand-lg navbar-light">
     <a class="navbar-brand" href="/">
-        <img src="{% static 'images/Eventbrite_wordmark_orange.jpg' %}" alt="Eventbrite Logo" class="navbar__brand">
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
         aria-expanded="false" aria-label="Toggle navigation">
@@ -13,11 +12,9 @@
             <li class="nav-item active">
                 <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
             </li>
-            {% comment %} {% if event %} {% endcomment %}
             <li class="nav-item">
                 <a class="nav-link" href="/dashboard/{{event.id}}">Dashboard</a>
             </li>
-            {% comment %} {% endif %} {% endcomment %}
             <li class="nav-item">
                 <a class="nav-link" href="/docs_form">Manage</a>
             </li>
@@ -25,11 +22,6 @@
                 <a class="nav-link" href="/events">Add Events</a>
             </li>
         </ul>
-        {% comment %}
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form> {% endcomment %}
     </div>
     <ul class="nav navbar-nav navbar-right ml-auto">
         <li class="nav-item open">

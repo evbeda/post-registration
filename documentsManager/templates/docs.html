@@ -54,11 +54,11 @@
                         <h5>{{ doc.name }}</h5>
                     </td>
                     <td>
-                        {% for file_type in doc.file_types %}
                         <ul>
+                        {% for file_type in doc.file_types %}
                             <li>{{ file_type }}</li>
+                            {% endfor %}
                         </ul>
-                        {% endfor %}
                     </td>
                     <td>
                         <h5>{{ doc.quantity}}</h5>
@@ -71,7 +71,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="/doc_form/?id={{ event.id }}" class="btn btn-info disabled" disable>
+                        <a href="{% url 'edit-filedoc' id=doc.id %}" class="btn btn-info">
                             Edit
                         </a>
                         <a href="/doc_form/?id={{ event.id }}" class="btn btn-danger disabled" disable>

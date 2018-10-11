@@ -20,7 +20,7 @@ class FileType(models.Model):
         db_table = 'FileType'
 
     def __str__(self):
-        return self.name
+        return self.name + ' (' + self.description + ')'
 
 
 class FileDoc(models.Model):
