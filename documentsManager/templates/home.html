@@ -14,7 +14,12 @@
 		{% for event in events %}
 		<div class="col-4">
 			<div class="card card--transparent" style="width: 18rem;">
+                {% if event.logo %}
 				<img class="card-img-top" src="{{ event.logo }}" alt="Card image cap">
+                {% else %}
+                {% load static %}
+                <img class="card-img-top" src="{% static 'images/evb_logo.png' %}" alt="Card image cap">
+                {% endif %}
 				<div class="card-body">
 					<h5 class="card-title">{{ event.name }}</h5>
 					<i>
