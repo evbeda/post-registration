@@ -1,9 +1,9 @@
+from datetime import datetime
 from django.forms import (
     CheckboxSelectMultiple,
     ModelForm,
     ModelMultipleChoiceField,
     TextInput,
-    ValidationError
 )
 from django.utils.translation import gettext_lazy as _
 
@@ -47,7 +47,7 @@ class TextDocForm(ModelForm):
         valid = super(TextDocForm, self).is_valid()
         if not valid:
             return valid
-        if (self.cleaned_data['min'] >= self.cleaned_data['max']):
+        if self.cleaned_data['min'] >= self.cleaned_data['max']:
             self.add_error('max', 'Max cannot be less than min.')
             return False
         return True
@@ -71,17 +71,29 @@ class TextDocForm(ModelForm):
 
 
 class EventForm(ModelForm):
+    def is_valid(self):
+        valid = super(EventForm, self).is_valid()
+        if not valid:
+            return valid
+        if self.cleaned_data['init_submission'] >= self.cleaned_data['end_submission']:
+            self.add_error('end_submission', 'End date cannot be less than Init date of Submissions .')
+            return False
+        return True
+
     class Meta:
         model = Event
         fields = [
             'init_submission',
             'end_submission',
         ]
-        labels = {
-            'init_submission': _('Init date of Submissions'),
-            'end_submission': _('End date of Submissions'),
-        }
         widgets = {
-            'init_submission': TextInput(attrs={'type': 'date', 'class': 'form-control mx-2'}),
-            'end_submission': TextInput(attrs={'type': 'date', 'class': 'form-control mx-2'}),
+            'init_submission': TextInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+                'min': datetime.now().strftime('%Y-%m-%d'),
+            }),
+            'end_submission': TextInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+            }),
         }

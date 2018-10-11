@@ -198,13 +198,15 @@ class ViewTest(TestBase):
 
     def test_modify_event_dates(self):
         EVB_ID = 1234
-        new_event = add_event(EVB_ID, '2017-02-03')
+        new_event = add_event(EVB_ID, '2018-03-03')
+        new_event.init_submission = datetime.strptime('2018-01-01', '%Y-%m-%d').date()
+        new_event.save()
         r = {
             'init_submission': '2018-02-01',
-            'end_submission': '2018-02-03',
+            'end_submission': '2018-02-25',
         }
         response = self.client.post(
-            '/events/{}/dates/'.format(new_event.id),
+            '/docs/{}/'.format(new_event.id),
             r,
         )
         result = Event.objects.get(id=new_event.id)
