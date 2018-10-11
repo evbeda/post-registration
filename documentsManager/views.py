@@ -102,6 +102,7 @@ class DocsView(FormView, LoginRequiredMixin):
         context['user'] = self.request.user
         event_id = self.kwargs['event_id']
         event = Event.objects.get(id=event_id)
+        context['event_model'] = event
         context['form'] = EventForm(initial={
             'init_submission': event.init_submission,
             'end_submission': event.end_submission,
@@ -115,6 +116,17 @@ class DocsView(FormView, LoginRequiredMixin):
         context['docs_file'] = FileDoc.objects.filter(event__id=event_id)
         context['docs_text'] = TextDoc.objects.filter(event__id=event_id)
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = EventForm(request.POST)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        update_dates(self.request, self.kwargs['event_id'])
+        return HttpResponseRedirect(reverse('docs', kwargs={'event_id': self.kwargs['event_id']}))
 
 
 @method_decorator(login_required, name='dispatch')

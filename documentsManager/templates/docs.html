@@ -1,18 +1,33 @@
 {% extends "base.html" %} {% block content %}
 {%include "partials/jumbotron.html" %}
-
 <div class="container">
-
-    <div class="row">
-        <div class="col">
-            <form action="{% url 'update_dates' event.id %}" method="post" class="form-inline">
-                {% csrf_token %}
-                {{ form }}
-                <input class='btn btn-info' type="submit" value="Submit"/>
-            </form>
+    <div class="row pt-2 pb-2">
+        <div class="col-md-9">
+            <div class='row mb-3'>
+                <div class='col-5'><h3>Star Submissions</h3></div>
+                <div class='col-5'><h3>End Submissions</h3></div>
+                <div class='col-2'></div>
+            </div>
+            <div class='row mb-3' id='allow_edit_div'>
+                <div class='col-5'><h5>{{ event_model.init_submission }}</h5></div>
+                <div class='col-5'><h5>{{ event_model.end_submission }}</h5></div>
+                <div class='col-2'><button class="btn btn-primary" id='allow_edit'>Edit</button></div>
+            </div>
+            <div class='row mb-3' id='confirm_edit_div'>
+                <form action="" method="post" class="form-inline w-100">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="col-5">{{ field }}</div>
+                    {% endfor %}
+                    <div class="col-2"><input class='btn btn-info' type="submit" value="Save" id='confirm_edit'/></div>
+                </form>
+            </div>
         </div>
-        <div class="text-right">
-            <a class="btn btn-primary" href="{% url 'doc_form' event.id %}" role="button"> Add</a>
+    </div>
+    <hr/>
+    <div class='row justify-content-end pt-3'>
+        <div>
+            <a class="btn btn-primary" href="{% url 'doc_form' event.id %}" role="button"> New Submission</a>
         </div>
     </div>
     <div class="row">
@@ -125,4 +140,23 @@
         </div>
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+    const allow_edit = $("#allow_edit");
+    const confirm_edit = $("#confirm_edit");
+    const allow_edit_div = $("#allow_edit_div");
+    const confirm_edit_div = $("#confirm_edit_div");
+    function toggleForms (event) {
+        allow_edit_div.fadeOut('fast', () => confirm_edit_div.fadeIn());
+    }
+    function toggleForms2 (event) {
+        confirm_edit_div.fadeOut('fast', () => allow_edit_div.fadeIn());
+    }
+    function switcher () {
+        confirm_edit_div.hide();
+        allow_edit.on('click', toggleForms);
+        confirm_edit.on('submit', toggleForms2);
+    }
+    $(document).ready(switcher);
+</script> 
 {% endblock content %}
