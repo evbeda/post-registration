@@ -112,6 +112,7 @@ class DocsView(FormView, LoginRequiredMixin):
             self.request.user), event.eb_event_id)
         view_event = parse_events(eb_event)
         event = view_event[0]
+        event['eb_event_start'] = eb_event[0]['start']['utc']
         event['id'] = event_id
         context['event'] = event
         context['docs_file'] = FileDoc.objects.filter(event__id=event_id)
