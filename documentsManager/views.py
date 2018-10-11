@@ -153,9 +153,11 @@ class FileDocUpdate(UpdateView):
     success_url = '/'
 
 
-class FileDocDelete(DeleteView):
-    model = FileDoc
-    success_url = 'events'
+class TextDocUpdate(UpdateView):
+    model = TextDoc
+    form_class = TextDocForm
+    template_name = 'partials/textdoc_update_form.html'
+    pk_url_kwarg = 'id'
 
 
 def parse_events(api_events):

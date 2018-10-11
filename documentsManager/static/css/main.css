@@ -9,11 +9,10 @@ body {
 .footer {
   background-color: #1E0A3C;
   min-height: 150px; }
-
-.footer__copyright {
-  color: #6f7287;
-  padding-top: 16px;
-  padding-bottom: 16px; }
+  .footer__copyright {
+    color: #6f7287;
+    padding-top: 16px;
+    padding-bottom: 16px; }
 
 .btn-primary {
   color: white; }
@@ -23,26 +22,26 @@ body {
   border-bottom: 1px solid #eeedf2;
   display: flex;
   justify-content: space-between; }
-
-.navbar__brand {
-  width: 100px; }
+  .navbar__brand {
+    width: 100px; }
 
 .jumbotron {
   background-color: #1E0A3C;
   color: white; }
 
-.card {
+.card--transparent {
   border-color: transparent;
   padding: 24px; }
+  .card--transparent:hover {
+    box-shadow: 0 4px 15px 0 rgba(40, 44, 53, 0.06), 0 2px 2px 0 rgba(40, 44, 53, 0.08);
+    background-color: #fff;
+    border-radius: 4px;
+    z-index: 3; }
+  .card--transparent-text {
+    color: #6f7287; }
 
-.card:hover {
-  box-shadow: 0 4px 15px 0 rgba(40, 44, 53, 0.06), 0 2px 2px 0 rgba(40, 44, 53, 0.08);
-  background-color: #fff;
-  border-radius: 4px;
-  z-index: 3; }
-
-.card-text {
-  color: #6f7287; }
+.card ul {
+  list-style: none; }
 
 .form-wrapper {
   right: 0;
@@ -54,14 +53,13 @@ body {
   position: relative;
   margin: 0 auto;
   cursor: pointer; }
-
-.navbar__avatar-img {
-  width: 100%;
-  display: block;
-  border-radius: 50%;
-  position: absolute;
-  border: 4px solid white;
-  box-shadow: 1px 1px 3px #4B4D63; }
+  .navbar__avatar-img {
+    width: 100%;
+    display: block;
+    border-radius: 50%;
+    position: absolute;
+    border: 4px solid white;
+    box-shadow: 1px 1px 3px #4B4D63; }
 
 .doc-list__title {
   border-bottom: 1px; }

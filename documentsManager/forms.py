@@ -4,6 +4,8 @@ from django.forms import (
     ModelForm,
     ModelMultipleChoiceField,
     TextInput,
+    NumberInput,
+    Select,
 )
 from django.utils.translation import gettext_lazy as _
 
@@ -35,7 +37,8 @@ class FileDocForm(ModelForm):
             'quantity': _('Quantity'),
         }
         widgets = {
-            'quantity': TextInput(attrs={'min': '1', 'max': '100', 'type': 'number'}),
+            'quantity': TextInput(attrs={'min': '1', 'max': '100', 'type': 'number', 'class': 'form-control col-3'}),
+            'name': TextInput(attrs={'class': 'form-control col-10'}),
         }
 
 
@@ -68,6 +71,12 @@ class TextDocForm(ModelForm):
             'min': _('Minimum'),
             'max': _('Maximum'),
         }
+        widgets = {
+            'name': TextInput(attrs={'class': 'form-control col-10'}),
+            'measure': Select(attrs={'class': 'form-control col-4'}),
+            'min': NumberInput(attrs={'class': 'form-control col-2'}),
+            'max': NumberInput(attrs={'class': 'form-control col-2'}),
+        }
 
 
 class EventForm(ModelForm):
@@ -76,7 +85,8 @@ class EventForm(ModelForm):
         if not valid:
             return valid
         if self.cleaned_data['init_submission'] >= self.cleaned_data['end_submission']:
-            self.add_error('end_submission', 'End date cannot be less than Init date of Submissions .')
+            self.add_error(
+                'end_submission', 'End date cannot be less than Init date of Submissions .')
             return False
         return True
 
