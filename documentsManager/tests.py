@@ -10,6 +10,7 @@ from django.db.utils import DataError
 from social_django.models import UserSocialAuth
 
 from documentsManager.apps import DocumentsmanagerConfig
+from documentsManager.forms import EventForm
 from documentsManager.models import (
     Event,
     TextDoc,
@@ -344,3 +345,21 @@ class ModelsTest(TestCase):
         file_doc = FileDoc.objects.create(event=new_event)
         file_doc.name = ('Foto')
         self.assertEqual(file_doc.name, 'Foto')
+
+
+class FormsTest(TestCase):
+
+    def test_is_valid_EventForm(self):
+        form = EventForm()
+        result = form.is_valid()
+        self.assertFalse(result)
+
+    def test_is_not_valid_EventForm(self):
+        init = datetime.strptime('2018-02-27', '%Y-%m-%d').date()
+        end = datetime.strptime('2018-02-25', '%Y-%m-%d').date()
+        form2 = EventForm({
+            'init_submission': init,
+            'end_submission': end,
+        })
+        result = form2.is_valid()
+        self.assertFalse(result)
