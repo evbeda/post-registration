@@ -126,7 +126,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="/doc_form/?id={{ event.id }}" class="btn btn-info disabled">
+                        <a href="{% url 'edit-textdoc' id=doc.id %}" class="btn btn-info">
                             Edit
                         </a>
                         <a href="/doc_form/?id={{ event.id }}" class="btn btn-danger disabled">
