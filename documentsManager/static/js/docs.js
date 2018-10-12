@@ -30,7 +30,7 @@ const confirmForm = function (event) {
         if (date_end_is_before && date_init_is_before) {
             $textModal.text('The end and start date is greater than the start date of the event.');
         }
-        if (date_end_is_before) {
+        else if (date_end_is_before) {
             $textModal.text('The end date is greater than the start date of the event.');
         }
         $('#myModal').modal('show');
