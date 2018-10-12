@@ -146,29 +146,48 @@ class HomeView(TemplateView, LoginRequiredMixin):
         return context
 
 
-class FileDocUpdate(UpdateView):
+class BaseDocUpdate(UpdateView):
+    template_name = 'partials/doc_update_form.html'
+
+    def get_success_url(self):
+        return reverse(
+            'docs',
+            kwargs={
+                'event_id': self.kwargs['event_id'],
+            },
+        )
+
+
+class FileDocUpdate(BaseDocUpdate):
     model = FileDoc
     form_class = FileDocForm
-    template_name = 'partials/doc_update_form.html'
-    success_url = '/'
 
 
-class TextDocUpdate(UpdateView):
+class TextDocUpdate(BaseDocUpdate):
     model = TextDoc
     form_class = TextDocForm
-    template_name = 'partials/doc_update_form.html'
 
 
-class FileDocDelete(DeleteView):
-    model = FileDoc
+class BaseDocDelete(DeleteView):
     template_name = 'partials/doc_confirm_delete.html'
+
+    def get_success_url(self):
+        return reverse(
+            'docs',
+            kwargs={
+                'event_id': self.kwargs['event_id'],
+            },
+        )
+
+
+class FileDocDelete(BaseDocDelete):
+    model = FileDoc
     success_url = '/'
 
 
-class TextDocDelete(DeleteView):
+class TextDocDelete(BaseDocDelete):
     model = TextDoc
     success_url = '/'
-    template_name = 'partials/doc_confirm_delete.html'
 
 
 def parse_events(api_events):
