@@ -10,7 +10,10 @@ from django.db.utils import DataError
 from social_django.models import UserSocialAuth
 
 from documentsManager.apps import DocumentsmanagerConfig
-from documentsManager.forms import EventForm
+from documentsManager.forms import (
+    EventForm,
+    TextDocForm,
+)
 from documentsManager.models import (
     Event,
     TextDoc,
@@ -363,3 +366,28 @@ class FormsTest(TestCase):
         })
         result = form2.is_valid()
         self.assertFalse(result)
+
+    def test_text_doc_form_is_invalid(self):
+        form = TextDocForm({
+            'name': 'CV',
+            'is_optional': 'on',
+            'measure': 'Words',
+            'min': '400',
+            'max': '300',
+        })
+        self.assertFalse(form.is_valid())
+
+    def test_text_doc_form_is_empty(self):
+        form = TextDocForm()
+        result = form.is_valid()
+        self.assertFalse(result)
+
+    def test_text_doc_form_is_valid(self):
+        form = TextDocForm({
+            'name': 'CV',
+            'is_optional': 'on',
+            'measure': 'Words',
+            'min': '400',
+            'max': '500',
+        })
+        self.assertTrue(form.is_valid)
