@@ -11,6 +11,7 @@ omit =
     kazienenv/*
     */tests/*,
     */migrations/*,
+    */middleware.py,
     */urls.py,
     */settings/*,
     */wsgi.py,
