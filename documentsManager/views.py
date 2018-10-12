@@ -149,6 +149,12 @@ class HomeView(TemplateView, LoginRequiredMixin):
 class BaseDocUpdate(UpdateView):
     template_name = 'partials/doc_update_form.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(UpdateView, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        context['event_id'] = event_id
+        return context
+
     def get_success_url(self):
         return reverse(
             'docs',
@@ -170,6 +176,12 @@ class TextDocUpdate(BaseDocUpdate):
 
 class BaseDocDelete(DeleteView):
     template_name = 'partials/doc_confirm_delete.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(DeleteView, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        context['event_id'] = event_id
+        return context
 
     def get_success_url(self):
         return reverse(
