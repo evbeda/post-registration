@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% block content %} {%include "partials/jumbotron.html" %}
+{% extends "base.html" %} {% block content %} {%include "partials/jumbotron.html" %} {% load static %}
+
 <div class="container">
     <div class="row pt-2 pb-2">
         <div class="col-md-9">
@@ -67,6 +68,7 @@
     <hr/>
     <div class='row justify-content-end pt-3'>
         <div>
+            <a class="eds-btn eds-btn--button eds-btn--neutral" href="{% url 'landing' event.id %}" target=”_blank”>Preview</a>
             <a class="eds-btn eds-btn--button eds-btn--fill" href="{% url 'doc_form' event.id %}" role="button"> New Submission</a>
         </div>
     </div>
@@ -336,5 +338,5 @@
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script> {% load static %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
 <script type="text/javascript" src="{% static 'js/docs.js' %}"></script> {% endblock content %}
