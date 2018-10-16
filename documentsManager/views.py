@@ -117,6 +117,11 @@ class DocsView(FormView, LoginRequiredMixin):
         context['event'] = event
         context['docs_file'] = FileDoc.objects.filter(event__id=event_id)
         context['docs_text'] = TextDoc.objects.filter(event__id=event_id)
+        context['attendee_url'] = self.request.get_host() + reverse(
+            'landing',
+            kwargs={
+                'event_id': event_id
+            },)
         return context
 
     def post(self, request, *args, **kwargs):
