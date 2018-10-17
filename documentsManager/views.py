@@ -202,6 +202,10 @@ class TextDocDelete(BaseDocDelete):
     success_url = '/'
 
 
+class Landing(TemplateView):
+    template_name = 'landing_form.html'
+
+
 def parse_events(api_events):
     events = []
     for event in api_events:
