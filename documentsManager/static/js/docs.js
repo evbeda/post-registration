@@ -1,12 +1,16 @@
 const event_start = moment($('#eb_event_start').val(), 'YYYY-MM-DDTH:mm:ssZ');
 const $allowEdit = $('#allow_edit');
-const $confirmEdit = $('#confirm_edit');
 const $allowEditDiv = $('#allow_edit_div');
+const $confirmEdit = $('#confirm_edit');
+const $cancelEdit = $('#cancel_update');
 const $confirmEditDiv = $('#confirm_edit_div');
+const $confirmEditWarning = $('#confirm_edit_warning');
+const $cancelEditWarning = $('#cancel_update_warning');
+const $warningDiv = $('#warning_div')
+const $cancelEditError = $('#cancel_update_error');
+const $errorDiv = $('#error_div')
 const $inputEndSubmission = $('#id_end_submission');
 const $inputInitSubmission = $('#id_init_submission');
-const $cancelUpdate = $('#cancel_update');
-const $buttonSaveWarningDates = $('#save_warning_dates');
 const $textModal = $('#modal-body-warning');
 const $formulario = $('#dates_form');
 
@@ -15,44 +19,87 @@ const toggleFormsEdit = function () {
     $inputEndSubmission.attr('min', $inputInitSubmission.val());
 };
 
-const confirmForm = function (event) {
-    $buttonSaveWarningDates.show();
+const hideInputs = function (value) {
+    $inputEndSubmission.prop('disabled', value);
+    $inputInitSubmission.prop('disabled', value);
+}
+
+const hideEditButton = function () {
+    $confirmEdit.hide();
+    $cancelEdit.hide();
+}
+
+const hideWarningErrorButton = function () {
+    $confirmEditWarning.hide();
+    $cancelEditWarning.hide();
+    $cancelEditError.hide();
+}
+
+const confirmForm = function(event) {
     event.target.checkValidity();
     event.preventDefault();
     const date_init_is_before = event_start.isBefore($inputInitSubmission.val());
     const date_end_is_before = event_start.isBefore($inputEndSubmission.val());
     if (moment($inputEndSubmission.val()).isBefore($inputInitSubmission.val())) {
-        $buttonSaveWarningDates.hide();
-        $textModal.text('The end date is greater than the start date of the submissions.');
-        $('#myModal').modal('show');
+        $errorDiv.fadeIn();
+        hideEditButton();
+        $cancelEditError.show();
+        hideInputs(true);
+        $errorDiv.find('.alert').text('The end date is greater than the start date of the submissions.')
     }
-    if (date_init_is_before || date_end_is_before) {
+    else if (date_init_is_before || date_end_is_before) {
+            $warningDiv.fadeIn();
+            hideEditButton();
+            $confirmEditWarning.show();
+            $cancelEditWarning.show();
+            hideInputs(true);
         if (date_end_is_before && date_init_is_before) {
-            $textModal.text('The end and start date is greater than the start date of the event.');
+            $warningDiv.find('.alert').text('The end and start date is greater than the start date of the event.')
         }
         else if (date_end_is_before) {
-            $textModal.text('The end date is greater than the start date of the event.');
+            $warningDiv.find('.alert').text('The end date is greater than the start date of the event.')
         }
-        $('#myModal').modal('show');
     } else {
         $formulario.submit();
     }
 };
 
+const confirmFormWarning = function (event) {
+    event.target.checkValidity();
+    event.preventDefault();
+    hideInputs(false);
+    $formulario.submit();
+}
+
 const cancelEdition = function (event) {
     event.preventDefault();
     $confirmEditDiv.fadeOut('fast', () => $allowEditDiv.fadeIn());
+    $confirmEdit.fadeIn('fast');
+    $cancelEdit.fadeIn('fast');
+    hideInputs(false);
 };
 
-const saveWarningDates = function () {
-    $formulario.submit();
+const backToEdit = function (event) {
+    event.preventDefault();
+    $confirmEdit.fadeIn('fast');
+    $cancelEdit.fadeIn('fast');
+    $warningDiv.hide();
+    $errorDiv.hide();
+    hideWarningErrorButton();
+    hideInputs(false);
 };
+
 const switcher = function () {
     $confirmEditDiv.hide();
+    $warningDiv.hide();
+    $errorDiv.hide();
+    hideWarningErrorButton();
     $allowEdit.on('click', toggleFormsEdit);
     $confirmEdit.on('click', confirmForm);
-    $cancelUpdate.on('click', cancelEdition);
-    $buttonSaveWarningDates.on('click', saveWarningDates);
+    $cancelEdit.on('click', cancelEdition);
+    $confirmEditWarning.on('click', confirmFormWarning);
+    $cancelEditWarning.on('click', backToEdit);
+    $cancelEditError.on('click', backToEdit);
 };
 
 $(document).ready(switcher);
