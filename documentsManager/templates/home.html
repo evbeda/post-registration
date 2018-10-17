@@ -76,7 +76,13 @@
 									<div class="eds-media-card-content__sub-content">
 										<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1">{{ event.start }}</div>
 										<div class="eds-media-card-content__sub-content-cropped">
-											<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1">Life Adventist Church of Berkeley</div>
+											<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1">
+												{% if event.venue %}
+												{{ event.venue }}
+												{% else %}
+												No location specified
+												{% endif %}
+											</div>
 											<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1">Free • on Eventbrite</div>
 											<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1"></div>
 										</div>
