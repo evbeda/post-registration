@@ -1,19 +1,27 @@
 @import 'variables';
 
 
-body {
+html {
     font-family: 'Roboto', sans-serif;
     color: #39364f;
+    height: 100%;
+}
+
+body {
+    position: relative;
+    min-height: 100%;
 }
 
 .content {
-    min-height: 70vh;
-    padding-bottom: 50px;
+    padding-bottom: $footer-height;
 }
 
 .footer {
     background-color: #1E0A3C;
-    min-height: 150px;
+    height: $footer-height;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
     &__copyright {
         color: #6f7287;
         padding-top: 16px;
@@ -75,4 +83,22 @@ body {
 
 .doc-list__title {
     border-bottom: 1px;
+}
+
+.link-wrapper {
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+        color: inherit;
+        text-decoration: none;    
+    }
+}
+
+.rotate-90 {
+    transform: rotate(90deg);
+}
+
+button.success-btn {
+    background-color: $ui-green;
 }
