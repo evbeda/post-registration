@@ -31,19 +31,18 @@ const hideEditButton = function () {
 
 const hideWarningErrorButton = function () {
     $confirmEditWarning.hide();
-    $cancelEditWarning.hide();
-    $cancelEditError.hide();
+    $cancelEditWarning.closest('span').hide();
+    $cancelEditError.closest('span').hide();
 }
 
 const confirmForm = function(event) {
-    event.target.checkValidity();
     event.preventDefault();
     const date_init_is_before = event_start.isBefore($inputInitSubmission.val());
     const date_end_is_before = event_start.isBefore($inputEndSubmission.val());
     if (moment($inputEndSubmission.val()).isBefore($inputInitSubmission.val())) {
         $errorDiv.fadeIn();
         hideEditButton();
-        $cancelEditError.show();
+        $cancelEditError.closest('span').show();
         hideInputs(true);
         $errorDiv.find('.alert').text('The end date is greater than the start date of the submissions.')
     }
@@ -51,7 +50,7 @@ const confirmForm = function(event) {
             $warningDiv.fadeIn();
             hideEditButton();
             $confirmEditWarning.show();
-            $cancelEditWarning.show();
+            $cancelEditWarning.closest('span').show();
             hideInputs(true);
         if (date_end_is_before && date_init_is_before) {
             $warningDiv.find('.alert').text('The end and start date is greater than the start date of the event.')
@@ -65,7 +64,6 @@ const confirmForm = function(event) {
 };
 
 const confirmFormWarning = function (event) {
-    event.target.checkValidity();
     event.preventDefault();
     hideInputs(false);
     $formulario.submit();

@@ -27,16 +27,12 @@
                         {% csrf_token %}
                         <div class="doc_req_file">
                             {{ forms.file_doc.as_p }}
-                            <div class="row justify-content-center mt-3">
+                            <div class="row justify-content-center align-items-center mt-3">
                                 <div class="col-4 col-lg-6 text-right">
                                     <input type='submit' name='submit_file' value="Create" class="eds-btn eds-btn--submit eds-btn--fill"/>
                                 </div>
                                 <div class="col-4 col-lg-6">
-                                    <a href="{% url 'docs' event.id %}">
-                                        <button class="eds-btn eds-btn--button eds-btn--neutral" type="button">
-                                            Cancel
-                                        </button>
-                                    </a>
+                                    <a data-spec="eds-link" href="{% url 'docs' event.id %}" class="eds-link">Cancel</a>
                                 </div>
                             </div>
                         </div>
@@ -45,15 +41,13 @@
                         {% csrf_token %}
                         <div class="doc_req_text">
                             {{ forms.text_doc.as_p }}
-                            <div class="row justify-content-center mt-3">
+                            <div class="row justify-content-center align-items-center mt-3">
                                 <div class="col-4 col-lg-6 text-right">
                                     <input type='submit' name='submit_text' value="Create" class="eds-btn eds-btn--submit eds-btn--fill"/>
                                 </div>
                                 <div class="col-4 col-lg-6">
                                     <a href="{% url 'docs' event.id %}">
-                                        <button class="eds-btn eds-btn--button eds-btn--neutral" type="button">
-                                            Cancel
-                                        </button>
+                                        <a data-spec="eds-link" href="{% url 'docs' event.id %}" class="eds-link">Cancel</a>
                                     </a>
                                 </div>
                             </div>

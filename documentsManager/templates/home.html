@@ -9,20 +9,15 @@
 <div class="container">
 	<div class="text-right">
 		<a href="{% url 'events' %}" role="button">
-			<button class="eds-btn eds-btn--button eds-btn--neutral eds-btn--icon-with-other-children" type="button">
-				<i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
-					<svg id="eds-icon--plus_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-						<path id="eds-icon--plus_base" d="M11.5 2v9.5H2v1h9.5V22h1v-9.5H22v-1h-9.5V2z" />
-					</svg>
-				</i>
-				Add Event
+			<button class="eds-btn eds-btn--button eds-btn--fill" type="button">
+    			Add Event
 			</button>
 		</a>
 	</div>
 	<div class="row">
 		{% for event in events %}
 		<div class="col-4">
-			<a href="{% url 'docs' event.id %}">
+			<a class="link-wrapper" href="{% url 'docs' event.id %}">
 				<div class="eds-card eds-card--neutral" role="presentation">
 					<section class="eds-l-pad-all-6 eds-media-card-content eds-media-card-content--grid eds-media-card-content--standard eds-media-card-content--fixed"
 					 role="presentation">

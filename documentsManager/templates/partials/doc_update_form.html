@@ -10,12 +10,12 @@
                     <form method="post">
                         {% csrf_token %} 
                         {{ form.as_p }}
-                        <div class="row justify-content-center mt-3">
+                        <div class="row justify-content-center align-items-center mt-3">
                             <div class="col-4 col-lg-6 text-right">
                                 <input type="submit" class="eds-btn eds-btn--button eds-btn--fill" value="Update">
                             </div>
                             <div class="col-4 col-lg-6">
-                                <a href="{% url 'docs' event_id %}" class="eds-btn eds-btn--button eds-btn--neutral">Cancel</a>
+                                <a data-spec="eds-link" href="{% url 'docs' event_id %}" class="eds-link">Cancel</a>
                             </div>
                         </div>
                     </form>

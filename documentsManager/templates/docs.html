@@ -2,36 +2,56 @@
 
 <div class="container">
     <div class="row pt-2 pb-2">
-        <div class="col-md-9">
+        <div class="col-lg-9">
             <div class='row mb-3'>
-                <div class='col-5'>
+                <div class='col-3'>
                     <p class="lead">Start Submissions</p>
                 </div>
-                <div class='col-5'>
+                <div class='col-3'>
                     <p class="lead">End Submissions</p>
                 </div>
-                <div class='col-2'></div>
             </div>
             <div class='row mb-3' id='allow_edit_div'>
-                <div class='col-5'>
+                <div class='col-3'>
                     <p>{{ event_model.init_submission }}</p>
                 </div>
-                <div class='col-5'>
+                <div class='col-3'>
                     <p>{{ event_model.end_submission }}</p>
                 </div>
-                <div class='col-2'><button class="eds-btn eds-btn--button eds-btn--neutral" id='allow_edit'>Edit</button></div>
+                <div class='col-3'>
+                    <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                        <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button" id='allow_edit'>
+                            <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                <svg id="eds-icon--pencil_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path id="eds-icon--pencil_base" fill-rule="evenodd" clip-rule="evenodd" d="M4 17.7L6.3 20l-2.9.6.6-2.9zm.3-1L15.4 5.6l3 3L7.3 19.7l-3-3zM16.1 4.9l1.4-1.4 3 3-1.4 1.4-3-3zM17.5 2L3.2 16.4 2 22l5.6-1.2L22 6.5 17.5 2z"></path>
+                                    <g id="eds-icon--pencil_dashes" fill-rule="evenodd" clip-rule="evenodd">
+                                        <path d="M12 21h2v1h-2zm4 0h2v1h-2zm4 0h2v1h-2z"></path>
+                                    </g>
+                                </svg>
+                            </i>
+                        </button>
+                    </span>
+                </div>
             </div>
             <div class='row mb-3' id='confirm_edit_div'>
                 <input type="hidden" value="{{ event.eb_event_start }}" id="eb_event_start">
                 <form action="" method="post" class="form-inline w-100" id="dates_form">
                     {% csrf_token %} 
                     {% for field in form %}
-                    <div class="col-5">{{ field }}</div>
+                    <div class="col-3">{{ field }}</div>
                     {% endfor %}
                     <div class="col-1">
-                        <input class='btn btn-info' type="submit" value="Save" id='confirm_edit_warning'/>
                         <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
-                            <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="submit" id='confirm_edit'>
+                            <button class="success-btn eds-btn--button eds-btn--none eds-btn--icon-only" type="submit" id='confirm_edit_warning'>
+                                <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                    <svg id="eds-icon--check_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path id="eds-icon--check_base" d="M4 12.8l4.8 4.7L20 6.5" fill="none" stroke="#050505" stroke-miterlimit="10"></path>
+                                    </svg>
+                                </i>
+                            </button>
+                        </span>
+                        <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                            <button class="success-btn eds-btn--button eds-btn--none eds-btn--icon-only" type="submit" id='confirm_edit'>
                                 <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
                                     <svg id="eds-icon--check_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                         <path id="eds-icon--check_base" d="M4 12.8l4.8 4.7L20 6.5" fill="none" stroke="#050505" stroke-miterlimit="10"></path>
@@ -50,17 +70,33 @@
                                 </i>
                             </button>
                         </span>
-                        <button class="btn btn-primary" id="cancel_update_warning">Back</button>
-                        <button class="btn btn-primary" id="cancel_update_error">Back</button>
+                        <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                            <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button" id="cancel_update_warning">
+                                <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                    <svg id="eds-icon--cross_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path id="eds-icon--cross_base" fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M18.3 5L12 11.3 5.7 5l-.7.7 6.3 6.3L5 18.3l.7.7 6.3-6.3 6.3 6.3.7-.7-6.3-6.3L19 5.7z"></path>
+                                    </svg>
+                                </i>
+                            </button>
+                        </span>
+                        <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                            <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button" id="cancel_update_error">
+                                <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                    <svg id="eds-icon--cross_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path id="eds-icon--cross_base" fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M18.3 5L12 11.3 5.7 5l-.7.7 6.3 6.3L5 18.3l.7.7 6.3-6.3 6.3 6.3.7-.7-6.3-6.3L19 5.7z"></path>
+                                    </svg>
+                                </i>
+                            </button>
+                        </span>
                     </div>
                 </form>
             </div>
             <div class='row mb-3' id='warning_div'>
-                <div class='col-8 alert alert-warning' role='alert'>
+                <div class='col-6 alert alert-warning' role='alert'>
                 </div>
             </div>
             <div class='row mb-3' id='error_div'>
-                <div class='col-8 alert alert alert-danger' role='alert'>
+                <div class='col-6 alert alert alert-danger' role='alert'>
                 </div>
             </div>
         </div>

@@ -7,18 +7,37 @@
 </div>
 <div class="container">
     {% if events %}
-    <ul class="list-group">
-        {% for event in events %}
-        <li class="list-group-item">
-            <a href="{% url 'events' event.eb_id %}" class="list-group-item list-group-item-action">
-                <h5>{{ event.name }}</h5>
-                <small>{{ event.start.day }}/{{ event.start.month }}/{{ event.start.year }}</small>
-                -
-                <small>{{ event.end.day }}/{{ event.end.month }}/{{ event.end.year }}</small>
-            </a>
-        </li>
-        {% endfor %}
-    </ul>
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <ul class="eds-card-list">
+                {% for event in events %}
+                <li class="eds-card-list__item" data-spec="eds-card-list-item">
+                  <div class="eds-card eds-card--neutral" role="presentation">
+                    <div class="eds-l-pad-all-3 w-100">
+                        <a class="link-wrapper" href="{% url 'events' event.eb_id %}">
+                            <div class="row">
+                                <div class="col-10 col-sm-9">
+                                    <h5>{{ event.name }}</h5>
+                                    <small>{{ event.start.day }}/{{ event.start.month }}/{{ event.start.year }}</small>
+                                    -
+                                    <small>{{ event.end.day }}/{{ event.end.month }}/{{ event.end.year }}</small>
+                                </div>
+                                <div class="col-2 col-sm-3 text-right">
+                                    <i class="rotate-90 eds-vector-image eds-icon--medium" data-spec="icon" aria-hidden="true">
+                                        <svg id="eds-icon--up-chevron_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                            <path id="eds-icon--up-chevron_base" fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M12 8l-7 7 .7.7L12 9.4l6.3 6.3.7-.7z"></path>
+                                        </svg>
+                                    </i>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                  </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
     {% else %}
     <div class="eds-empty-state eds-align--center">
         <div>
