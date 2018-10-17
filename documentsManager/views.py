@@ -143,8 +143,8 @@ class HomeView(TemplateView, LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
         context['user'] = self.request.user
-        api_events = get_all_events_api(get_auth_token(self.request.user))
-        parse_api_events = parse_events(api_events)
+        api_events_w_venues = get_events_with_venues_api(get_auth_token(self.request.user))
+        parse_api_events = parse_events(api_events_w_venues)
         docs_events_list = Event.objects.all().values_list('eb_event_id', 'id')
         events = filter_managed_event(parse_api_events, docs_events_list)
         context['events'] = events
@@ -259,6 +259,7 @@ def parse_events(api_events):
             'description': event.get('description', {}).get('text', 'No description'),
             'logo': (event.get('logo', {}) or {}).get('original', {}).get('url', None),
             'is_free': event.get('is_free', {}),
+            'venue': event.get('venue', {}).get('address', {}).get('localized_address_display', None)
         }
         events.append(view_event)
     return events
@@ -278,6 +279,11 @@ def get_auth_token(user):
 def get_all_events_api(token):
     eventbrite = Eventbrite(token)
     return eventbrite.get('/users/me/events/').get('events', [])
+
+
+def get_events_with_venues_api(token):
+    eventbrite = Eventbrite(token)
+    return eventbrite.get(path='/users/me/events/', expand=('venue',)).get('events', [])
 
 
 def get_one_event_api(token, eb_event_id):
