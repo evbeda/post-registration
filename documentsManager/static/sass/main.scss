@@ -1,3 +1,6 @@
+@import 'variables';
+
+
 body {
     font-family: 'Roboto', sans-serif;
     color: #39364f;
@@ -37,20 +40,6 @@ body {
     color: white;
 }
 
-.card--transparent {
-    border-color: transparent;
-    padding: 24px;
-    &:hover {
-        box-shadow: 0 4px 15px 0 rgba(40,44,53,.06), 0 2px 2px 0 rgba(40,44,53,.08);
-        background-color: #fff;
-        border-radius: 4px;
-        z-index: 3;
-    }
-    &-text {
-        color: #6f7287;
-    }
-}
-
 .card {
     ul {
         list-style: none;
@@ -62,22 +51,27 @@ body {
     left: auto;
 }
 
-.navbar__avatar {
-    width: 55px;
-    height: 100%;
-    position: relative;
-    margin: 0 auto;
-    cursor: pointer;
+.navbar {
+    // background-color: $ui-purple;
+    color: $grey-600;
 
-    &-img {
-        width: 100%;
-        display: block;
-        border-radius: 50%;
-        position: absolute;
-        border: 4px solid white;
-        box-shadow: 1px 1px 3px #4B4D63;
+    &__avatar {
+        width: 55px;
+        height: 100%;
+        position: relative;
+        margin: 0 auto;
+        cursor: pointer;
+    
+        &-img {
+            width: 100%;
+            display: block;
+            border-radius: 50%;
+            position: absolute;
+            border: 4px solid white;
+            box-shadow: 1px 1px 3px #4B4D63;
+        }
     }
- }
+}
 
 .doc-list__title {
     border-bottom: 1px;

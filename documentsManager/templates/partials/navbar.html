@@ -26,9 +26,12 @@
     <ul class="nav navbar-nav navbar-right ml-auto">
         <li class="nav-item open">
             <div class="navbar__avatar" data-toggle="dropdown" id="navbarDropdown">
-                <img class="navbar__avatar-img" src="{% static 'images/avatar-icon.png' %}" alt="Avatar">
+                <svg class="eds-avatar__background eds-avatar__background--has-border" height="50" width="50" data-spec="spec-avatar">
+                    <image class="navbar__avatar-img" href="{% static 'images/avatar-icon.png' %}" height="50" width="50" preserveAspectRatio="xMidYMin slice">
+                    </image>
+                </svg>
             </div>
-            <ul class="dropdown-menu form-wrapper" aria-labelledby="navbarDropdown">
+            <ul class="dropdown-menu form-wrapper eds-nav-list" aria-labelledby="navbarDropdown">
                 <li class="dropdown-item">
                     <a href="{% url 'logout' %}" class="nav-link">
                         Logout

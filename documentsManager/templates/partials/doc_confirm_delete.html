@@ -12,10 +12,14 @@
                         <p>Are you sure you want to delete "{{ object }}"?</p>
                         <div class="row justify-content-center mt-3">
                             <div class="col-4 col-lg-6 text-right">
-                                <input type="submit" class="btn btn-danger" value="Confirm">
+                                <input type="submit" class="eds-btn eds-btn--button eds-btn--fill" value="Confirm">
                             </div>
                             <div class="col-4 col-lg-6">
-                                <a href="{% url 'docs' event_id %}" class="btn btn-light">Cancel</a>
+                                <a href="{% url 'docs' event_id %}">
+                                    <button class="eds-btn eds-btn--button eds-btn--neutral" type="button">
+                                        Cancel
+                                    </button>
+                                </a>
                             </div>
                         </div>
                     </form>

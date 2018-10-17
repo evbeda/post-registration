@@ -3,8 +3,9 @@
 
     <div class="row justify-content-center">
         <div class="col-8 col-md-6">
-            <h3 class="mb-3">Create Documentation Requirement</h3>
-            <div class="card">
+            <h3>Create Documentation Requirement</h3>
+            <hr class="eds-divider__hr eds-bg-color--grey-200 eds-divider--horizontal" data-spec="divider-hr" aria-hidden="true"/>
+            <div class="card mt-3">
                 <div class="card-body">
                     <h5>Type of Submission:</h5>
                     <div class="form-group form-check">
@@ -28,10 +29,14 @@
                             {{ forms.file_doc.as_p }}
                             <div class="row justify-content-center mt-3">
                                 <div class="col-4 col-lg-6 text-right">
-                                    <input type='submit' name='submit_file' value="Create" class="btn btn-primary"/>
+                                    <input type='submit' name='submit_file' value="Create" class="eds-btn eds-btn--submit eds-btn--fill"/>
                                 </div>
                                 <div class="col-4 col-lg-6">
-                                    <a href="{% url 'docs' event.id %}" class="btn btn-light">Cancel</a>
+                                    <a href="{% url 'docs' event.id %}">
+                                        <button class="eds-btn eds-btn--button eds-btn--neutral" type="button">
+                                            Cancel
+                                        </button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -42,10 +47,14 @@
                             {{ forms.text_doc.as_p }}
                             <div class="row justify-content-center mt-3">
                                 <div class="col-4 col-lg-6 text-right">
-                                    <input type='submit' name='submit_text' value="Create" class="btn btn-primary"/>
+                                    <input type='submit' name='submit_text' value="Create" class="eds-btn eds-btn--submit eds-btn--fill"/>
                                 </div>
                                 <div class="col-4 col-lg-6">
-                                    <a href="{% url 'docs' event.id %}" class="btn btn-light">Cancel</a>
+                                    <a href="{% url 'docs' event.id %}">
+                                        <button class="eds-btn eds-btn--button eds-btn--neutral" type="button">
+                                            Cancel
+                                        </button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
