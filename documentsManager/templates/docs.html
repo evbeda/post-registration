@@ -1,31 +1,54 @@
-{% extends "base.html" %} {% block content %}
-{%include "partials/jumbotron.html" %}
+{% extends "base.html" %} {% block content %} {%include "partials/jumbotron.html" %}
 <div class="container">
     <div class="row pt-2 pb-2">
         <div class="col-md-9">
             <div class='row mb-3'>
-                <div class='col-5'><h3>Start Submissions</h3></div>
-                <div class='col-5'><h3>End Submissions</h3></div>
+                <div class='col-5'>
+                    <p class="lead">Start Submissions</p>
+                </div>
+                <div class='col-5'>
+                    <p class="lead">End Submissions</p>
+                </div>
                 <div class='col-2'></div>
             </div>
             <div class='row mb-3' id='allow_edit_div'>
-                <div class='col-5'><h5>{{ event_model.init_submission }}</h5></div>
-                <div class='col-5'><h5>{{ event_model.end_submission }}</h5></div>
-                <div class='col-2'><button class="btn btn-primary" id='allow_edit'>Edit</button></div>
+                <div class='col-5'>
+                    <p>{{ event_model.init_submission }}</p>
+                </div>
+                <div class='col-5'>
+                    <p>{{ event_model.end_submission }}</p>
+                </div>
+                <div class='col-2'><button class="eds-btn eds-btn--button eds-btn--neutral" id='allow_edit'>Edit</button></div>
             </div>
             <div class='row mb-3' id='confirm_edit_div'>
                 <input type="hidden" value="{{ event.eb_event_start }}" id="eb_event_start">
                 <form action="" method="post" class="form-inline w-100" id="dates_form">
-                    {% csrf_token %}
+                    {% csrf_token %} 
                     {% for field in form %}
-                        <div class="col-5">{{ field }}</div>
+                    <div class="col-5">{{ field }}</div>
                     {% endfor %}
                     <div class="col-1">
-                        <input class='btn btn-info' type="submit" value="Save" id='confirm_edit'/>
                         <input class='btn btn-info' type="submit" value="Save" id='confirm_edit_warning'/>
+                        <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                            <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="submit" id='confirm_edit'>
+                                <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                    <svg id="eds-icon--check_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path id="eds-icon--check_base" d="M4 12.8l4.8 4.7L20 6.5" fill="none" stroke="#050505" stroke-miterlimit="10"></path>
+                                    </svg>
+                                </i>
+                            </button>
+                        </span>
                     </div>
                     <div class="col-1">
-                        <button class="btn btn-primary" id="cancel_update">Cancel</button>
+                        <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                            <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button" id="cancel_update">
+                                <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                    <svg id="eds-icon--cross_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path id="eds-icon--cross_base" fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M18.3 5L12 11.3 5.7 5l-.7.7 6.3 6.3L5 18.3l.7.7 6.3-6.3 6.3 6.3.7-.7-6.3-6.3L19 5.7z"></path>
+                                    </svg>
+                                </i>
+                            </button>
+                        </span>
                         <button class="btn btn-primary" id="cancel_update_warning">Back</button>
                         <button class="btn btn-primary" id="cancel_update_error">Back</button>
                     </div>
@@ -44,121 +67,274 @@
     <hr/>
     <div class='row justify-content-end pt-3'>
         <div>
-            <a class="btn btn-primary" href="{% url 'doc_form' event.id %}" role="button"> New Submission</a>
+            <a class="eds-btn eds-btn--button eds-btn--fill" href="{% url 'doc_form' event.id %}" role="button"> New Submission</a>
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <h2 class="doc-list__title">File Documentation</h2>
+            <p class="lead">File Documentation
+                </h2>
         </div>
     </div>
-    <div class="row">
-        <div class="col">
-            <table class="table">
+    <div class="eds-data-table mb-5">
+        <div class="eds-data-table__wrapper">
+            <table class="eds-data-table__main eds-l-mar-vert-2" data-spec="data-table-main">
                 <thead>
-                <tr>
-                    <th scope="col">Title of the Document</th>
-                    <th scope="col">File types Accepted</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Is Required</th>
-                    <th scope="col">Actions</th>
-                </tr>
+                    <tr data-spec="data-table-header" class="eds-data-table-header">
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">ID</span><span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">Title of the Document</span><span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">File Format Accepted</span><span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">Quantity</span>
+                                <span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">Is Required</span>
+                                <span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">Actions</span>
+                                <span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                    </tr>
                 </thead>
-                <tbody>
-                {% for doc in docs_file %}
-                <tr>
-                    <td>
-                        <h5>{{ doc.name }}</h5>
-                    </td>
-                    <td>
-                        <ul>
-                        {% for file_type in doc.file_types %}
-                            <li>{{ file_type }}</li>
-                            {% endfor %}
-                        </ul>
-                    </td>
-                    <td>
-                        <h5>{{ doc.quantity}}</h5>
-                    </td>
-                    <td>
-                        {% if doc.is_optional %}
-                        <h5>Optional</h5>
-                        {% else %}
-                        <h5>Mandatory</h5>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="{% url 'edit-filedoc' event.id doc.id %}" class="btn btn-info">
-                            Edit
-                        </a>
-                        <a href="{% url 'delete-filedoc' event.id doc.id %}" class="btn btn-danger">
-                            Delete
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
+                <tbody class="eds-table-list">
+                    {% for doc in docs_file %}
+                    <tr class="eds-data-table-list-item">
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.id }}</td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.name }}</td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
+                            <div>
+                                {% for file_type in doc.file_types %}
+                                <div class="eds-list-item eds-list-item--align-middle" data-spec="eds-list-item">
+                                    <span class="eds-list-item__aside eds-list-item__icon">
+                                        {% if file_type.name == "image" %}
+                                            <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                                <svg id="eds-icon--photo_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path id="eds-icon--photo_base" fill-rule="evenodd" clip-rule="evenodd" d="M2 20h20V4H2v16zm1-1h18V5H3v14z"></path>
+                                                    <path id="eds-icon--photo_sun" fill-rule="evenodd" clip-rule="evenodd" d="M16.5 7C15.1 7 14 8.1 14 9.5s1.1 2.5 2.5 2.5S19 10.9 19 9.5 17.9 7 16.5 7zm0 4c-.8 0-1.5-.7-1.5-1.5S15.7 8 16.5 8s1.5.7 1.5 1.5-.7 1.5-1.5 1.5z"></path>
+                                                    <path id="eds-icon--photo_mountain" fill-rule="evenodd" clip-rule="evenodd" d="M15.5 13l-.7.8-3.5-3.8-6.4 7h14.2l-3.6-4zm-8.3 3l4.1-4.4 2.7 3 .7.8.7-.8 1.4 1.5H7.2z"></path>
+                                                </svg>
+                                            </i>
+                                        {% elif file_type.name == 'text' %}
+                                            <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                                <svg id="eds-icon--document_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path id="eds-icon--document_base" fill-rule="evenodd" clip-rule="evenodd" d="M16 6h2.5L16 3.5V6zM5 3v18h14V7h-4V3H5zM4 22V2h12l4 4v16H4z"></path>
+                                                    <g id="eds-icon--document_lines" fill-rule="evenodd" clip-rule="evenodd">
+                                                        <path d="M8 9h8v1H8zm0 3h8v1H8zm0 3h8v1H8z"></path>
+                                                    </g>
+                                                </svg>
+                                            </i>
+                                        {% elif file_type.name == 'presentation' %}
+                                            <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                                <svg id="eds-icon--business_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path id="eds-icon--business_base" fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M4 17h16V4H4v13zm7.5-15v1H3v14H2v1h8.3L7 21.3l.7.7 3.8-3.8V22h1v-3.8l3.8 3.8.7-.7-3.3-3.3H22v-1h-1V3h-8.5V2h-1z"></path>
+                                                    <g id="eds-icon--business_lines" fill-rule="evenodd" clip-rule="evenodd" fill="#231F20">
+                                                        <path d="M16 9h1v4h-1zm-2-2h1v6h-1zm-2 2h1v4h-1z"></path>
+                                                    </g>
+                                                    <path id="eds-icon--business_circle" fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M8 9c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 3c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"></path>
+                                                </svg>
+                                            </i>
+                                        {% elif file_type.name == 'audio' %}
+                                            <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                                <svg id="eds-icon--microphone_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path id="eds-icon--microphone_base" fill-rule="evenodd" clip-rule="evenodd" d="M17 12c0 2.6-2 4.7-4.5 5v-1c2-.2 3.5-1.9 3.5-4V6c0-2.2-1.8-4-4-4S8 3.8 8 6v6c0 2 1.5 3.7 3.5 4v1C9 16.7 7 14.6 7 12H6c0 3.1 2.4 5.7 5.5 6v3H10v1h4v-1h-1.5v-3c3.1-.3 5.5-2.8 5.5-6h-1zm-8 0h2v-1H9v-1h2V9H9V8h2V7H9V6c0-1.7 1.3-3 3-3s3 1.3 3 3v6c0 1.7-1.3 3-3 3s-3-1.3-3-3"></path>
+                                                </svg>
+                                            </i>
+                                        {% elif file_type.name == 'video' %}
+                                        <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                            <svg id="eds-icon--film-camera_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <path id="eds-icon--film-camera_base" fill-rule="evenodd" clip-rule="evenodd" d="M22 12.5l-5 1.7v-2.3c1.7-.4 3-2 3-3.9 0-2.2-1.7-3.9-3.9-4H5.8C3.7 4.1 2 5.9 2 8c0 1.9 1.3 3.4 3 3.9V20h12v-3.2l5 1.7v-6zM19 8c0 1.7-1.3 3-3 3s-3-1.3-3-3 1.3-3 3-3c1.6 0 3 1.3 3 3zm-5.6-3c-.9.7-1.4 1.8-1.4 3s.5 2.3 1.4 3H8.6c.9-.7 1.4-1.8 1.4-3s-.5-2.3-1.4-3h4.8zM3 8c0-1.7 1.3-3 3-3s3 1.3 3 3-1.3 3-3 3-3-1.3-3-3zm13 11H6v-7h10v7zm5-1.9l-4-1.3v-.6l4-1.3v3.2z"></path>
+                                            </svg>
+                                        </i>
+                                        {% elif file_type.name == 'formated' %}
+                                            <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true"><svg id="eds-icon--book_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path id="eds-icon--book_base" fill-rule="evenodd" clip-rule="evenodd" d="M20 2H4v20h15v-3h1V2zm-2 19H5.2c.4-1.2 1.5-2 2.8-2h10v2zm1-3H8c-1.2 0-2.3.5-3 1.4V3h14v15z"></path>
+                                                    <path id="eds-icon--book_line_2_" fill-rule="evenodd" clip-rule="evenodd" d="M8 13h8v1H8z"></path>
+                                                    <path id="eds-icon--book_line" fill-rule="evenodd" clip-rule="evenodd" d="M8 10h8v1H8z"></path>
+                                                    <path id="eds-icon--book_line_1_" fill-rule="evenodd" clip-rule="evenodd" d="M8 7h8v1H8z"></path>
+                                                </svg>
+                                            </i>
+                                        {% endif %}
+                                    </span>
+                                    <div class="eds-list-item__contents text-capitalize" data-spec="eds-list-item-contents">{{ file_type }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.quantity}}</td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
+                            {% if doc.is_optional %} Optional {% else %} Mandatory {% endif %}
+                        </td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
+                            <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                                <a href="{% url 'edit-filedoc' event.id doc.id %}">
+                                    <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
+                                        <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                            <svg id="eds-icon--pencil_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <path id="eds-icon--pencil_base" fill-rule="evenodd" clip-rule="evenodd" d="M4 17.7L6.3 20l-2.9.6.6-2.9zm.3-1L15.4 5.6l3 3L7.3 19.7l-3-3zM16.1 4.9l1.4-1.4 3 3-1.4 1.4-3-3zM17.5 2L3.2 16.4 2 22l5.6-1.2L22 6.5 17.5 2z"
+                                                />
+                                                <g id="eds-icon--pencil_dashes" fill-rule="evenodd" clip-rule="evenodd">
+                                                    <path d="M12 21h2v1h-2zm4 0h2v1h-2zm4 0h2v1h-2z" />
+                                                </g>
+                                            </svg>
+                                        </i>
+                                    </button>
+                                </a>
+                            </span>
+                            <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                                <a href="{% url 'delete-filedoc' event.id doc.id %}">
+                                    <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
+                                        <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                            <svg id="eds-icon--trash_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <path id="eds-icon--trash_base" fill-rule="evenodd" clip-rule="evenodd" d="M5 6h1v15H5V6zm13 0h1v15h-1V6zM5 21h14v1H5v-1z"
+                                                />
+                                                <path id="eds-icon--trash_top" fill-rule="evenodd" clip-rule="evenodd" d="M15 4V2H9v2H4v1h16V4h-5zm-1 0h-4V3h4v1z" />
+                                                <g id="eds-icon--trash_lines" fill-rule="evenodd" clip-rule="evenodd">
+                                                    <path d="M9 8h1v11H9zm5 0h1v11h-1z" />
+                                                </g>
+                                            </svg>
+                                        </i>
+                                    </button>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
-
             </table>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <h2 class="doc-list__title">Text Documentation</h2>
+        <div class="eds-g-cell eds-g-cell-12-12">
+            <div class="eds-align--right"></div>
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <table class="table">
+            <p class="lead">Text Documentation</p>
+        </div>
+    </div>
+    <div class="eds-data-table mb-5">
+        <div class="eds-data-table__wrapper">
+            <table class="eds-data-table__main eds-l-mar-vert-2" data-spec="data-table-main">
                 <thead>
-                <tr>
-                    <th scope="col">Title of the Document</th>
-                    <th scope="col">Type of Limitation</th>
-                    <th scope="col">Min</th>
-                    <th scope="col">Max</th>
-                    <th scope="col">Is Required</th>
-                    <th scope="col">Actions</th>
-                </tr>
+                    <tr data-spec="data-table-header" class="eds-data-table-header">
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">ID</span><span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">Title of the Document</span>
+                                <span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">Type of Limitation</span>
+                                <span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">Min</span>
+                                <span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">Max</span>
+                                <span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">Is Required</span>
+                                <span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">Actions</span>
+                                <span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                    </tr>
                 </thead>
-                <tbody>
-                {% for doc in docs_text %}
-                <tr>
-                    <td>
-                        <h5>{{ doc.name }}</h5>
-                    </td>
-                    <td>
-                        <h5>{{ doc.measure }}</h5>
-                    </td>
-                    <td>
-                        <h5>{{ doc.min }}</h5>
-                    </td>
-                    <td>
-                        <h5>{{ doc.max }}</h5>
-                    </td>
-                    <td>
-                        {% if doc.is_optional %}
-                        <h5>Optional</h5>
-                        {% else %}
-                        <h5>Mandatory</h5>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="{% url 'edit-textdoc' event.id doc.id %}" class="btn btn-info">
-                            Edit
-                        </a>
-                        <a href="{% url 'delete-textdoc' event.id doc.id %}" class="btn btn-danger">
-                            Delete
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
+                <tbody class="eds-table-list">
+                    {% for doc in docs_text %}
+                    <tr class="eds-data-table-list-item">
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.id }}</td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.name }}
+                        </td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.measure }}
+                        </td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.min }}</td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.max }}</td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
+                            {% if doc.is_optional %} Optional {% else %} Mandatory {% endif %}
+                        </td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
+                            <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                                <a href="{% url 'edit-textdoc' event.id doc.id %}">
+                                    <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
+                                        <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                            <svg id="eds-icon--pencil_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <path id="eds-icon--pencil_base" fill-rule="evenodd" clip-rule="evenodd" d="M4 17.7L6.3 20l-2.9.6.6-2.9zm.3-1L15.4 5.6l3 3L7.3 19.7l-3-3zM16.1 4.9l1.4-1.4 3 3-1.4 1.4-3-3zM17.5 2L3.2 16.4 2 22l5.6-1.2L22 6.5 17.5 2z"
+                                                />
+                                                <g id="eds-icon--pencil_dashes" fill-rule="evenodd" clip-rule="evenodd">
+                                                    <path d="M12 21h2v1h-2zm4 0h2v1h-2zm4 0h2v1h-2z" />
+                                                </g>
+                                            </svg>
+                                        </i>
+                                    </button>
+                                </a>
+                            </span>
+                            <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                                <a href="{% url 'delete-textdoc' event.id doc.id %}">
+                                    <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
+                                        <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                            <svg id="eds-icon--trash_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <path id="eds-icon--trash_base" fill-rule="evenodd" clip-rule="evenodd" d="M5 6h1v15H5V6zm13 0h1v15h-1V6zM5 21h14v1H5v-1z"
+                                                />
+                                                <path id="eds-icon--trash_top" fill-rule="evenodd" clip-rule="evenodd" d="M15 4V2H9v2H4v1h16V4h-5zm-1 0h-4V3h4v1z" />
+                                                <g id="eds-icon--trash_lines" fill-rule="evenodd" clip-rule="evenodd">
+                                                    <path d="M9 8h1v11H9zm5 0h1v11h-1z" />
+                                                </g>
+                                            </svg>
+                                        </i>
+                                    </button>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
+        </div>
+        <div class="eds-g-cell eds-g-cell-12-12">
+            <div class="eds-align--right"></div>
         </div>
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
-{% load static %}
-<script type="text/javascript" src="{% static 'js/docs.js' %}"></script>
-{% endblock content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script> {% load static %}
+<script type="text/javascript" src="{% static 'js/docs.js' %}"></script> {% endblock content %}

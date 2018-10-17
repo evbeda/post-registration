@@ -216,6 +216,7 @@ def parse_events(api_events):
             'end': datetime.strptime(event['end']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
             'description': event.get('description', {}).get('text', 'No description'),
             'logo': (event.get('logo', {}) or {}).get('original', {}).get('url', None),
+            'is_free': event.get('is_free', {}),
         }
         events.append(view_event)
     return events

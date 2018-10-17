@@ -6,12 +6,7 @@
     </div>
 </div>
 <div class="container">
-    {% if not events %}
-    <div class="alert alert-warning" role="alert">
-        It seems that all your events are being handled in our app! :D
-        <a href="{% url 'home' %}">Go back to: Managed Events</a>
-    </div>
-    {% else %}
+    {% if events %}
     <ul class="list-group">
         {% for event in events %}
         <li class="list-group-item">
@@ -24,6 +19,72 @@
         </li>
         {% endfor %}
     </ul>
-    {% endif %}
+    {% else %}
+    <div class="eds-empty-state eds-align--center">
+        <div>
+            <div class="eds-empty-state__graphic eds-align--center">
+                <span class="eds-graphic--halo eds-graphic-halo--xsmall">
+                    <i class="eds-vector-image eds-graphic--small eds-vector-image-size--reset eds-align--center eds-vector-image-halo-size-override"
+                        data-spec="icon" aria-hidden="true"><svg width="144" height="144" viewBox="0 0 144 144"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <title>
+                                graphic_invite
+                            </title>
+                            <g id="assets" fill="none" fill-rule="evenodd">
+                                    <g id="img_changes">
+                                        <path id="Rectangle" fill-opacity="0" fill="#D8D8D8" d="M0 0h144v144H0z"/>
+                                        <g id="gra_calendar" transform="translate(25 31)">
+                                            <path id="Fill-2" fill="#FFF" d="M.5 81.5h93v-66H.5z"/>
+                                            <path id="Fill-3" fill="#FFF" d="M.5 15.5h93V.5H.5z"/>
+                                            <path id="Stroke-4" stroke="#3A3A3A" stroke-width="3" d="M.5 81.5h93v-66H.5z"/>
+                                            <path id="Fill-6" fill="#D2D6DF" d="M30.5 35h9v-9h-9z"/>
+                                            <path id="Fill-7" fill="#D2D6DF" d="M42.5 35h9v-9h-9z"/>
+                                            <path id="Fill-8" fill="#D2D6DF" d="M54.5 35h9v-9h-9z"/>
+                                            <path id="Fill-9" fill="#D2D6DF" d="M66.5 35h9v-9h-9z"/>
+                                            <path id="Fill-10" fill="#D2D6DF" d="M78.5 35h9v-9h-9z"/>
+                                            <path id="Fill-11" fill="#D2D6DF" d="M6.5 47h9v-9h-9z"/>
+                                            <path id="Fill-12" fill="#D2D6DF" d="M18.5 47h9v-9h-9z"/>
+                                            <path id="Fill-13" fill="#D2D6DF" d="M30.5 47h9v-9h-9z"/>
+                                            <path id="Fill-14" fill="#D2D6DF" d="M42.5 47h9v-9h-9z"/>
+                                            <path id="Fill-15" fill="#D2D6DF" d="M54.5 47h9v-9h-9z"/>
+                                            <path id="Fill-16" fill="#D2D6DF" d="M66.5 47h9v-9h-9z"/>
+                                            <path id="Fill-17" fill="#D2D6DF" d="M78.5 47h9v-9h-9z"/>
+                                            <path id="Fill-18" fill="#D2D6DF" d="M6.5 59h9v-9h-9z"/>
+                                            <path id="Fill-19" fill="#D2D6DF" d="M18.5 59h9v-9h-9z"/>
+                                            <path id="Fill-20" fill="#D2D6DF" d="M30.5 59h9v-9h-9z"/>
+                                            <path id="Fill-21" fill="#F6682F" d="M42.5 59h9v-9h-9z"/>
+                                            <path id="Fill-22" fill="#F6682F" d="M54.5 59h9v-9h-9z"/>
+                                            <path id="Fill-23" fill="#F6682F" d="M66.5 59h9v-9h-9z"/>
+                                            <path id="Fill-24" fill="#F6682F" d="M78.5 59h9v-9h-9z"/>
+                                            <path id="Fill-25" fill="#F6682F" d="M6.5 71h9v-9h-9z"/>
+                                            <path id="Fill-26" fill="#F6682F" d="M18.5 71h9v-9h-9z"/>
+                                            <path id="Fill-27" fill="#F6682F" d="M30.5 71h9v-9h-9z"/>
+                                            <path id="Fill-28" fill="#F6682F" d="M42.5 71h9v-9h-9z"/>
+                                            <path id="Fill-29" fill="#F6682F" d="M54.5 71h9v-9h-9z"/>
+                                            <path id="Stroke-30" stroke="#3A3A3A" stroke-width="3" d="M.5 11V.5h93V11"/>
+                                            <path d="M9.5 6.5h75" id="Stroke-32" stroke="#3A3A3A" stroke-width="3" stroke-linejoin="round"/>
+                                            <path d="M24.5 30.5h-3" id="Stroke-37" stroke="#3A3A3A" stroke-width="3" stroke-linejoin="round"/>
+                                            <path d="M12.5 30.5h-3" id="Stroke-38" stroke="#3A3A3A" stroke-width="3" stroke-linejoin="round"/>
+                                            <path d="M84.5 66.5h-3" id="Stroke-39" stroke="#3A3A3A" stroke-width="3" stroke-linejoin="round"/>
+                                            <path d="M72.5 66.5h-3" id="Stroke-40" stroke="#3A3A3A" stroke-width="3" stroke-linejoin="round"/>
+                                        </g>
+                                    </g>
+                                </g>
+                        </svg></i></span></div>
+            <h1 class="eds-empty-state__title eds-text--center eds-text-hs eds-text-color--grey-900 eds-l-sn-mar-top-6 eds-l-sm-mar-top-6 eds-l-sw-mar-top-6 eds-l-mn-mar-top-6 eds-l-md-mar-top-6 eds-l-md-mar-top-8 eds-l-mw-mar-top-8 eds-l-ln-mar-top-8 eds-l-lg-mar-top-8 eds-l-lw-mar-top-8">It seems
+                like you don't have more events to add.</h1>
+            <div class="eds-align--center">
+                <p class="eds-empty-state__description eds-text--center eds-text-bl eds-text-color--grey-600 eds-l-sn-mar-top-3 eds-l-sm-mar-top-3 eds-l-sw-mar-top-3 eds-l-mn-mar-top-3 eds-l-md-mar-top-3 eds-l-md-mar-top-1 eds-l-mw-mar-top-1 eds-l-ln-mar-top-1 eds-l-lg-mar-top-1 eds-l-lw-mar-top-1">You
+                    can look at all your managed events here.</p>
+            </div>
+            <div class="eds-empty-state__actions eds-align--center eds-l-sn-mar-top-4 eds-l-sm-mar-top-4 eds-l-sw-mar-top-4 eds-l-mn-mar-top-4 eds-l-md-mar-top-4 eds-l-md-mar-top-6 eds-l-mw-mar-top-6 eds-l-ln-mar-top-6 eds-l-lg-mar-top-6 eds-l-lw-mar-top-6">
+                <a href="{% url 'home' %}">
+                    <button data-spec="eds-empty-state__primary-button" class="eds-btn eds-btn--button eds-btn--fill" type="button">
+                        Managed Events
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
-{% endblock content %}
+{% endif %} {% endblock content %}
