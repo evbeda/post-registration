@@ -15,24 +15,44 @@
 <body>
 <div class="container_post">
     <div class="container">
-        <div class="card shadow p-3 mb-5 bg-white rounded ">
+        <img src="{% static 'images/conference.jpg' %}" alt="">
+        <div class="card shadow bg-white rounded ">
+            <div class="card-header">
+                <b>End day to submit:</b> {{ event.end_submission }}
+            </div>
             <div class="card-body">
-                <h1 class="card-title">Card title</h1>
-
+                <h1 class="card-title display-4">{{ eb_event.name }}</h1>
+                {% if text_doc %}
+                <hr>
+                <h2 class="card-subtitle text-muted">{{ text_doc.name }}</h2>
+                <label for="comment"
+                >You have to write at least {{ text_doc.min }} to {{ text_doc.max }} {{ text_doc.measure }}</label>
+                {% if text_doc.is_optional %}
+                <span class="ml-1 text-danger">*</span>
+                {% endif %}
+                <textarea class="form-control" rows="5" id="comment" placeholder="Explanation..."></textarea>
+                {% endif %}
+                {% if file_doc %}
+                <hr>
+                <h2 class="card-subtitle text-muted">{{ file_doc.name }}</h2>
+                <label for="comment">Max uploads allowed: {{ file_doc.quantity}}</label>
+                {% if file_doc.is_optional %}
+                <span class="ml-1 text-danger">*</span>
+                {% endif %}
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="inputGroupFile01">
+                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer d-flex justify-content-between d-flex align-items-center">
+                <span class="ml-2 text-danger">* Required</span>
+                <a class="btn btn-success btn-lg" href="{% url 'success' event.id %}">Send</a>
             </div>
         </div>
+
     </div>
 </div>
-<style>
-    .container_post {
-        height: 100vh;
-        width: 100vw;
-        background-color: #16A85A;
-        display: flex;
-        align-items: center;
-    }
-</style>
-
 </body>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
