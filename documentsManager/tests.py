@@ -5,8 +5,8 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve
-from django.test import TestCase
 from django.db.utils import DataError
+from django.test import TestCase
 from social_django.models import UserSocialAuth
 
 from documentsManager.apps import DocumentsmanagerConfig
@@ -217,6 +217,29 @@ class ViewTest(TestBase):
         expected = datetime.strptime('2018-02-01', '%Y-%m-%d').date()
         self.assertEqual(result.init_submission, expected)
         self.assertEqual(response.url, '/docs/{}/'.format(new_event.id))
+
+    @patch('documentsManager.views.Eventbrite.get')
+    def test_response_with_landing_page(self, mock_api_evb):
+        mock_api_evb.return_value = MOCK_EVENTS_API
+        event = Event.objects.create(eb_event_id=321)
+        event.end_submission = '2018-02-25'
+        response = self.client.get('/landing/{}/'.format(event.id))
+        self.assertEqual(response.status_code, 200)
+
+    def test_response_with_success(self):
+        event = Event.objects.create(eb_event_id=321)
+        response = self.client.get('/landing/{}/success/'.format(event.id))
+        self.assertEqual(response.status_code, 200)
+
+    @patch('documentsManager.views.Eventbrite.get')
+    def test_response_with_landing_page_with_text_doc(self, mock_api_evb):
+        mock_api_evb.return_value = MOCK_EVENTS_API
+        event = Event.objects.create(eb_event_id=321)
+        TextDoc.objects.create(event=event)
+        FileDoc.objects.create(event=event)
+        response = self.client.get('/landing/{}/'.format(event.id))
+        self.assertTrue('text_doc' in response.context)
+        self.assertTrue('file_doc' in response.context)
 
 
 class DocumentsmanagerConfigTest(TestCase):

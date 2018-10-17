@@ -207,8 +207,31 @@ class TextDocDelete(BaseDocDelete):
     success_url = '/'
 
 
-class Landing(TemplateView):
+class LandingView(TemplateView):
     template_name = 'landing_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(LandingView, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        event = Event.objects.filter(pk=event_id).first()
+        if event:
+            context['event'] = event
+            eb_event = get_one_event_api(
+                get_auth_token(self.request.user),
+                event.eb_event_id
+            )
+            context['eb_event'] = parse_events(eb_event)[0]
+            text_doc = TextDoc.objects.filter(event=event).first()
+            if text_doc:
+                context['text_doc'] = text_doc
+            file_doc = FileDoc.objects.filter(event=event).first()
+            if file_doc:
+                context['file_doc'] = file_doc
+        return context
+
+
+class SuccessView(TemplateView):
+    template_name = 'success.html'
 
 
 def parse_events(api_events):
