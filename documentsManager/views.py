@@ -173,10 +173,24 @@ class FileDocUpdate(BaseDocUpdate):
     model = FileDoc
     form_class = FileDocForm
 
+    def get_context_data(self, **kwargs):
+        context = super(BaseDocUpdate, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        context['event_id'] = event_id
+        context['form_type'] = 'filedoc'
+        return context
+
 
 class TextDocUpdate(BaseDocUpdate):
     model = TextDoc
     form_class = TextDocForm
+
+    def get_context_data(self, **kwargs):
+        context = super(BaseDocUpdate, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        context['event_id'] = event_id
+        context['form_type'] = 'textdoc'
+        return context
 
 
 class BaseDocDelete(DeleteView):

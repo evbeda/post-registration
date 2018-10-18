@@ -1,4 +1,8 @@
-{% extends "base.html" %} {% block content %} {% include "partials/jumbotron.html" %}
+{% extends "base.html" %} 
+{% block content %} 
+{% include "partials/jumbotron.html" %}
+
+
 <div class="container">
     <div class="row mb-3">
         <div class="col">
@@ -47,32 +51,51 @@
     <div class="row justify-content-center">
         <div class="col-8 col-md-6">
             <h3>Create Documentation Requirement</h3>
-            <hr class="eds-divider__hr eds-bg-color--grey-200 eds-divider--horizontal" data-spec="divider-hr" aria-hidden="true"/>
+            <hr class="eds-divider__hr eds-bg-color--grey-200 eds-divider--horizontal" data-spec="divider-hr" aria-hidden="true" />
             <div class="card mt-3">
                 <div class="card-body">
-                    <h5>Type of Submission:</h5>
-                    <div class="form-group form-check">
-                        <input type="radio" name="doc_switcher" value="file" id="fileRadio"
-                            class="form-check-input"
-                            {% if file_form %} checked {% endif %}>
-                        <label class="form-check-label" for="fileRadio">
-                            File Submission
-                        </label>
+                    <div class="eds-radio" data-spec="radio-wrapper" role="radiogroup">
+                        <legend class="col-form-label pt-0">Type of Submission:</legend>
+                        <div class="eds-radio__option" data-spec="radio-option-container">
+                            <input type="radio" class="eds-radio__input" name="doc_switcher" value="file" id="fileRadio" {% if file_form %} checked {% endif %} data-spec="radio-button" data-automation="radio-checked-example-0" aria-checked="true"/>
+                            <label class="mb-0 eds-radio__label eds-radio__delegate" for="fileRadio" data-spec="radio-delegate">Item 1</label>
+                            <label class="mb-0 eds-radio__label eds-radio__display-label" for="fileRadio" data-spec="radio-display-label" data-automation="radio-checked-example-0-label">File Submission</label>
+                        </div>
+                        <div class="eds-radio__option" data-spec="radio-option-container">
+                            <input type="radio" class="eds-radio__input" name="doc_switcher" value="text" id="textRadio" {% if not file_form %} checked {% endif %} data-spec="radio-button" data-automation="radio-checked-example-1" aria-checked="false"/>
+                            <label class="mb-0 eds-radio__label eds-radio__delegate" for="textRadio" data-spec="radio-delegate">Item 2</label>
+                            <label class="mb-0 eds-radio__label eds-radio__display-label" for="textRadio" data-spec="radio-display-label" data-automation="radio-checked-example-1-label">Form/Text Submission</label>
+                        </div>
                     </div>
-                    <div class="form-group form-check">
-                        <input type="radio" name="doc_switcher" value="text" id="textRadio" class="form-check-input"
-                            {% if not file_form %} checked {% endif %}>
-                        <label class="form-check-label" for="textRadio">
-                            Form/Text Submission
-                        </label>
-                    </div>
+
                     <form action="" method='post'>
                         {% csrf_token %}
                         <div class="doc_req_file">
-                            {{ forms.file_doc.as_p }}
+                            {{ form.non_field_errors }}
+                            <div class="form-group">
+                                {{ form.file_doc.errors }}
+                                <label for="{{ form.name.id_for_label }}">Name:</label>
+                                {{ forms.file_doc.name }}
+                                <small id="nameHelp" class="form-text text-muted">Example: Article, Resume, Presentation</small>
+                            </div>
+                            <div class="form-group form-check">
+                                {{ forms.file_doc.is_optional.errors }}
+                                {{ forms.file_doc.is_optional }}
+                                <label class="form-check-label" for="{{ forms.file_doc.is_optional.id_for_label }}">Optional:</label>
+                            </div>
+                            <div class="form-group">
+                                {{ forms.file_doc.file_type.errors }}
+                                <label for="{{ forms.file_doc.file_type.id_for_label }}">Allowed formats:</label>
+                                {{ forms.file_doc.file_type }}
+                            </div>
+                            <div class="form-group">
+                                {{ forms.file_doc.quantity.errors }}
+                                <label for="{{ forms.file_doc.quantity.id_for_label }}">Quantity:</label>
+                                {{ forms.file_doc.quantity }}
+                            </div>
                             <div class="row justify-content-center align-items-center mt-3">
                                 <div class="col-4 col-lg-6 text-right">
-                                    <input type='submit' name='submit_file' value="Create" class="eds-btn eds-btn--submit eds-btn--fill"/>
+                                    <input type='submit' name='submit_file' value="Create" class="eds-btn eds-btn--submit eds-btn--fill" />
                                 </div>
                                 <div class="col-4 col-lg-6">
                                     <a data-spec="eds-link" href="{% url 'docs' event.id %}" class="eds-link">Cancel</a>
@@ -83,10 +106,46 @@
                     <form action="" method='post'>
                         {% csrf_token %}
                         <div class="doc_req_text">
-                            {{ forms.text_doc.as_p }}
+                            {{ form.non_field_errors }}
+                            <div class="form-group">
+                                {{ form.text_doc.errors }}
+                                <label for="{{ form.name.id_for_label }}">Name:</label>
+                                {{ forms.text_doc.name }}
+                                <small id="emailHelp" class="form-text text-muted">Example: Article, Resume, Presentation</small>
+                            </div>
+                            <div class="form-group form-check">
+                                {{ forms.text_doc.is_optional.errors }}
+                                {{ forms.text_doc.is_optional }}
+                                <label class="form-check-label" for="{{ forms.text_doc.is_optional.id_for_label }}">Optional:</label>
+                            </div>
+                            <div class="form-group">
+                                {{ forms.text_doc.measure.errors }}
+                                <label for="{{ forms.text_doc.measure.id_for_label }}">Measure:</label>
+                                {{ forms.text_doc.measure }}
+                            </div>
+                            <div class="eds-field__sub">
+                                <div class="eds-field__sub--left"></div>
+                                <div class="eds-field__sub--right"></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        {{ forms.text_doc.min.errors }}
+                                        <label for="{{ forms.text_doc.min.id_for_label }}">Minimum:</label>
+                                        {{ forms.text_doc.min }}
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        {{ forms.text_doc.max.errors }}
+                                        <label for="{{ forms.text_doc.max.id_for_label }}">Maximum:</label>
+                                        {{ forms.text_doc.max }}
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row justify-content-center align-items-center mt-3">
                                 <div class="col-4 col-lg-6 text-right">
-                                    <input type='submit' name='submit_text' value="Create" class="eds-btn eds-btn--submit eds-btn--fill"/>
+                                    <input type='submit' name='submit_text' value="Create" class="eds-btn eds-btn--submit eds-btn--fill" />
                                 </div>
                                 <div class="col-4 col-lg-6">
                                     <a href="{% url 'docs' event.id %}">
@@ -119,4 +178,5 @@
         $(":radio").on('change', toggleForms);
     }
     $(document).ready(switcher);
-</script> {% endblock content %}
+</script> 
+{% endblock content %}
