@@ -191,7 +191,7 @@
         <div>
             <a class="eds-btn eds-btn--button eds-btn--neutral" href="{% url 'landing' event.id %}" target=”_blank”>Preview</a>
             <a class="eds-btn eds-btn--button eds-btn--fill" href="{% url 'doc_form' event.id %}" role="button"> New
-                Requirement</a>
+                Submission</a>
         </div>
     </div>
     <div class="row">
@@ -240,11 +240,8 @@
                     </tr>
                 </thead>
                 <tbody class="eds-table-list">
-                {% if not doc_file %}
+                {% if not docs_file %}
                 <tr class="eds-data-table-list-item">
-                    <td class="eds-data-table-list-item__column">
-
-                    </td>
                     <td class="eds-data-table-list-item__column">
                         - To add a new <b>files requirement</b> click on <b>'New Requirement'</b>
                     </td>
@@ -257,7 +254,7 @@
                         <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
                             <div>
                                 {% for file_type in doc.file_types %}
-                                <div class="eds-list-item eds-list-item--align-middle" data-spec="eds-list-item">
+                                <div class="eds-list-item eds-list-item--align-middle pb-2" data-spec="eds-list-item">
                                     <span class="eds-list-item__aside eds-list-item__icon">
                                         {% if file_type.name == "image" %}
                                             <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
@@ -413,11 +410,8 @@
                     </tr>
                 </thead>
                 <tbody class="eds-table-list">
-                {% if not doc_text %}
+                {% if not docs_text %}
                 <tr class="eds-data-table-list-item">
-                    <td class="eds-data-table-list-item__column">
-
-                    </td>
                     <td class="eds-data-table-list-item__column">
                         - To add a new <b>text requirement</b> click on <b>'New Requirement'</b>
                     </td>

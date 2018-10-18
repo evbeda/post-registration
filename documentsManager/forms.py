@@ -5,6 +5,7 @@ from django.forms import (
     ModelMultipleChoiceField,
     TextInput,
     NumberInput,
+    CheckboxInput,
     Select,
 )
 from django.utils.translation import gettext_lazy as _
@@ -19,7 +20,7 @@ class FileDocForm(ModelForm):
     file_type = ModelMultipleChoiceField(
         queryset=FileType.objects.all(),
         required=False,
-        widget=CheckboxSelectMultiple
+        widget=CheckboxSelectMultiple(attrs={'class': 'form-check-input'})
     )
 
     class Meta:
@@ -39,6 +40,7 @@ class FileDocForm(ModelForm):
         widgets = {
             'quantity': TextInput(attrs={'min': '1', 'max': '100', 'type': 'number', 'class': 'form-control col-3'}),
             'name': TextInput(attrs={'class': 'form-control col-10'}),
+            'is_optional': CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
 
@@ -73,9 +75,10 @@ class TextDocForm(ModelForm):
         }
         widgets = {
             'name': TextInput(attrs={'class': 'form-control col-10'}),
-            'measure': Select(attrs={'class': 'form-control col-4'}),
-            'min': NumberInput(attrs={'class': 'form-control col-2'}),
-            'max': NumberInput(attrs={'class': 'form-control col-2'}),
+            'is_optional': CheckboxInput(attrs={'class': 'form-check-input'}),
+            'measure': Select(attrs={'class': 'form-control'}),
+            'min': NumberInput(attrs={'class': 'form-control'}),
+            'max': NumberInput(attrs={'class': 'form-control'}),
         }
 
 

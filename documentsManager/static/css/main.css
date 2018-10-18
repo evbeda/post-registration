@@ -39,6 +39,9 @@ body {
 .card ul {
   list-style: none; }
 
+form .form-group ul {
+  padding-left: 1.25rem; }
+
 .form-wrapper {
   right: 0;
   left: auto; }
