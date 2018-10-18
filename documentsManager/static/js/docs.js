@@ -6,9 +6,9 @@ const $cancelEdit = $('#cancel_update');
 const $confirmEditDiv = $('#confirm_edit_div');
 const $confirmEditWarning = $('#confirm_edit_warning');
 const $cancelEditWarning = $('#cancel_update_warning');
-const $warningDiv = $('#warning_div')
+const $warningDiv = $('#warning_div');
 const $cancelEditError = $('#cancel_update_error');
-const $errorDiv = $('#error_div')
+const $errorDiv = $('#error_div');
 const $inputEndSubmission = $('#id_end_submission');
 const $inputInitSubmission = $('#id_init_submission');
 const $textModal = $('#modal-body-warning');
@@ -22,18 +22,18 @@ const toggleFormsEdit = function () {
 const hideInputs = function (value) {
     $inputEndSubmission.prop('disabled', value);
     $inputInitSubmission.prop('disabled', value);
-}
+};
 
 const hideEditButton = function () {
     $confirmEdit.hide();
     $cancelEdit.hide();
-}
+};
 
 const hideWarningErrorButton = function () {
     $confirmEditWarning.hide();
     $cancelEditWarning.closest('span').hide();
     $cancelEditError.closest('span').hide();
-}
+};
 
 const confirmForm = function(event) {
     event.preventDefault();
@@ -44,7 +44,8 @@ const confirmForm = function(event) {
         hideEditButton();
         $cancelEditError.closest('span').show();
         hideInputs(true);
-        $errorDiv.find('.alert').text('The end date is greater than the start date of the submissions.')
+        const text = 'The end date is greater than the start date of the submissions.';
+        $errorDiv.find('.eds-notification-bar__content').text(text);
     }
     else if (date_init_is_before || date_end_is_before) {
             $warningDiv.fadeIn();
@@ -53,10 +54,12 @@ const confirmForm = function(event) {
             $cancelEditWarning.closest('span').show();
             hideInputs(true);
         if (date_end_is_before && date_init_is_before) {
-            $warningDiv.find('.alert').text('The end and start date is greater than the start date of the event.')
+            const text = 'The end and start date is greater than the start date of the event.';
+            $warningDiv.find('.eds-notification-bar__content').text(text);
         }
         else if (date_end_is_before) {
-            $warningDiv.find('.alert').text('The end date is greater than the start date of the event.')
+            const text = 'The end date is greater than the start date of the event.';
+            $warningDiv.find('.eds-notification-bar__content').text(text);
         }
     } else {
         $formulario.submit();
@@ -67,7 +70,7 @@ const confirmFormWarning = function (event) {
     event.preventDefault();
     hideInputs(false);
     $formulario.submit();
-}
+};
 
 const cancelEdition = function (event) {
     event.preventDefault();

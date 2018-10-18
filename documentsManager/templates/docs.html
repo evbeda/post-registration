@@ -1,6 +1,33 @@
 {% extends "base.html" %} {% block content %} {%include "partials/jumbotron.html" %} {% load static %}
 
 <div class="container">
+    <div class="row mb-3">
+        <div class="col">
+            <ul class="eds-breadcrumbs">
+                <li class="eds-breadcrumbs__item">
+                    <a class="eds-breadcrumbs__item--link eds-text-bm eds-text-color--grey-600"
+                       href="/"
+                       data-spec="breadcrumbs-link">Managed Events</a>
+                    <span class="eds-l-mar-hor-1">
+                    <i class="eds-vector-image eds-icon--xsmall eds-vector-image--grey-400" data-spec="icon"
+                       aria-hidden="true">
+                        <svg id="eds-icon--chevron-right-chunky_svg" xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 24 24">
+                            <path id="eds-icon--chevron-right-chunky_base"
+                                  fill-rule="evenodd" clip-rule="evenodd"
+                                  d="M10.2 17l5-5-5-5-1.4 1.4 3.6 3.6-3.6 3.6z">
+                            </path>
+                        </svg>
+                    </i>
+                </span>
+                </li>
+                <li class="eds-breadcrumbs__item">
+                <span data-spec="breadcrumbs-active"
+                      class="eds-text-bm eds-text-color--grey-900">{{ event.name }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
     <div class="row pt-2 pb-2">
         <div class="col-lg-9">
             <div class='row mb-3'>
@@ -33,10 +60,10 @@
                     </span>
                 </div>
             </div>
-            <div class='row mb-3' id='confirm_edit_div'>
+            <div class='row mb-3 hidden_div' id='confirm_edit_div'>
                 <input type="hidden" value="{{ event.eb_event_start }}" id="eb_event_start">
                 <form action="" method="post" class="form-inline w-100" id="dates_form">
-                    {% csrf_token %} 
+                    {% csrf_token %}
                     {% for field in form %}
                     <div class="col-3">{{ field }}</div>
                     {% endfor %}
@@ -91,12 +118,70 @@
                     </div>
                 </form>
             </div>
-            <div class='row mb-3' id='warning_div'>
-                <div class='col-6 alert alert-warning' role='alert'>
+            <div class='row mb-3 pl-3 hidden_divg' id='warning_div'>
+                <div class="eds-notification-bar eds-bg-color--vibrant-yellow"
+                     role="alert"
+                     style="width:65%"
+                     data-spec="notification-bar">
+                    <div class="eds-notification-bar__icon">
+                        <i class="eds-vector-image eds-icon--small eds-vector-image--white"
+                           data-spec="icon"
+                           aria-hidden="true">
+                            <svg class="eds-icon--alert-chunky_svg"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 viewBox="0 0 24 24">
+                                <path class="eds-icon--alert-chunky_base"
+                                      fill-rule="evenodd"
+                                      clip-rule="evenodd"
+                                      d="M12 18c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6zm0-14c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8z">
+                                </path>
+                                <path class="eds-icon--alert-chunky_dot"
+                                      fill-rule="evenodd"
+                                      clip-rule="evenodd"
+                                      d="M11 14h2v2h-2z">
+                                </path>
+                                <path class="eds-icon--alert-chunky_line"
+                                      fill-rule="evenodd"
+                                      clip-rule="evenodd"
+                                      d="M11 8h2v5h-2z">
+                                </path>
+                            </svg>
+                        </i>
+                    </div>
+                    <div class="eds-notification-bar__content"></div>
                 </div>
             </div>
-            <div class='row mb-3' id='error_div'>
-                <div class='col-6 alert alert alert-danger' role='alert'>
+            <div class='row mb-3 pl-3 hidden_div' id='error_div'>
+                <div class="eds-notification-bar eds-notification-bar--alert"
+                     role="alert"
+                     style="width:65%"
+                     data-spec="notification-bar">
+                    <div class="eds-notification-bar__icon">
+                        <i class="eds-vector-image eds-icon--small eds-vector-image--white"
+                           data-spec="icon"
+                           aria-hidden="true">
+                            <svg class="eds-icon--alert-chunky_svg"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 viewBox="0 0 24 24">
+                                <path class="eds-icon--alert-chunky_base"
+                                      fill-rule="evenodd"
+                                      clip-rule="evenodd"
+                                      d="M12 18c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6zm0-14c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8z">
+                                </path>
+                                <path class="eds-icon--alert-chunky_dot"
+                                      fill-rule="evenodd"
+                                      clip-rule="evenodd"
+                                      d="M11 14h2v2h-2z">
+                                </path>
+                                <path class="eds-icon--alert-chunky_line"
+                                      fill-rule="evenodd"
+                                      clip-rule="evenodd"
+                                      d="M11 8h2v5h-2z">
+                                </path>
+                            </svg>
+                        </i>
+                    </div>
+                    <div class="eds-notification-bar__content"></div>
                 </div>
             </div>
         </div>
@@ -105,13 +190,13 @@
     <div class='row justify-content-end pt-3'>
         <div>
             <a class="eds-btn eds-btn--button eds-btn--neutral" href="{% url 'landing' event.id %}" target=”_blank”>Preview</a>
-            <a class="eds-btn eds-btn--button eds-btn--fill" href="{% url 'doc_form' event.id %}" role="button"> New Submission</a>
+            <a class="eds-btn eds-btn--button eds-btn--fill" href="{% url 'doc_form' event.id %}" role="button"> New
+                Requirement</a>
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <p class="lead">File Documentation
-                </h2>
+            <p class="lead">File Documentation</p>
         </div>
     </div>
     <div class="eds-data-table mb-5">
@@ -155,6 +240,16 @@
                     </tr>
                 </thead>
                 <tbody class="eds-table-list">
+                {% if not doc_file %}
+                <tr class="eds-data-table-list-item">
+                    <td class="eds-data-table-list-item__column">
+
+                    </td>
+                    <td class="eds-data-table-list-item__column">
+                        - To add a new <b>files requirement</b> click on <b>'New Requirement'</b>
+                    </td>
+                </tr>
+                {% endif %}
                     {% for doc in docs_file %}
                     <tr class="eds-data-table-list-item">
                         <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.id }}</td>
@@ -318,6 +413,16 @@
                     </tr>
                 </thead>
                 <tbody class="eds-table-list">
+                {% if not doc_text %}
+                <tr class="eds-data-table-list-item">
+                    <td class="eds-data-table-list-item__column">
+
+                    </td>
+                    <td class="eds-data-table-list-item__column">
+                        - To add a new <b>text requirement</b> click on <b>'New Requirement'</b>
+                    </td>
+                </tr>
+                {% endif %}
                     {% for doc in docs_text %}
                     <tr class="eds-data-table-list-item">
                         <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.id }}</td>
