@@ -1,8 +1,7 @@
 {% extends "base.html" %} {% block content %}
-
 <div class="jumbotron jumbotron-fluid">
     <div class="container">
-        <h1 class="display-4">Your Unmanaged Events</h1>
+        <h1>Events without documentation management.</h1>
     </div>
 </div>
 <div class="container">
@@ -36,6 +35,8 @@
     {% if events %}
     <div class="row justify-content-center">
         <div class="col-md-9">
+            <h5 class="mb-1">Select the event which you want to request documentation.</h5>
+            <hr class="eds-divider__hr eds-bg-color--grey-200 eds-divider--horizontal mb-3" data-spec="divider-hr" aria-hidden="true"/>
             <ul class="eds-card-list">
                 {% for event in events %}
                 <li class="eds-card-list__item" data-spec="eds-card-list-item">
