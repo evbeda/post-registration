@@ -13,7 +13,7 @@ body {
 }
 
 .content {
-    padding-bottom: $footer-height;
+    padding-bottom: $footer-height+20px;
 }
 
 .footer {
@@ -125,4 +125,13 @@ button.success-btn {
 
 .hidden_div{
     display:none;
+}
+
+.eds-card-list__item {
+
+    &:hover {
+        #eds-icon--up-chevron_base {
+            fill: $ui-orange;
+        }          
+    }
 }

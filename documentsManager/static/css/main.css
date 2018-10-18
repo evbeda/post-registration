@@ -8,7 +8,7 @@ body {
   min-height: 100%; }
 
 .content {
-  padding-bottom: 150px; }
+  padding-bottom: 170px; }
 
 .footer {
   background-color: #1E0A3C;
@@ -76,26 +76,27 @@ button.success-btn {
   background-color: #16A85A; }
 
 .card-body textarea {
-    resize: none;
-}
+  resize: none; }
 
 .container_post {
-    height: 100vh;
-    width: 100vw;
-    background-color: #16A85A;
-    display: flex;
-    align-items: center;
-}
-.container_post img{
-    top:0;
-    left:0;
-    position: fixed;
-    height: 100vh;
-    width: 100vw;
-    z-index:0;
-}
+  height: 100vh;
+  width: 100vw;
+  background-color: #16A85A;
+  display: flex;
+  align-items: center; }
 
-.hidden_div{
-    display:none;
-}
+.container_post img {
+  top: 0;
+  left: 0;
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  z-index: 0; }
+
+.hidden_div {
+  display: none; }
+
+.eds-card-list__item:hover #eds-icon--up-chevron_base {
+  fill: #F05537; }
+
 /*# sourceMappingURL=main.css.map */
