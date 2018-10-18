@@ -18,10 +18,14 @@
         <img src="{% static 'images/conference.jpg' %}" alt="">
         <div class="card shadow bg-white rounded ">
             <div class="card-header">
-                <b>End day to submit:</b> {{ event.end_submission }}
+                The submissions can be sent until: <b> {{ event.end_submission }}</b>
             </div>
             <div class="card-body">
                 <h1 class="card-title display-4">{{ eb_event.name }}</h1>
+                {% if not text_doc and not file_doc %}
+                <hr>
+                <h2 class="card-subtitle text-muted">You don't have configured submissions yet</h2>
+                {% endif %}
                 {% if text_doc %}
                 <hr>
                 <h2 class="card-subtitle text-muted">{{ text_doc.name }}</h2>
@@ -47,7 +51,12 @@
             </div>
             <div class="card-footer d-flex justify-content-between d-flex align-items-center">
                 <span class="ml-2 text-danger">* Required</span>
-                <a class="btn btn-success btn-lg" href="{% url 'success' event.id %}">Send</a>
+                {% if not text_doc and not file_doc %}
+                <button class="eds-btn eds-btn--button eds-btn--fill" onclick="window.close();">Back to Manage Docs
+                </button>
+                {% else %}
+                <a class="eds-btn eds-btn--button eds-btn--fill" href="{% url 'success' event.id %}">Send</a>
+                {% endif %}
             </div>
         </div>
 
