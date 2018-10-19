@@ -143,7 +143,8 @@ class HomeView(TemplateView, LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
         context['user'] = self.request.user
-        api_events_w_venues = get_events_with_venues_api(get_auth_token(self.request.user))
+        api_events_w_venues = get_events_with_venues_api(
+            get_auth_token(self.request.user))
         parse_api_events = parse_events(api_events_w_venues)
         docs_events_list = Event.objects.all().values_list('eb_event_id', 'id')
         events = filter_managed_event(parse_api_events, docs_events_list)
@@ -152,7 +153,6 @@ class HomeView(TemplateView, LoginRequiredMixin):
 
 
 class BaseDocUpdate(UpdateView):
-    template_name = 'partials/doc_update_form.html'
 
     def get_context_data(self, **kwargs):
         context = super(UpdateView, self).get_context_data(**kwargs)
@@ -172,29 +172,17 @@ class BaseDocUpdate(UpdateView):
 class FileDocUpdate(BaseDocUpdate):
     model = FileDoc
     form_class = FileDocForm
-
-    def get_context_data(self, **kwargs):
-        context = super(BaseDocUpdate, self).get_context_data(**kwargs)
-        event_id = self.kwargs['event_id']
-        context['event_id'] = event_id
-        context['form_type'] = 'filedoc'
-        return context
+    template_name = 'file_doc_update_form.html'
 
 
 class TextDocUpdate(BaseDocUpdate):
     model = TextDoc
     form_class = TextDocForm
-
-    def get_context_data(self, **kwargs):
-        context = super(BaseDocUpdate, self).get_context_data(**kwargs)
-        event_id = self.kwargs['event_id']
-        context['event_id'] = event_id
-        context['form_type'] = 'textdoc'
-        return context
+    template_name = 'text_doc_update_form.html'
 
 
 class BaseDocDelete(DeleteView):
-    template_name = 'partials/doc_confirm_delete.html'
+    template_name = 'doc_confirm_delete.html'
 
     def get_context_data(self, **kwargs):
         context = super(DeleteView, self).get_context_data(**kwargs)
