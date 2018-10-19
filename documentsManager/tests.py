@@ -238,8 +238,8 @@ class ViewTest(TestBase):
         TextDoc.objects.create(event=event)
         FileDoc.objects.create(event=event)
         response = self.client.get('/landing/{}/'.format(event.id))
-        self.assertTrue('text_doc' in response.context)
-        self.assertTrue('file_doc' in response.context)
+        self.assertTrue('text_docs' in response.context)
+        self.assertTrue('file_docs' in response.context)
 
 
 class DocumentsmanagerConfigTest(TestCase):

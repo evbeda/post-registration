@@ -235,12 +235,12 @@ class LandingView(TemplateView):
                 event.eb_event_id
             )
             context['eb_event'] = parse_events(eb_event)[0]
-            text_doc = TextDoc.objects.filter(event=event).first()
+            text_doc = TextDoc.objects.filter(event=event)
             if text_doc:
-                context['text_doc'] = text_doc
-            file_doc = FileDoc.objects.filter(event=event).first()
+                context['text_docs'] = text_doc
+            file_doc = FileDoc.objects.filter(event=event)
             if file_doc:
-                context['file_doc'] = file_doc
+                context['file_docs'] = file_doc
         return context
 
 
