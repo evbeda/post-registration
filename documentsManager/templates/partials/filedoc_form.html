@@ -1,0 +1,33 @@
+<form method="post">
+    {% csrf_token %} 
+    {{ form.non_field_errors }}
+    <div class="form-group">
+        {{ form.errors }}
+        <label for="{{ form.name.id_for_label }}">Name:</label>
+        {{ form.name }}
+        <small id="nameHelp" class="form-text text-muted">Example: Article, Resume, Presentation</small>
+    </div>
+    <div class="form-group form-check">
+        {{ form.is_optional.errors }}
+        {{ form.is_optional }}
+        <label class="form-check-label" for="{{ form.is_optional.id_for_label }}">Optional:</label>
+    </div>
+    <div class="form-group">
+        {{ form.file_type.errors }}
+        <label for="{{ form.file_type.id_for_label }}">Allowed formats:</label>
+        {{ form.file_type }}
+    </div>
+    <div class="form-group">
+        {{ form.quantity.errors }}
+        <label for="{{ form.quantity.id_for_label }}">Quantity:</label>
+        {{ form.quantity }}
+    </div>
+    <div class="row justify-content-center align-items-center mt-3">
+        <div class="col-4 col-lg-6 text-right">
+            <input type="submit" class="eds-btn eds-btn--button eds-btn--fill" value="Update">
+        </div>
+        <div class="col-4 col-lg-6">
+            <a data-spec="eds-link" href="{% url 'docs' event_id %}" class="eds-link">Cancel</a>
+        </div>
+    </div>
+</form>
