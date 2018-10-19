@@ -46,7 +46,7 @@ class FileDoc(models.Model):
 class TextDoc(models.Model):
     MEASUREMENT_CHOICE = (
         ('Words', 'Words'),
-        ('Chars', 'Chars'),
+        ('Characters', 'Characters'),
     )
     name = models.CharField(max_length=100, blank=False)
     is_optional = models.BooleanField(default=False)
