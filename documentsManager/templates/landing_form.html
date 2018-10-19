@@ -12,65 +12,64 @@
     <title>Attendees Documentation</title>
 </head>
 
-<body>
-<div class="container_post">
+<body class="container_post d-flex justify-content-center p-5g">
+<div>
     <div class="container">
-        <img src="{% static 'images/conference.jpg' %}" alt="">
-        <div class="card shadow bg-white rounded ">
-            <div class="card-header">
-                The submissions can be sent until: <b> {{ event.end_submission }}</b>
-            </div>
-            <div class="card-body">
-                <h1 class="card-title display-4">{{ eb_event.name }}</h1>
-                {% if not text_doc and not file_doc %}
-                <hr>
-                <h2 class="card-subtitle text-muted">You don't have configured submissions yet</h2>
-                {% endif %}
-                {% if text_doc %}
-                <hr>
-                <h2 class="card-subtitle text-muted">{{ text_doc.name }}</h2>
-                <label for="comment"
-                >You have to write at least {{ text_doc.min }} to {{ text_doc.max }} {{ text_doc.measure }}</label>
-                {% if text_doc.is_optional %}
-                <span class="ml-1 text-danger">*</span>
-                {% endif %}
-                <textarea class="form-control" rows="5" id="comment" placeholder="Explanation..."></textarea>
-                {% endif %}
-                {% if file_doc %}
-                <hr>
-                <h2 class="card-subtitle text-muted">{{ file_doc.name }}</h2>
-                <label for="comment">Max uploads allowed: {{ file_doc.quantity}}</label>
-                {% if file_doc.is_optional %}
-                <span class="ml-1 text-danger">*</span>
-                {% endif %}
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="inputGroupFile01">
-                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+        <div class="row">
+            <div class="col">
+                <div class="card shadow bg-white rounded ">
+                    <div class="card-header">
+                        The submissions can be sent until: <b> {{ event.end_submission }}</b>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="card-title display-4">{{ eb_event.name }}</h1>
+                        {% if not text_docs and not file_docs %}
+                        <hr>
+                        <h2 class="card-subtitle text-muted">You don't have configured submissions yet</h2>
+                        {% endif %}
+                        {% if text_docs %}
+                        {% for text_doc in text_docs %}
+                        <hr>
+                        <h2 class="card-subtitle text-muted">{{ text_doc.name }}</h2>
+                        <label for="comment"
+                        >You have to write at least {{ text_doc.min }} to {{ text_doc.max }}
+                            {{ text_doc.measure }}</label>
+                        {% if text_doc.is_optional %}
+                        <span class="ml-1 text-danger">*</span>
+                        {% endif %}
+                        <textarea class="form-control" rows="5" id="comment" placeholder="Explanation..."></textarea>
+                        {% endfor %}
+                        {% endif %}
+                        {% if file_docs %}
+                        {% for file_doc in file_docs %}
+                        <hr>
+                        <h2 class="card-subtitle text-muted">{{ file_doc.name }}</h2>
+                        <label for="comment">Max uploads allowed: {{ file_doc.quantity}}</label>
+                        {% if file_doc.is_optional %}
+                        <span class="ml-1 text-danger">*</span>
+                        {% endif %}
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="inputGroupFile01" value="Uploadg">
+                            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="card-footer d-flex justify-content-between d-flex align-items-center">
+                        <span class="ml-2 text-danger">* Required</span>
+                        {% if not text_docs and not file_docs %}
+                        <button class="eds-btn eds-btn--button eds-btn--fill" onclick="window.close();">Back to Manage
+                            Docs
+                        </button>
+                        {% else %}
+                        <a class="eds-btn eds-btn--button eds-btn--fill" href="{% url 'success' event.id %}">Ok</a>
+                        {% endif %}
+                    </div>
                 </div>
-                {% endif %}
-            </div>
-            <div class="card-footer d-flex justify-content-between d-flex align-items-center">
-                <span class="ml-2 text-danger">* Required</span>
-                {% if not text_doc and not file_doc %}
-                <button class="eds-btn eds-btn--button eds-btn--fill" onclick="window.close();">Back to Manage Docs
-                </button>
-                {% else %}
-                <a class="eds-btn eds-btn--button eds-btn--fill" href="{% url 'success' event.id %}">Send</a>
-                {% endif %}
             </div>
         </div>
-
     </div>
 </div>
 </body>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-        crossorigin="anonymous"></script>
 
 </html>

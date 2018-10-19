@@ -9,19 +9,58 @@
     <link rel="stylesheet" type="text/css"
           href="https://cdn.evbstatic.com/s3-build/30226-rc2018-10-03_16.04-d2023ac/js/node_modules/eventbrite_design_system/css/eds.css">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css"/>
     <title>Attendees Documentation</title>
 </head>
 
-<body>
-<div class="container_post">
+<body class="container_post d-flex justify-content-center">
+<div>
     <div class="container">
-        <img src="{% static 'images/conference.jpg' %}" alt="">
-        <div class="card shadow bg-white rounded">
-            <div class="card-body">
-                <h1 class="card-title text-center display-2">Done!</h1>
-                <p class="card-text text-center">
-                    Soon we will contact you.
-                </p>
+        <div class="row">
+            <div class="col">
+                <div class="card shadow bg-white rounded animated fadeInLeft">
+                    <div class="card-body text-center">
+                        <i class="eds-max-img"
+                           data-spec="icon"
+                           aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="144"
+                                 height="144"
+                                 viewBox="0 0 144 144">
+                                <g fill="none"
+                                   fill-rule="evenodd">
+                                    <path d="M0 0h144v144H0z">
+                                    </path>
+                                    <g>
+                                        <path fill="#F6682F"
+                                              fill-rule="nonzero"
+                                              d="M49.714 92.693h68.529V48H49.714z">
+                                        </path>
+                                        <path fill="#F8FAFF"
+                                              fill-rule="nonzero"
+                                              d="M118.243 48L83.979 79.284 49.714 48z">
+                                        </path>
+                                        <path stroke="#363A43"
+                                              stroke-width="3"
+                                              d="M49.714 92.693h68.529V48H49.714z">
+                                        </path>
+                                        <path stroke="#363A43"
+                                              stroke-width="3"
+                                              d="M118.243 48L83.979 79.284 49.714 48m0 45.08l19.367-19.366m49.714 19.367L99.429 73.714">
+                                        </path>
+                                        <path stroke="#363A43"
+                                              stroke-width="2"
+                                              d="M25.714 56.571h2.98m2.163 0h2.98m3.877 0h2.98m-9.837 13.715h2.98m3.877 0h2.98m2.163 0h2.98M25.714 85.714h2.98m2.163 0h2.98m3.877 0h2.98">
+                                        </path>
+                                    </g>
+                                </g>
+                            </svg>
+                        </i>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <h1 class="card-title">Successfully uploaded</h1>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
