@@ -52,6 +52,13 @@
                             <input type="file" class="custom-file-input" id="inputGroupFile01" value="Uploadg">
                             <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                         </div>
+                        {% if file_doc.file_types %}
+                        <small>Allowed formats:
+                            {% for filetype in file_doc.file_types %}
+                            {{ filetype.description }}
+                            {% endfor %}
+                        </small>
+                        {% endif %}
                         {% endfor %}
                         {% endif %}
                     </div>
