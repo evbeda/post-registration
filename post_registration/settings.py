@@ -43,6 +43,7 @@ ALLOWED_HOSTS = [
     'post-registration.herokuapp.com',
     'release-post-registration.herokuapp.com',
     '127.0.0.1',
+    'c3682092.ngrok.io',
 ]
 
 # Application definition

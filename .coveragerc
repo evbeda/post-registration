@@ -16,7 +16,9 @@ omit =
     */settings/*,
     */wsgi.py,
     manage.py,
-    fabfile.py
+    fabfile.py,
+    */app_settings.py,
+
 
 [report]
 exclude_lines =
