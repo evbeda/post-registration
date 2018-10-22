@@ -86,16 +86,32 @@
 											<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1">{{ event.start }}</div>
 											<div class="eds-media-card-content__sub-content-cropped">
 												<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1">
-													{% if event.venue %}
-													{{ event.venue }}
-													{% else %}
-													No location specified
-													{% endif %}
+												{% if event.venue_id == '' %}	
+                                                No location specified
+                                                {% else %}
+                                                {{ event.venue }}
+                                                {% endif %}
 												</div>
+												<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1">Free • on Eventbrite</div>
 												<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1"></div>
 											</div>
 										</div>
 									</div>
+								</div>
+								<div class="eds-media-card-content__actions-container eds-media-card-content__actions-container--always-visible">
+									<span class="eds-media-card-content__actions-container__action eds-l-pad-all-1">
+										<span class="eds-icon-button eds-icon-button--dark">
+											<button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
+												<i class="eds-vector-image eds-icon--small eds-vector-image--block" title="Save" data-spec="icon"><svg id="eds-icon--user-chunky_svg"
+													 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+														<path id="eds-icon--heart-chunky_base" fill-rule="evenodd" clip-rule="evenodd" d="M18.8 6.2C18.1 5.4 17 5 16 5c-1 0-2 .4-2.8 1.2L12 7.4l-1.2-1.2C10 5.4 9 5 8 5c-1 0-2 .4-2.8 1.2-1.5 1.6-1.5 4.2 0 5.8l6.8 7 6.8-7c1.6-1.6 1.6-4.2 0-5.8zm-1.4 4.4L12 16.1l-5.4-5.5c-.8-.8-.8-2.2 0-3C7 7.2 7.5 7 8 7c.5 0 1 .2 1.4.6l2.6 2.7 2.7-2.7c.3-.4.8-.6 1.3-.6s1 .2 1.4.6c.8.8.8 2.2 0 3z"
+														/>
+													</svg>
+													<span class="eds-is-hidden-accessible">Save</span>
+												</i>
+											</button>
+										</span>
+									</span>
 								</div>
 							</main>
 						</section>

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from django.conf import settings
 
 from django.core.validators import MaxValueValidator
 from django.db import models
@@ -94,3 +95,11 @@ class Evaluator(models.Model):
 
     class Meta(object):
         db_table = 'Evaluator'
+
+
+class UserWebhook(models.Model):
+    webhook_id = models.CharField(max_length=255)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )

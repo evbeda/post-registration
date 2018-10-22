@@ -17,9 +17,4 @@ class Migration(migrations.Migration):
             name='state',
             field=models.CharField(choices=[('pending', 'Waiting for acceptance'), ('active', 'Active'), ('inactive', 'Inactive')], default='pending', max_length=20),
         ),
-        migrations.AlterField(
-            model_name='textdoc',
-            name='measure',
-            field=models.CharField(choices=[('Words', 'Words'), ('Characters', 'Characters')], default='Words', max_length=10),
-        ),
     ]

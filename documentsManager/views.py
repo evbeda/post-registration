@@ -1,33 +1,49 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from .forms import EvaluatorForm, EventForm, FileDocForm, TextDocForm
+from django.views.generic import (
+    FormView,
+    CreateView,
+    ListView,
+    DeleteView,
+    UpdateView,
+)
+from .forms import (
+    EvaluatorForm,
+    EventForm,
+    FileDocForm,
+    TextDocForm,
+    SignUpForm,
+    SubmissionForm,
+)
 from .models import Evaluator, Event, FileDoc, TextDoc
-from astroid import objects
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.views.generic import FormView, CreateView, ListView
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from eventbrite import Eventbrite
 from multi_form_view import MultiFormView
 from social_django.models import UserSocialAuth
-
-from .forms import (
-    FileDocForm,
-    TextDocForm,
-    EventForm,
-    SignUpForm,
-    SubmissionForm,
-)
 from .models import (
     FileDoc,
     Event,
     TextDoc,
 )
+from .utils import (
+    get_data,
+    create_order_webhook_from_view,
+)
+
+
+@csrf_exempt
+def accept_webhook(request):
+    get_data(json.loads(request.body), request.build_absolute_uri)
+    return HttpResponse()
 
 
 @method_decorator(login_required, name='dispatch')
@@ -148,6 +164,7 @@ class HomeView(TemplateView, LoginRequiredMixin):
 
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
+        create_order_webhook_from_view(self.request.user,)
         context['user'] = self.request.user
         try:
             api_events_w_venues = get_events_with_venues_api(
@@ -347,6 +364,14 @@ class EvaluatorDelete(DeleteView):
         )
 
 
+class DashboardView(TemplateView, LoginRequiredMixin):
+    template_name = 'dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(DashboardView, self).get_context_data(**kwargs)
+        return context
+
+
 def parse_events(api_events):
     events = []
     for event in api_events:
@@ -358,8 +383,12 @@ def parse_events(api_events):
             'description': event.get('description', {}).get('text', 'No description'),
             'logo': (event.get('logo', {}) or {}).get('original', {}).get('url', None),
             'is_free': event.get('is_free', {}),
-            'venue': event.get('venue', {}).get('address', {}).get('localized_address_display', None)
+            'venue_id': event.get('venue_id', {}),
         }
+        if view_event['venue_id']:
+            view_event['venue'] = event.get('venue', {}).get('address', {}).get('localized_address_display', None)
+        else:
+            view_event['venue'] = ''
         events.append(view_event)
     return events
 

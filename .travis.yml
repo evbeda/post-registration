@@ -8,6 +8,7 @@ env:
   - DJANGO_SETTINGS_MODULE="post_registration.settings"
   - PYTHONPATH="/home/travis/build/evbeda/post-registration"
   - PIP_USE_MIRRORS=true
+  - URL_LOCAL=https://c3682092.ngrok.io
 
 install:
 - pip install -r requirements.txt

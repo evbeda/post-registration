@@ -17,6 +17,7 @@ from .views import (
     EvaluatorCreate,
     EvaluatorUpdate,
     EvaluatorDelete,
+    accept_webhook,
 )
 
 urlpatterns = [
@@ -45,5 +46,6 @@ urlpatterns = [
     url(r'events/$', EventsView.as_view(), name='events'),
     url(r'events/(?P<eb_event_id>\d+)/$', select_event, name='events'),
     url(r'signup/$', SignUpView.as_view(), name='signup'),
+    url(r'^webhook-point/', accept_webhook, name='accept_webhook'),
     url(r'^$', HomeView.as_view(), name='home'),
 ]
