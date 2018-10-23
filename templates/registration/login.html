@@ -4,14 +4,46 @@
     <h1 class="display-3 text-center text-light reveal">Post-Registration App</h1>
 </div>
 <div class="row">
-    <p class="text-center text-light">Login with your Eventbrite account to start</p>
-</div>
-<div class="row">
     <form>
         <div class="col-lg-12 text-center">
             <a class="btn btn-success" href="{% url 'social:begin' 'eventbrite' %}">Login with Eventbrite </a>
         </div>
     </form>
 </div>
+<div class="row">
+    <p class="text-center text-light" id='hide_login_div'>If you don't have an Eventbrite account, log in below.</p>
+</div>
+<div id='login_div'>
+	<div class="row">
+	    <form method="POST" action="{% url 'login' %}">
+	        <div class="col-lg-12 text-center errors">
+	        	{% csrf_token %}
+			    <div class="form-group">
+			        {{ form.username.errors }}
+			        <label class='text-light' for="{{ form.username.id_for_label }}">{{ form.username.label }}:</label>
+			        {{ form.username }}
+			    </div>
+			    <div class="form-group">
+			        {{ form.password.errors }}
+			        <label class='text-light' for="{{ form.password.id_for_label }}">{{ form.password.label }}:</label>
+			        {{ form.password }}
+			    </div>
+			    {{ form.non_field_errors }}
+			    <div class="row justify-content-center align-items-center mt-3" id='submit_login'>
+		            <input type="submit" class="btn btn-success" value="Log In">
+			    </div>
+	        </div>
+	    </form>
+	</div>
+	<div class="row">
+		<div class="col-lg-12 text-center">
+	    <p class="text-center text-light">Don't have an account? </p>
+	    </div>
+	</div>
+	<div class="row">
+		<div class="col-lg-12 text-center">
+		<a data-spec="eds-link" class="eds-link" href="{% url 'signup' %}">Sign up</a>
+		</div>
+	</div>
 </div>
 {% endblock %}

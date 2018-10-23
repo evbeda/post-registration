@@ -16,6 +16,10 @@ body {
     padding-bottom: $footer-height+20px;
 }
 
+.signup-container{
+    margin-top: 50px;
+}
+
 .footer {
     background-color: #1E0A3C;
     height: $footer-height;
@@ -133,3 +137,12 @@ button.success-btn {
         }          
     }
 }
+
+.errors{
+
+    & li{
+        color: red;
+    }
+}
+
+
