@@ -49,9 +49,10 @@ class TextDoc(models.Model):
         ('Characters', 'Characters'),
     )
     name = models.CharField(max_length=100, blank=False)
+    description = models.CharField(blank=True, max_length=150)
     is_optional = models.BooleanField(default=False)
     measure = models.CharField(
-        max_length=5,
+        max_length=10,
         choices=MEASUREMENT_CHOICE,
         default='Words',
     )

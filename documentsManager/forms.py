@@ -4,6 +4,7 @@ from django.forms import (
     ModelForm,
     ModelMultipleChoiceField,
     TextInput,
+    Textarea,
     NumberInput,
     CheckboxInput,
     Select,
@@ -33,7 +34,7 @@ class FileDocForm(ModelForm):
         ]
         labels = {
             'name': _('Name'),
-            'file_type': _('File Format'),
+            'file_type': _('Allowed Format'),
             'is_optional': _('Optional'),
             'quantity': _('Quantity'),
         }
@@ -61,6 +62,7 @@ class TextDocForm(ModelForm):
         model = TextDoc
         fields = [
             'name',
+            'description',
             'is_optional',
             'measure',
             'min',
@@ -68,6 +70,7 @@ class TextDocForm(ModelForm):
         ]
         labels = {
             'name': _('Name'),
+            'description': _('Description'),
             'is_optional': _('Optional'),
             'measure': _('Measure'),
             'min': _('Minimum'),
@@ -75,6 +78,7 @@ class TextDocForm(ModelForm):
         }
         widgets = {
             'name': TextInput(attrs={'class': 'form-control col-10'}),
+            'description': Textarea(attrs={'rows': 3, 'class': 'form-control'}),
             'is_optional': CheckboxInput(attrs={'class': 'form-check-input'}),
             'measure': Select(attrs={'class': 'form-control'}),
             'min': NumberInput(attrs={'class': 'form-control'}),
