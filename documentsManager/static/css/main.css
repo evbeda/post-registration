@@ -10,6 +10,9 @@ body {
 .content {
   padding-bottom: 170px; }
 
+.signup-container {
+  margin-top: 50px; }
+
 .footer {
   background-color: #1E0A3C;
   height: 150px;
@@ -91,5 +94,8 @@ button.success-btn {
 
 .eds-card-list__item:hover #eds-icon--up-chevron_base {
   fill: #F05537; }
+
+.errors li {
+  color: red; }
 
 /*# sourceMappingURL=main.css.map */

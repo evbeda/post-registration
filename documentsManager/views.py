@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.views.generic import FormView
+from django.views.generic import FormView, CreateView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView, DeleteView
 from eventbrite import Eventbrite
@@ -16,6 +16,7 @@ from .forms import (
     FileDocForm,
     TextDocForm,
     EventForm,
+    SignUpForm,
 )
 from .models import (
     FileDoc,
@@ -143,12 +144,15 @@ class HomeView(TemplateView, LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
         context['user'] = self.request.user
-        api_events_w_venues = get_events_with_venues_api(
-            get_auth_token(self.request.user))
-        parse_api_events = parse_events(api_events_w_venues)
-        docs_events_list = Event.objects.all().values_list('eb_event_id', 'id')
-        events = filter_managed_event(parse_api_events, docs_events_list)
-        context['events'] = events
+        try:
+            api_events_w_venues = get_events_with_venues_api(
+                get_auth_token(self.request.user))
+            parse_api_events = parse_events(api_events_w_venues)
+            docs_events_list = Event.objects.all().values_list('eb_event_id', 'id')
+            events = filter_managed_event(parse_api_events, docs_events_list)
+            context['events'] = events
+        except Exception:
+            pass
         return context
 
 
@@ -234,6 +238,16 @@ class LandingView(TemplateView):
 
 class SuccessView(TemplateView):
     template_name = 'success.html'
+
+
+class SignUpView(CreateView):
+    form_class = SignUpForm
+    template_name = 'signup.html'
+
+    def get_success_url(self):
+        return reverse(
+            'login',
+        )
 
 
 def parse_events(api_events):
