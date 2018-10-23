@@ -31,13 +31,14 @@
                         {% for text_doc in text_docs %}
                         <hr>
                         <h2 class="card-subtitle text-muted">{{ text_doc.name }}</h2>
-                        <label for="comment"
-                        >You have to write at least {{ text_doc.min }} to {{ text_doc.max }}
-                            {{ text_doc.measure }}</label>
+                        <p>{{ text_doc.description }}</p>
                         {% if text_doc.is_optional %}
-                        <span class="ml-1 text-danger">*</span>
                         {% endif %}
                         <textarea class="form-control" rows="5" id="comment" placeholder="Explanation..."></textarea>
+                        <small for="comment"
+                        >You have to write between {{ text_doc.min }} to {{ text_doc.max }}
+                            {{ text_doc.measure }}</small>
+                        <span class="ml-1 text-danger">*</span>
                         {% endfor %}
                         {% endif %}
                         {% if file_docs %}

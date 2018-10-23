@@ -54,7 +54,7 @@ const confirmForm = function(event) {
             $cancelEditWarning.closest('span').show();
             hideInputs(true);
         if (date_end_is_before && date_init_is_before) {
-            const text = 'The end and start date is greater than the start date of the event.';
+            const text = 'The end and start date are greater than the start date of the event.';
             $warningDiv.find('.eds-notification-bar__content').text(text);
         }
         else if (date_end_is_before) {

@@ -73,24 +73,24 @@
                         <div class="doc_req_file">
                             {{ form.non_field_errors }}
                             <div class="form-group">
-                                {{ form.file_doc.errors }}
-                                <label for="{{ form.name.id_for_label }}">Name:</label>
+                                {{ forms.file_doc.errors }}
+                                <label for="{{ forms.file_doc.name.id_for_label }}">{{ forms.file_doc.name.label }}:</label>
                                 {{ forms.file_doc.name }}
                                 <small id="nameHelp" class="form-text text-muted">Example: Article, Resume, Presentation</small>
                             </div>
                             <div class="form-group form-check">
                                 {{ forms.file_doc.is_optional.errors }}
                                 {{ forms.file_doc.is_optional }}
-                                <label class="form-check-label" for="{{ forms.file_doc.is_optional.id_for_label }}">Optional:</label>
+                                <label class="form-check-label" for="{{ forms.file_doc.is_optional.id_for_label }}">{{ forms.file_doc.is_optional.label }}</label>
                             </div>
                             <div class="form-group">
                                 {{ forms.file_doc.file_type.errors }}
-                                <label for="{{ forms.file_doc.file_type.id_for_label }}">Allowed formats:</label>
+                                <label for="{{ forms.file_doc.file_type.id_for_label }}">{{ forms.file_doc.file_type.label }}:</label>
                                 {{ forms.file_doc.file_type }}
                             </div>
                             <div class="form-group">
                                 {{ forms.file_doc.quantity.errors }}
-                                <label for="{{ forms.file_doc.quantity.id_for_label }}">Quantity:</label>
+                                <label for="{{ forms.file_doc.quantity.id_for_label }}">{{ forms.file_doc.quantity.label }}:</label>
                                 {{ forms.file_doc.quantity }}
                             </div>
                             <div class="row justify-content-center align-items-center mt-3">
@@ -108,19 +108,24 @@
                         <div class="doc_req_text">
                             {{ form.non_field_errors }}
                             <div class="form-group">
-                                {{ form.text_doc.errors }}
-                                <label for="{{ form.name.id_for_label }}">Name:</label>
+                                {{ forms.text_doc.errors }}
+                                <label for="{{ form.name.id_for_label }}">{{ forms.text_doc.name.label }}:</label>
                                 {{ forms.text_doc.name }}
                                 <small id="emailHelp" class="form-text text-muted">Example: Article, Resume, Presentation</small>
+                            </div>
+                            <div class="form-group">
+                                {{ forms.text_doc.description.errors }}
+                                <label class="form-check-label" for="{{ forms.text_doc.description.id_for_label }}">{{ forms.text_doc.description.label }}:</label>
+                                {{ forms.text_doc.description }}
                             </div>
                             <div class="form-group form-check">
                                 {{ forms.text_doc.is_optional.errors }}
                                 {{ forms.text_doc.is_optional }}
-                                <label class="form-check-label" for="{{ forms.text_doc.is_optional.id_for_label }}">Optional:</label>
+                                <label class="form-check-label" for="{{ forms.text_doc.is_optional.id_for_label }}">{{ forms.text_doc.is_optional.label }}</label>
                             </div>
                             <div class="form-group">
                                 {{ forms.text_doc.measure.errors }}
-                                <label for="{{ forms.text_doc.measure.id_for_label }}">Measure:</label>
+                                <label for="{{ forms.text_doc.measure.id_for_label }}">{{ forms.text_doc.measure.label }}:</label>
                                 {{ forms.text_doc.measure }}
                             </div>
                             <div class="eds-field__sub">
@@ -131,14 +136,14 @@
                                 <div class="col-3">
                                     <div class="form-group">
                                         {{ forms.text_doc.min.errors }}
-                                        <label for="{{ forms.text_doc.min.id_for_label }}">Minimum:</label>
+                                        <label for="{{ forms.text_doc.min.id_for_label }}">{{ forms.text_doc.min.label }}:</label>
                                         {{ forms.text_doc.min }}
                                     </div>
                                 </div>
                                 <div class="col-3">
                                     <div class="form-group">
                                         {{ forms.text_doc.max.errors }}
-                                        <label for="{{ forms.text_doc.max.id_for_label }}">Maximum:</label>
+                                        <label for="{{ forms.text_doc.max.id_for_label }}">{{ forms.text_doc.max.label }}:</label>
                                         {{ forms.text_doc.max }}
                                     </div>
                                 </div>
