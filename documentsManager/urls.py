@@ -17,6 +17,7 @@ from .views import (
 
 urlpatterns = [
     url(r'landing/(?P<event_id>\d+)/$', LandingView.as_view(), name='landing'),
+    url(r'success/$', SuccessView.as_view(), name='success'),
     url(r'landing/(?P<event_id>\d+)/success/$', SuccessView.as_view(), name='success'),
     url(r'doc_form/(?P<event_id>\d+)/$', DocFormView.as_view(), name='doc_form'),
     url(r'^event/(?P<event_id>\d+)/docs/file/(?P<pk>\d+)/edit/$',

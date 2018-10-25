@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
+
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.forms import (
@@ -11,15 +13,20 @@ from django.forms import (
     CheckboxInput,
     Select,
     EmailField,
+    Form,
 )
 from django.utils.translation import gettext_lazy as _
 
-from .models import FileDoc, FileType, TextDoc, Event
+from .models import (
+    FileDoc,
+    FileType,
+    TextDoc,
+    Event,
+    FileSubmission,
+)
 
 
 class FileDocForm(ModelForm):
-    # error_css_class = 'error'
-    # required_css_class = 'required'
 
     file_type = ModelMultipleChoiceField(
         queryset=FileType.objects.all(),
@@ -49,8 +56,6 @@ class FileDocForm(ModelForm):
 
 
 class TextDocForm(ModelForm):
-    # error_css_class = 'error'
-    # required_css_class = 'required'
 
     def is_valid(self):
         valid = super(TextDocForm, self).is_valid()
@@ -144,3 +149,20 @@ class SignUpForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class SubmissionForm(Form):
+
+    def is_valid(self):
+        if len(self.files):
+            event = Event.objects.filter(pk=self.data.get('event_id')).first()
+            file_docs = FileDoc.objects.filter(event=event)
+            for file_doc in file_docs:
+                name = '{}_file'.format(file_doc.id)
+                if name in self.files.keys():
+                    FileSubmission.objects.create(
+                        file_doc=file_doc,
+                        file=self.files[name],
+                    )
+            return True
+        return False
