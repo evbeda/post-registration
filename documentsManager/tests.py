@@ -5,6 +5,7 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve
+from django.urls import reverse
 from django.db.utils import DataError
 from django.test import TestCase
 from social_django.models import UserSocialAuth
@@ -13,6 +14,7 @@ from documentsManager.apps import DocumentsmanagerConfig
 from documentsManager.forms import (
     EventForm,
     TextDocForm,
+    SignUpForm,
 )
 from documentsManager.models import (
     Event,
@@ -373,6 +375,12 @@ class ModelsTest(TestCase):
         self.assertEqual(file_doc.name, 'Foto')
 
 
+class SignUpView(TestBase):
+    def test_signup_view_name(self):
+        view = resolve(reverse('signup'))
+        self.assertEqual(view.url_name, 'signup')
+
+
 class FormsTest(TestCase):
 
     def test_is_valid_EventForm(self):
@@ -414,3 +422,16 @@ class FormsTest(TestCase):
             'max': '500',
         })
         self.assertTrue(form.is_valid)
+
+    def test_SignUp_Form(self):
+        form = SignUpForm({
+            'username': 'juan27',
+            'password1': 'password27',
+            'password2': 'password27',
+            'email': 'juan@gmail.com',
+        })
+        form.save()
+        user_model = get_user_model()
+        user = user_model.objects.get(email='juan@gmail.com')
+        self.assertEqual(user.username, 'juan27')
+        self.assertEqual(user.email, 'juan@gmail.com')
