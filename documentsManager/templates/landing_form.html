@@ -17,63 +17,72 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                <div class="card shadow bg-white rounded ">
-                    <div class="card-header">
-                        The submissions can be sent until: <b> {{ event.end_submission }}</b>
-                    </div>
-                    <div class="card-body">
-                        <h1 class="card-title display-4">{{ eb_event.name }}</h1>
-                        {% if not text_docs and not file_docs %}
-                        <hr>
-                        <h2 class="card-subtitle text-muted">You don't have configured submissions yet</h2>
-                        {% endif %}
-                        {% if text_docs %}
-                        {% for text_doc in text_docs %}
-                        <hr>
-                        <h2 class="card-subtitle text-muted">{{ text_doc.name }}</h2>
-                        <p>{{ text_doc.description }}</p>
-                        {% if text_doc.is_optional %}
-                        {% endif %}
-                        <textarea class="form-control" rows="5" id="comment" placeholder="Explanation..."></textarea>
-                        <small for="comment"
-                        >You have to write between {{ text_doc.min }} to {{ text_doc.max }}
-                            {{ text_doc.measure }}</small>
-                        <span class="ml-1 text-danger">*</span>
-                        {% endfor %}
-                        {% endif %}
-                        {% if file_docs %}
-                        {% for file_doc in file_docs %}
-                        <hr>
-                        <h2 class="card-subtitle text-muted">{{ file_doc.name }}</h2>
-                        <label for="comment">Max uploads allowed: {{ file_doc.quantity}}</label>
-                        {% if file_doc.is_optional %}
-                        <span class="ml-1 text-danger">*</span>
-                        {% endif %}
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="inputGroupFile01" value="Uploadg">
-                            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="event_id" value="{{ event.id }}" required>
+                    <div class="card shadow bg-white rounded ">
+                        <div class="card-header">
+                            The submissions can be sent until: <b> {{ event.end_submission }}</b>
                         </div>
-                        {% if file_doc.file_types %}
-                        <small>Allowed formats:
-                            {% for filetype in file_doc.file_types %}
-                            {{ filetype.description }}
+                        <div class="card-body">
+                            <h1 class="card-title display-4">{{ eb_event.name }}</h1>
+                            {% if not text_docs and not file_docs %}
+                            <hr>
+                            <h2 class="card-subtitle text-muted">You don't have configured submissions yet</h2>
+                            {% endif %}
+                            {% if text_docs %}
+                            {% for text_doc in text_docs %}
+                            <hr>
+                            <h2 class="card-subtitle text-muted">{{ text_doc.name }}</h2>
+                            <label for="comment"
+                            >You have to write at least {{ text_doc.min }} to {{ text_doc.max }}
+                                {{ text_doc.measure }}</label>
+                            {% if text_doc.is_optional %}
+                            <span class="ml-1 text-danger">*</span>
+                            {% endif %}
+                            <textarea class="form-control"
+                                      rows="5"
+                                      id="comment"
+                                      placeholder="Explanation..."
+                                      name="{{ text_doc.id }}_text"
+                                      minlength="{{ text_doc.min }}"
+                                      maxlength="{{ text_doc.max }}"
+                                      {% if text_doc.is_optional %} required {% endif %}
+                            ></textarea>
                             {% endfor %}
-                        </small>
-                        {% endif %}
-                        {% endfor %}
-                        {% endif %}
+                            {% endif %}
+                            {% if file_docs %}
+                            {% for file_doc in file_docs %}
+                            <hr>
+                            <h2 class="card-subtitle text-muted">{{ file_doc.name }}</h2>
+                            <label for="comment">Max uploads allowed: {{ file_doc.quantity}}</label>
+                            {% if file_doc.is_optional %}
+
+                            <span class="ml-1 text-danger">*</span>
+                            {% endif %}
+                            <input type="file"
+                                   class="btn btn-outline-secondary disabled btn-block"
+                                   name="{{ file_doc.id }}_file"
+                                   accept="{% for type in file_doc.file_types %}{{ type.description|add:', ' }}{% endfor %}"
+                                   {% if text_doc.is_optional %} required {% endif %}
+                            >
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="card-footer d-flex justify-content-between d-flex align-items-center">
+                            <span class="ml-2 text-danger">* Required</span>
+                            {% if not text_docs and not file_docs %}
+                            <button class="eds-btn eds-btn--button eds-btn--fill" onclick="window.close();">Back to
+                                Manage
+                                Docs
+                            </button>
+                            {% else %}
+                            <button class="eds-btn eds-btn--button eds-btn--fill">Ok</button>
+                            {% endif %}
+                        </div>
+                        >>>>>>> added backend logic for form
                     </div>
-                    <div class="card-footer d-flex justify-content-between d-flex align-items-center">
-                        <span class="ml-2 text-danger">* Required</span>
-                        {% if not text_docs and not file_docs %}
-                        <button class="eds-btn eds-btn--button eds-btn--fill" onclick="window.close();">Back to Manage
-                            Docs
-                        </button>
-                        {% else %}
-                        <a class="eds-btn eds-btn--button eds-btn--fill" href="{% url 'success' event.id %}">Ok</a>
-                        {% endif %}
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>

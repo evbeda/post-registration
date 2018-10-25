@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 import datetime
+
 from django.core.validators import MaxValueValidator
 from django.db import models
 
@@ -65,3 +67,12 @@ class TextDoc(models.Model):
 
     class Meta(object):
         db_table = 'TextDoc'
+
+
+class FileSubmission(models.Model):
+    file_doc = models.ForeignKey(FileDoc)
+    file = models.FileField()
+    date = models.DateField(default=datetime.date.today)
+
+    class Meta(object):
+        db_table = 'FileSubmission'

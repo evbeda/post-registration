@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Django settings for post_registration project.
 
@@ -14,6 +15,7 @@ import os
 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
+
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 
@@ -166,3 +168,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 DB_FROM_ENV = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(DB_FROM_ENV)
 LOGIN_REDIRECT_URL = '/'
+DEFAULT_FILE_STORAGE = 'storages.backends.dropbox.DropBoxStorage'
+DROPBOX_OAUTH2_TOKEN = get_env_variable('DROPBOX_OAUTH2_TOKEN')

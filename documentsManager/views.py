@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
@@ -17,6 +18,7 @@ from .forms import (
     TextDocForm,
     EventForm,
     SignUpForm,
+    SubmissionForm,
 )
 from .models import (
     FileDoc,
@@ -67,7 +69,7 @@ class DocFormView(MultiFormView, LoginRequiredMixin):
         context['file_form'] = self.file_form
         return context
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, **kwargs):
         if request.POST.get('submit_file'):
             self.file_form = True
             form = FileDocForm(request.POST)
@@ -213,8 +215,14 @@ class TextDocDelete(BaseDocDelete):
     success_url = '/'
 
 
-class LandingView(TemplateView):
+class SuccessView(TemplateView):
+    template_name = 'success.html'
+
+
+class LandingView(FormView):
     template_name = 'landing_form.html'
+    success_url = '/success/'
+    form_class = SubmissionForm
 
     def get_context_data(self, **kwargs):
         context = super(LandingView, self).get_context_data(**kwargs)
@@ -227,18 +235,13 @@ class LandingView(TemplateView):
                 event.eb_event_id
             )
             context['eb_event'] = parse_events(eb_event)[0]
-            text_doc = TextDoc.objects.filter(event=event)
-            if text_doc:
-                context['text_docs'] = text_doc
-            file_doc = FileDoc.objects.filter(event=event)
-            if file_doc:
-                context['file_docs'] = file_doc
+            text_docs = TextDoc.objects.filter(event=event)
+            if text_docs:
+                context['text_docs'] = text_docs
+            file_docs = FileDoc.objects.filter(event=event)
+            if file_docs:
+                context['file_docs'] = file_docs
         return context
-
-
-class SuccessView(TemplateView):
-    template_name = 'success.html'
-
 
 class SignUpView(CreateView):
     form_class = SignUpForm
@@ -248,7 +251,6 @@ class SignUpView(CreateView):
         return reverse(
             'login',
         )
-
 
 def parse_events(api_events):
     events = []
