@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
+import os
 from datetime import datetime
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.utils.translation import gettext_lazy as _
+from django.forms.widgets import EmailInput, HiddenInput
+
+
 from django.forms import (
     CheckboxSelectMultiple,
     ModelForm,
@@ -14,15 +20,16 @@ from django.forms import (
     Select,
     EmailField,
     Form,
+    TextInput,
 )
 from django.utils.translation import gettext_lazy as _
-
 from .models import (
     FileDoc,
     FileType,
     TextDoc,
     Event,
     FileSubmission,
+    Evaluator,
 )
 
 
@@ -166,3 +173,46 @@ class SubmissionForm(Form):
                     )
             return True
         return False
+
+
+class EvaluatorForm(ModelForm):
+
+    class Meta:
+        model = Evaluator
+        fields = [
+            'name',
+            'email',
+        ]
+        widgets = {
+            'name': TextInput(attrs={'class': 'form-control'}),
+            'email': EmailInput(attrs={'class': 'form-control'}),
+        }
+
+    def send_email(self, form):
+        import smtplib
+        FROM = 'kaizendev18@gmail.com'
+        TO = form.cleaned_data['email']
+        SUBJECT = 'Invitation to evaluate submissions for an event.'
+        TEXT = 'Hello, {}. You have been selected as official evaluator for this event.'.format(
+            form.cleaned_data['name'])
+
+        # Prepare actual message
+        message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+        """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
+        try:
+            server = smtplib.SMTP("smtp.gmail.com", 587)
+            server.ehlo()
+            server.starttls()
+            server.login('kaizendev18@gmail.com', 'teamkaizen')
+            server.sendmail(FROM, TO, message)
+            server.close()
+            print('successfully sent the mail')
+        except Exception as e:
+            print("failed to send mail")
+
+
+def save(self, event_id):
+    instance = super().save()
+    instance.events.add(Event.objects.get(pk=event_id))
+    instance.save()
+    return instance

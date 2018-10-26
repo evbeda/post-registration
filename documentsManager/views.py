@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
+from .forms import EvaluatorForm, EventForm, FileDocForm, TextDocForm
+from .models import Evaluator, Event, FileDoc, TextDoc
+from astroid import objects
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.views.generic import FormView, CreateView
+from django.views.generic import FormView, CreateView, ListView
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import UpdateView, DeleteView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from eventbrite import Eventbrite
 from multi_form_view import MultiFormView
 from social_django.models import UserSocialAuth
@@ -243,6 +246,7 @@ class LandingView(FormView):
                 context['file_docs'] = file_docs
         return context
 
+
 class SignUpView(CreateView):
     form_class = SignUpForm
     template_name = 'signup.html'
@@ -251,6 +255,97 @@ class SignUpView(CreateView):
         return reverse(
             'login',
         )
+
+
+@method_decorator(login_required, name='dispatch')
+class EvaluatorList(ListView):
+    model = Evaluator
+    context_object_name = 'evaluators'
+    template_name = 'evaluators_grid.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(EvaluatorList, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        event = Event.objects.get(id=event_id)
+        eb_event = get_one_event_api(
+            get_auth_token(self.request.user), event.eb_event_id)
+        view_event = parse_events(eb_event)
+        context['event'] = view_event[0]
+        context['event_id'] = event_id
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class EvaluatorCreate(CreateView):
+    model = Evaluator
+    template_name = 'evaluator_form.html'
+    form_class = EvaluatorForm
+
+    def get_context_data(self, **kwargs):
+        context = super(EvaluatorCreate, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        event = Event.objects.get(pk=event_id)
+        file_docs = FileDoc.objects.filter(event=event)
+        context['file_docs'] = file_docs
+        text_docs = TextDoc.objects.filter(event=event)
+        context['text_docs'] = text_docs
+        context['event_id'] = event_id
+        return context
+
+    def form_valid(self, form):
+        form.save(self.kwargs['event_id'])
+        form.send_email(form)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse(
+            'evaluators',
+            kwargs={
+                'event_id': self.kwargs['event_id'],
+            },
+        )
+
+
+@method_decorator(login_required, name='dispatch')
+class EvaluatorUpdate(UpdateView):
+    model = Evaluator
+    template_name = 'evaluator_form.html'
+    form_class = EvaluatorForm
+
+    def get_context_data(self, **kwargs):
+        context = super(EvaluatorUpdate, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        context['event_id'] = event_id
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            'evaluators',
+            kwargs={
+                'event_id': self.kwargs['event_id'],
+            },
+        )
+
+
+@method_decorator(login_required, name='dispatch')
+class EvaluatorDelete(DeleteView):
+    model = Evaluator
+    template_name = 'evaluator_confirm_delete.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(EvaluatorDelete, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        context['event_id'] = event_id
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            'evaluators',
+            kwargs={
+                'event_id': self.kwargs['event_id'],
+            },
+        )
+
 
 def parse_events(api_events):
     events = []
