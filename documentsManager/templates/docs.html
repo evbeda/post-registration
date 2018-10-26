@@ -1,5 +1,8 @@
-{% extends "base.html" %} {% block content %} {%include "partials/jumbotron.html" %} {% load static %}
+{% extends "base.html" %} 
 
+{% block content %} 
+{% load static %}
+{%include "partials/jumbotron.html" %} 
 <div class="container">
     <div class="row mb-3">
         <div class="col">
@@ -28,6 +31,14 @@
             </ul>
         </div>
     </div>
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link active" href={% url 'docs' event.id %}>Requirements</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'evaluators' event.id %}">Evaluators</a>
+        </li>
+    </ul>
     <div class="row pt-2 pb-2">
         <div class="col-lg-9">
             <div class='row mb-3'>
@@ -187,12 +198,10 @@
         </div>
     </div>
     <hr/>
-    <div class='row justify-content-end pt-3'>
-        <div>
-            <a class="eds-btn eds-btn--button eds-btn--neutral" href="{% url 'landing' event.id %}" target=”_blank”>Preview</a>
-            <a class="eds-btn eds-btn--button eds-btn--fill" href="{% url 'doc_form' event.id %}" role="button"> New
-                Submission</a>
-        </div>
+    <div class='row justify-content-end no-gutters pt-3'>
+        <a class="eds-btn eds-btn--button eds-btn--neutral" href="{% url 'landing' event.id %}" target=”_blank”>Preview</a>
+        <a class="eds-btn eds-btn--button eds-btn--fill" href="{% url 'doc_form' event.id %}" role="button"> New
+            Submission</a>
     </div>
     <div class="row">
         <div class="col">

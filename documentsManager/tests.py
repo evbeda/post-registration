@@ -1,34 +1,46 @@
 from datetime import datetime
-from unittest.mock import patch
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import resolve
 from django.urls import reverse
+from django.core.urlresolvers import resolve, reverse
 from django.db.utils import DataError
+from django.shortcuts import get_object_or_404
 from django.test import TestCase
 from social_django.models import UserSocialAuth
+from unittest.mock import patch
 
 from documentsManager.apps import DocumentsmanagerConfig
 from documentsManager.forms import (
     EventForm,
     TextDocForm,
     SignUpForm,
+    EvaluatorForm,
 )
 from documentsManager.models import (
     Event,
     TextDoc,
     FileType,
     FileDoc,
+    Evaluator,
 )
 from documentsManager.views import (
     add_event,
     get_auth_token,
     filter_managed_event,
     filter_no_managed_event,
+    EvaluatorCreate,
+    EvaluatorDelete,
+    EvaluatorCreate,
+    EvaluatorDelete,
+    add_event,
+    filter_managed_event,
+    filter_no_managed_event,
+    get_auth_token
 )
 from post_registration.settings import get_env_variable
+
 
 MOCK_EVENTS_API = {
     'name': {
@@ -134,6 +146,12 @@ class TestBase(TestCase):
         login = self.client.login(username='kaizen', password='awesome')
         return login
 
+    def create_event(self, eb_event_id=1):
+        return Event.objects.create(eb_event_id=eb_event_id)
+
+    def create_evaluator(self, name='John', email='john@email.com'):
+        return Evaluator.objects.create(name=name, email=email)
+
 
 class ViewTest(TestBase):
 
@@ -145,7 +163,7 @@ class ViewTest(TestBase):
         self.assertEqual(view.view_name, 'doc_form')
 
     def test_docs_from_exist(self):
-        view = resolve('/docs/13/')
+        view = resolve('/event/13/docs/')
         self.assertEqual(view.view_name, 'docs')
 
     def test_home_url_resolves_home_view(self):
@@ -162,9 +180,10 @@ class ViewTest(TestBase):
 
     @patch('documentsManager.views.Eventbrite.get')
     def test_docs_redirect(self, mock_eventbrite_get):
+
         mock_eventbrite_get.return_value = MOCK_EVENTS_API
         new_event = Event.objects.create(eb_event_id=1)
-        response = self.client.get('/docs/{}/'.format(new_event.id))
+        response = self.client.get('/event/{}/docs/'.format(new_event.id))
         self.assertEqual(response.status_code, 200)
 
     def test_events_redirect(self):
@@ -199,26 +218,27 @@ class ViewTest(TestBase):
         mock_api_evb.return_value = MOCK_EVENTS_API
         response = self.client.get('/events/50285339/')
         event = Event.objects.get(eb_event_id=50285339)
-        expect = '/docs/{}/'.format(event.id)
+        expect = '/event/{}/docs/'.format(event.id)
         self.assertEqual(response.url, expect)
 
     def test_modify_event_dates(self):
         EVB_ID = 1234
         new_event = add_event(EVB_ID, '2018-03-03')
-        new_event.init_submission = datetime.strptime('2018-01-01', '%Y-%m-%d').date()
+        new_event.init_submission = datetime.strptime(
+            '2018-01-01', '%Y-%m-%d').date()
         new_event.save()
         r = {
             'init_submission': '2018-02-01',
             'end_submission': '2018-02-25',
         }
         response = self.client.post(
-            '/docs/{}/'.format(new_event.id),
+            '/event/{}/docs/'.format(new_event.id),
             r,
         )
         result = Event.objects.get(id=new_event.id)
         expected = datetime.strptime('2018-02-01', '%Y-%m-%d').date()
         self.assertEqual(result.init_submission, expected)
-        self.assertEqual(response.url, '/docs/{}/'.format(new_event.id))
+        self.assertEqual(response.url, '/event/{}/docs/'.format(new_event.id))
 
     @patch('documentsManager.views.Eventbrite.get')
     def test_response_with_landing_page(self, mock_api_evb):
@@ -379,6 +399,161 @@ class SignUpView(TestBase):
     def test_signup_view_name(self):
         view = resolve(reverse('signup'))
         self.assertEqual(view.url_name, 'signup')
+
+
+class EvaluatorTest(TestBase):
+
+    def test_create_evaluator(self):
+        evaluator = self.create_evaluator()
+        self.assertTrue(isinstance(evaluator, Evaluator))
+
+    def test_evaluator_string_representation(self):
+        evaluator = self.create_evaluator()
+        self.assertEquals(str(evaluator), evaluator.name)
+
+    def test_evaluator_verbose_name_plural(self):
+        self.assertEqual(
+            str(Evaluator._meta.verbose_name_plural), "evaluators")
+
+    def test_evaluator_default_state(self):
+        evaluator = self.create_evaluator()
+        self.assertEquals(evaluator.state, 'pending')
+
+
+@patch('documentsManager.views.get_one_event_api')
+class EvaluatorListTest(TestBase):
+    def test_evaluator_list_view_name(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        event = self.create_event()
+        view = resolve(reverse('evaluators', kwargs={'event_id': event.id}))
+        self.assertEqual(view.url_name, 'evaluators')
+
+    def test_evaluator_list_response_status(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        event = self.create_event()
+        self.create_evaluator()
+        response = self.client.get(
+            reverse('evaluators', kwargs={'event_id': event.id}))
+        self.assertEquals(response.status_code, 200)
+
+    def test_evaluator_uses_correct_template(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        event = self.create_event()
+        response = self.client.get(
+            reverse('evaluators', kwargs={'event_id': event.id}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'evaluators_grid.html')
+
+    def test_evaluator_list_response_content(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        event = self.create_event()
+        evaluator = self.create_evaluator()
+        evaluator.events.add(event)
+        evaluator.save()
+        response = self.client.get(
+            reverse('evaluators', kwargs={'event_id': event.id}))
+        self.assertContains(response, evaluator)
+
+
+class EvaluatorCreateTest(TestBase):
+    # test_redirect
+    # test_evaluator_creation
+    pass
+
+
+@patch('documentsManager.views.get_one_event_api')
+class EvaluatorUpdateTest(TestBase):
+    def test_evaluator_redirect_on_update(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        evaluator = self.create_evaluator()
+        event = self.create_event()
+        evaluator.events.add(event)
+        evaluator.save()
+        data = {'name': 'Jack', 'email': 'test@mail.com',
+                'state': evaluator.state, 'events': evaluator.events}
+        response = self.client.post(
+            reverse('evaluator_update', kwargs={
+                    'event_id': event.id, 'pk': evaluator.id}),
+            data
+        )
+        self.assertRedirects(response, reverse(
+            'evaluators', kwargs={'event_id': event.id}))
+
+    def test_evaluator_update_success(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = MOCK_EVENTS_API
+        evaluator = self.create_evaluator()
+        event = self.create_event()
+        evaluator.events.add(event)
+        evaluator.save()
+        data = {'name': 'Jack', 'email': 'test@mail.com',
+                'state': evaluator.state, 'events': evaluator.events}
+        response = self.client.post(
+            reverse('evaluator_update', kwargs={
+                    'event_id': event.id, 'pk': evaluator.id}),
+            data
+        )
+        self.assertEqual(response.status_code, 302)
+        evaluator.refresh_from_db()
+        self.assertEqual(evaluator.name, 'Jack')
+        self.assertEqual(evaluator.email, 'test@mail.com')
+
+    # test_evaluator_update_invalid
+
+
+@patch('documentsManager.views.get_one_event_api')
+class EvaluatorDeleteTest(TestBase):
+    def test_evaluator_success_redirect(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        event = self.create_event()
+        evaluator = self.create_evaluator()
+        evaluator.events.add(event)
+        evaluator.save()
+        response = self.client.post(
+            reverse('evaluator_delete', kwargs={
+                    'event_id': event.id, 'pk': evaluator.id}),
+        )
+        self.assertRedirects(response, reverse(
+            'evaluators', kwargs={'event_id': event.id}))
+
+    def test_cannot_evaluator_delete_twice(self, mock_get_one_event_api):
+        event = self.create_event()
+        evaluator = self.create_evaluator()
+        evaluator.events.add(event)
+        evaluator.save()
+        response = self.client.post(
+            reverse('evaluator_delete', kwargs={
+                    'event_id': event.id, 'pk': evaluator.id}),
+        )
+        response = self.client.post(
+            reverse('evaluator_delete', kwargs={
+                    'event_id': event.id, 'pk': evaluator.id}),
+        )
+        self.assertEquals(response.status_code, 404)
+
+    def test_evaluator_dissapear_from_db(self, mock_get_one_event_api):
+        event = self.create_event()
+        evaluator = self.create_evaluator()
+        evaluator.events.add(event)
+        evaluator.save()
+        response = self.client.post(
+            reverse('evaluator_delete', kwargs={
+                    'event_id': event.id, 'pk': evaluator.id}),
+        )
+        self.assertFalse(Evaluator.objects.filter(pk=evaluator.id).exists())
+
+
+class EvaluatorFormTest(TestBase):
+    def test_valid_form(self):
+        e = self.create_evaluator(name='John', email='john@mail.com')
+        data = {'name': e.name, 'email': e.email, }
+        form = EvaluatorForm(data=data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_form(self):
+        e = Evaluator.objects.create(name='John', email='johnmail.com')
+        data = {'name': e.name, 'email': e.email, }
+        form = EvaluatorForm(data=data)
+        self.assertFalse(form.is_valid())
 
 
 class FormsTest(TestCase):

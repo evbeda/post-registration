@@ -76,3 +76,21 @@ class FileSubmission(models.Model):
 
     class Meta(object):
         db_table = 'FileSubmission'
+
+
+class Evaluator(models.Model):
+    STATES = (
+        ('pending', 'Waiting for acceptance'),
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+    )
+    name = models.CharField(max_length=20)
+    email = models.EmailField()
+    events = models.ManyToManyField(Event)
+    state = models.CharField(max_length=20, choices=STATES, default='pending')
+
+    def __str__(self):
+        return self.name
+
+    class Meta(object):
+        db_table = 'Evaluator'
