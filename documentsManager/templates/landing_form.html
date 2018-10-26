@@ -37,7 +37,7 @@
                             <label for="comment"
                             >You have to write at least {{ text_doc.min }} to {{ text_doc.max }}
                                 {{ text_doc.measure }}</label>
-                            {% if text_doc.is_optional %}
+                            {% if not text_doc.is_optional %}
                             <span class="ml-1 text-danger">*</span>
                             {% endif %}
                             <textarea class="form-control"
@@ -47,7 +47,7 @@
                                       name="{{ text_doc.id }}_text"
                                       minlength="{{ text_doc.min }}"
                                       maxlength="{{ text_doc.max }}"
-                                      {% if text_doc.is_optional %} required {% endif %}
+                                      {% if not text_doc.is_optional %} required {% endif %}
                             ></textarea>
                             {% endfor %}
                             {% endif %}
@@ -56,7 +56,7 @@
                             <hr>
                             <h2 class="card-subtitle text-muted">{{ file_doc.name }}</h2>
                             <label for="comment">Max uploads allowed: {{ file_doc.quantity}}</label>
-                            {% if file_doc.is_optional %}
+                            {% if not file_doc.is_optional %}
 
                             <span class="ml-1 text-danger">*</span>
                             {% endif %}
@@ -64,7 +64,7 @@
                                    class="btn btn-outline-secondary disabled btn-block"
                                    name="{{ file_doc.id }}_file"
                                    accept="{% for type in file_doc.file_types %}{{ type.description|add:', ' }}{% endfor %}"
-                                   {% if text_doc.is_optional %} required {% endif %}
+                                   {% if not text_doc.is_optional %} required {% endif %}
                             >
                             <small>
                                 Allowed file types: {% for type in file_doc.file_types %}{{ type.description|add:','}}
