@@ -121,6 +121,11 @@ DATABASES = {
     }
 }
 
+# User substitution
+# https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#auth-custom-user
+
+AUTH_USER_MODEL = 'documentsManager.User'
+
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.eventbrite.EventbriteOAuth2',
     'django.contrib.auth.backends.ModelBackend',

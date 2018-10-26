@@ -2,7 +2,6 @@ from datetime import datetime
 from unittest.mock import patch
 
 from django.apps import apps
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve, reverse
 from django.db.utils import DataError
@@ -22,12 +21,13 @@ from documentsManager.models import (
     FileType,
     FileDoc,
     Evaluator,
+    User,
 )
 from documentsManager.views import (
     add_event,
     filter_managed_event,
     filter_no_managed_event,
-    get_auth_token
+    get_auth_token,
 )
 from post_registration.settings import get_env_variable
 
@@ -116,12 +116,9 @@ MOCK_EVENTS_API = {
 
 class TestBase(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(
-            username='kaizen',
-            password='awesome',
-            is_active=True,
-            is_staff=True,
-            is_superuser=True
+        self.user = User.objects.create_superuser(
+            email='kaizen@email.com',
+            password='awesome1234',
         )
         self.auth = UserSocialAuth.objects.create(
             user=self.user,
@@ -132,7 +129,7 @@ class TestBase(TestCase):
                 "token_type": "bearer"
             },
         )
-        login = self.client.login(username='kaizen', password='awesome')
+        login = self.client.login(username='kaizen@email.com', password='awesome1234')
         return login
 
     def create_event(self, eb_event_id=1):
@@ -276,12 +273,9 @@ class SettingsTest(TestCase):
 
 class AuthTokenTest(TestCase):
     def test_error(self):
-        self.user = get_user_model().objects.create_user(
-            username='mike',
-            password='genius',
-            is_active=True,
-            is_staff=True,
-            is_superuser=True
+        self.user = User.objects.create_superuser(
+            email='mike@email.com',
+            password='genius1234',
         )
         self.auth = UserSocialAuth.objects.create(
             user=self.user,
@@ -523,7 +517,7 @@ class EvaluatorDeleteTest(TestBase):
         evaluator = self.create_evaluator()
         evaluator.events.add(event)
         evaluator.save()
-        response = self.client.post(
+        self.client.post(
             reverse('evaluator_delete', kwargs={
                     'event_id': event.id, 'pk': evaluator.id}),
         )
@@ -588,15 +582,12 @@ class FormsTest(TestCase):
 
     def test_SignUp_Form(self):
         form = SignUpForm({
-            'username': 'juan27',
             'password1': 'password27',
             'password2': 'password27',
             'email': 'juan@gmail.com',
         })
         form.save()
-        user_model = get_user_model()
-        user = user_model.objects.get(email='juan@gmail.com')
-        self.assertEqual(user.username, 'juan27')
+        user = User.objects.get(email='juan@gmail.com')
         self.assertEqual(user.email, 'juan@gmail.com')
 
     def test_validate_text_submissions(self):

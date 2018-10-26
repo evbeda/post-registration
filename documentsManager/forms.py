@@ -17,7 +17,6 @@ from django.forms import (
 )
 from django.forms.widgets import EmailInput
 from django.utils.translation import gettext_lazy as _
-
 from .models import (
     FileDoc,
     FileType,
@@ -25,6 +24,7 @@ from .models import (
     Event,
     FileSubmission,
     Evaluator,
+    User,
 )
 
 
@@ -131,14 +131,12 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = {
-            'username',
             'password1',
             'password2',
             'email',
         }
 
         labels = {
-            'username': _('Username'),
             'password1': _('Password'),
             'password2': _('Confirm Password'),
             'email': _('Email'),
@@ -147,12 +145,13 @@ class SignUpForm(UserCreationForm):
     def save(self, commit=True):
         user = super(SignUpForm, self).save(commit=False)
         user.email = self.cleaned_data['email']
+        user.username = user.email
         if commit:
             user.save()
         return user
 
 
-def validate_text_submissions(text_fields) -> bool:
+def validate_text_submissions(text_fields):
     for text_field in text_fields:
         if '_text' in text_field:
             text_id = text_field.replace('_text', '')
@@ -165,7 +164,7 @@ def validate_text_submissions(text_fields) -> bool:
     return True
 
 
-def validate_files_submissions(files, id_event) -> bool:
+def validate_files_submissions(files, id_event):
     event = Event.objects.get(pk=id_event)
     file_docs = FileDoc.objects.filter(event=event)
     for file_doc in file_docs:
@@ -223,7 +222,7 @@ class EvaluatorForm(ModelForm):
             server.sendmail(FROM, TO, message)
             server.close()
             print('successfully sent the mail')
-        except Exception as e:
+        except Exception:
             print("failed to send mail")
 
 
