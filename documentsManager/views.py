@@ -16,7 +16,6 @@ from .forms import (
     SignUpForm,
     SubmissionForm,
 )
-from .models import Evaluator, Event, FileDoc, TextDoc
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
@@ -29,10 +28,12 @@ from django.views.generic.base import TemplateView
 from eventbrite import Eventbrite
 from multi_form_view import MultiFormView
 from social_django.models import UserSocialAuth
+
 from .models import (
     FileDoc,
     Event,
     TextDoc,
+    Evaluator,
 )
 from .utils import (
     get_data,
@@ -166,15 +167,14 @@ class HomeView(TemplateView, LoginRequiredMixin):
         context = super(HomeView, self).get_context_data(**kwargs)
         create_order_webhook_from_view(self.request.user,)
         context['user'] = self.request.user
-        try:
+        context['is_eb_user'] = self.request.user.social_auth.exists()
+        if context['is_eb_user']:
             api_events_w_venues = get_events_with_venues_api(
                 get_auth_token(self.request.user))
             parse_api_events = parse_events(api_events_w_venues)
             docs_events_list = Event.objects.all().values_list('eb_event_id', 'id')
             events = filter_managed_event(parse_api_events, docs_events_list)
             context['events'] = events
-        except Exception:
-            pass
         return context
 
 

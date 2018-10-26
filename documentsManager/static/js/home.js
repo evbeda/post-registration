@@ -2,6 +2,7 @@ const $managedEventsTag = $('#managed_events_tag');
 const $evaluateEventsTag = $('#evaluate_events_tag');
 const $manageEvents = $('#managed_events');
 const $evaluateEvents = $('#evaluate_events');
+const $ebUser = $('#eb_user');
 
 
 const toggleManage = function () {
@@ -19,11 +20,16 @@ const toggleEvaluate = function () {
     $evaluateEventsTag.addClass('active');
 };
 
-const switcher = function () {
-    $evaluateEvents.hide();
-    $manageEvents.show();
-    $managedEventsTag.on('click', toggleManage);
-    $evaluateEventsTag.on('click', toggleEvaluate);
+const switcher = function() {
+ if ($ebUser.val() == 'True') {
+   $manageEvents.show();
+   $evaluateEvents.hide();
+ } else {
+   $evaluateEvents.show();
+   $manageEvents.hide();
+ }
+ $managedEventsTag.on("click", toggleManage);
+ $evaluateEventsTag.on("click", toggleEvaluate);
 };
 
 $(document).ready(switcher);
