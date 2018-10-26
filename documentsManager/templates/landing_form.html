@@ -66,6 +66,10 @@
                                    accept="{% for type in file_doc.file_types %}{{ type.description|add:', ' }}{% endfor %}"
                                    {% if text_doc.is_optional %} required {% endif %}
                             >
+                            <small>
+                                Allowed file types: {% for type in file_doc.file_types %}{{ type.description|add:','}}
+                                {% endfor %}
+                            </small>
                             {% endfor %}
                             {% endif %}
                         </div>
@@ -80,7 +84,6 @@
                             <button class="eds-btn eds-btn--button eds-btn--fill">Ok</button>
                             {% endif %}
                         </div>
-                        >>>>>>> added backend logic for form
                     </div>
                 </form>
             </div>
