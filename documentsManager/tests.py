@@ -1,15 +1,13 @@
 from datetime import datetime
+from unittest.mock import patch
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import reverse
 from django.core.urlresolvers import resolve, reverse
 from django.db.utils import DataError
-from django.shortcuts import get_object_or_404
 from django.test import TestCase
 from social_django.models import UserSocialAuth
-from unittest.mock import patch
 
 from documentsManager.apps import DocumentsmanagerConfig
 from documentsManager.forms import (
@@ -17,7 +15,7 @@ from documentsManager.forms import (
     TextDocForm,
     SignUpForm,
     EvaluatorForm,
-)
+    validate_text_submissions, validate_files_submissions, SubmissionForm)
 from documentsManager.models import (
     Event,
     TextDoc,
@@ -27,20 +25,11 @@ from documentsManager.models import (
 )
 from documentsManager.views import (
     add_event,
-    get_auth_token,
-    filter_managed_event,
-    filter_no_managed_event,
-    EvaluatorCreate,
-    EvaluatorDelete,
-    EvaluatorCreate,
-    EvaluatorDelete,
-    add_event,
     filter_managed_event,
     filter_no_managed_event,
     get_auth_token
 )
 from post_registration.settings import get_env_variable
-
 
 MOCK_EVENTS_API = {
     'name': {
@@ -309,7 +298,6 @@ class ModelsTest(TestCase):
         new_event = Event.objects.create(eb_event_id=3)
         text_doc = TextDoc.objects.create(event=new_event)
         self.assertEqual(text_doc.name, '')
-        self.assertEqual(text_doc.id, 3)
         self.assertEqual(text_doc.measure, 'Words')
         self.assertEqual(text_doc.max, 500)
         self.assertEqual(text_doc.min, 10)
@@ -610,3 +598,47 @@ class FormsTest(TestCase):
         user = user_model.objects.get(email='juan@gmail.com')
         self.assertEqual(user.username, 'juan27')
         self.assertEqual(user.email, 'juan@gmail.com')
+
+    def test_validate_text_submissions(self):
+        event = Event.objects.create(eb_event_id=123)
+        text_doc = TextDoc.objects.create(event=event)
+        key = '{}_text'.format(text_doc.id)
+        text_fields = {
+            key: 'a a a a a a a a a a'
+        }
+        result = validate_text_submissions(text_fields)
+        expected = True
+        self.assertEqual(result, expected)
+
+    def test_validate_files_submissions(self):
+        event = Event.objects.create(eb_event_id=123)
+        file_doc = FileDoc.objects.create(event=event)
+        key = '{}_file'.format(file_doc.id)
+        values = {
+            key: ''
+        }
+        result = validate_files_submissions(values, event.id)
+        self.assertEqual(result, True)
+
+    def test_Submission_Form(self):
+        event = Event.objects.create(eb_event_id=123)
+        text_doc = TextDoc.objects.create(event=event)
+        key = '{}_text'.format(text_doc.id)
+        form = SubmissionForm({
+            key: 'a a a a a a a a a a'
+        })
+        self.assertEqual(form.is_valid(), True)
+
+    def test_Submission_Form_with_files(self):
+        event = Event.objects.create(eb_event_id=123)
+        file_doc = FileDoc.objects.create(event=event)
+        key = '{}_file'.format(file_doc.id)
+        form = SubmissionForm(
+            files={
+                key: ''
+            },
+            data={
+                'event_id': event.id
+            },
+        )
+        self.assertEqual(form.is_valid(), True)
