@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
-import os
 from datetime import datetime
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
-from django.utils.translation import gettext_lazy as _
-from django.forms.widgets import EmailInput, HiddenInput
-
-
 from django.forms import (
     CheckboxSelectMultiple,
     ModelForm,
     ModelMultipleChoiceField,
-    TextInput,
     Textarea,
     NumberInput,
     CheckboxInput,
@@ -22,7 +15,9 @@ from django.forms import (
     Form,
     TextInput,
 )
+from django.forms.widgets import EmailInput
 from django.utils.translation import gettext_lazy as _
+
 from .models import (
     FileDoc,
     FileType,
@@ -34,7 +29,6 @@ from .models import (
 
 
 class FileDocForm(ModelForm):
-
     file_type = ModelMultipleChoiceField(
         queryset=FileType.objects.all(),
         required=False,
@@ -158,25 +152,47 @@ class SignUpForm(UserCreationForm):
         return user
 
 
+def validate_text_submissions(text_fields) -> bool:
+    for text_field in text_fields:
+        if '_text' in text_field:
+            text_id = text_field.replace('_text', '')
+            text_doc = TextDoc.objects.get(pk=text_id)
+            quantity = len(text_field)
+            if text_doc.measure == 'Words':
+                quantity = len(text_field.split(' '))
+            if not (quantity < text_doc.min or quantity > text_doc.max):
+                return False
+    return True
+
+
+def validate_files_submissions(files, id_event) -> bool:
+    event = Event.objects.get(pk=id_event)
+    file_docs = FileDoc.objects.filter(event=event)
+    for file_doc in file_docs:
+        name = '{}_file'.format(file_doc.id)
+        if name not in files.keys():
+            return False
+        FileSubmission.objects.create(
+            file_doc=file_doc,
+            file=files[name],
+        )
+    return True
+
+
 class SubmissionForm(Form):
 
     def is_valid(self):
+        files_validation = True
         if len(self.files):
-            event = Event.objects.filter(pk=self.data.get('event_id')).first()
-            file_docs = FileDoc.objects.filter(event=event)
-            for file_doc in file_docs:
-                name = '{}_file'.format(file_doc.id)
-                if name in self.files.keys():
-                    FileSubmission.objects.create(
-                        file_doc=file_doc,
-                        file=self.files[name],
-                    )
-            return True
-        return False
+            files_validation = validate_files_submissions(
+                self.files,
+                self.data.get('event_id')
+            )
+        text_validation = validate_text_submissions(self.data.keys())
+        return files_validation and text_validation
 
 
 class EvaluatorForm(ModelForm):
-
     class Meta:
         model = Evaluator
         fields = [
