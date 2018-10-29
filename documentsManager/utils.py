@@ -1,7 +1,10 @@
 from eventbrite import Eventbrite
 import requests
 import json
-# from django.conf import settings
+from django.core import mail
+from post_registration.settings import EMAIL_HOST_USER
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from social_django.models import UserSocialAuth
 from .models import UserWebhook
 from .app_settings import (
@@ -10,7 +13,7 @@ from .app_settings import (
 )
 
 
-def get_data(body):
+def get_data(body, domain):
     config_data = body
     user_id = config_data['config']['user_id']
     url_user = config_data['api_url']
@@ -20,7 +23,9 @@ def get_data(body):
         data = requests.get(url_user + '?token=' + access_token)
         container_mail = json.loads(data.content)
         email = (container_mail)['email']
-        return {'status': False, 'email': email}
+        send_email_to_attende(email)
+
+        return {'status': True, 'email': email}
     else:
         return {'status': False, 'email': False}
 
@@ -78,5 +83,15 @@ def get_auth_token(user):
 
 
 def webhook_available_to_process(user_id):
-    if UserSocialAuth.objects.exists() and social_user_exists(user_id):
-        return True
+    if UserSocialAuth.objects.exists():
+        if social_user_exists(user_id):
+            return True
+
+
+def send_email_to_attende(email):
+    TO = 'santiagolloret@eventbrite.com'
+    SUBJECT = 'Thanks for buying a ticket for this event.'
+    from_email = EMAIL_HOST_USER
+    html_message = render_to_string('email_attende.html')
+    text_content = strip_tags(html_message)
+    mail.send_mail(SUBJECT, text_content, from_email, [TO], html_message=html_message)
