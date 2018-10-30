@@ -1,13 +1,24 @@
 # -*- coding: utf-8 -*-
+import json
 from datetime import datetime
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import (
     FormView,
     CreateView,
-    ListView,
     DeleteView,
     UpdateView,
 )
+from django.views.generic.base import TemplateView
+from eventbrite import Eventbrite
+from multi_form_view import MultiFormView
+from social_django.models import UserSocialAuth
+
 from .forms import (
     EvaluatorForm,
     EventForm,
@@ -16,24 +27,12 @@ from .forms import (
     SignUpForm,
     SubmissionForm,
 )
-import json
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.utils.decorators import method_decorator
-from django.views.generic.base import TemplateView
-from eventbrite import Eventbrite
-from multi_form_view import MultiFormView
-from social_django.models import UserSocialAuth
-
 from .models import (
     FileDoc,
     Event,
     TextDoc,
     Evaluator,
+    EvaluatorEvent,
 )
 from .utils import (
     get_data,
@@ -275,9 +274,7 @@ class SignUpView(CreateView):
 
 
 @method_decorator(login_required, name='dispatch')
-class EvaluatorList(ListView):
-    model = Evaluator
-    context_object_name = 'evaluators'
+class EvaluatorList(TemplateView):
     template_name = 'evaluators_grid.html'
 
     def get_context_data(self, **kwargs):
@@ -285,10 +282,13 @@ class EvaluatorList(ListView):
         event_id = self.kwargs['event_id']
         event = Event.objects.get(id=event_id)
         eb_event = get_one_event_api(
-            get_auth_token(self.request.user), event.eb_event_id)
+            get_auth_token(self.request.user),
+            event.eb_event_id
+        )
         view_event = parse_events(eb_event)
         context['event'] = view_event[0]
         context['event_id'] = event_id
+        context['evaluator_events'] = EvaluatorEvent.objects.filter(event=event).select_related('evaluator')
         return context
 
 
@@ -301,16 +301,11 @@ class EvaluatorCreate(CreateView):
     def get_context_data(self, **kwargs):
         context = super(EvaluatorCreate, self).get_context_data(**kwargs)
         event_id = self.kwargs['event_id']
-        event = Event.objects.get(pk=event_id)
-        file_docs = FileDoc.objects.filter(event=event)
-        context['file_docs'] = file_docs
-        text_docs = TextDoc.objects.filter(event=event)
-        context['text_docs'] = text_docs
         context['event_id'] = event_id
         return context
 
     def form_valid(self, form):
-        form.save(self.kwargs['event_id'])
+        form.save()
         form.send_email(form)
         return HttpResponseRedirect(self.get_success_url())
 

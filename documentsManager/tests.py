@@ -1,5 +1,4 @@
 from datetime import datetime
-from unittest import skip
 from unittest.mock import patch
 
 from django.apps import apps
@@ -167,7 +166,6 @@ class ViewTest(TestBase):
 
     @patch('documentsManager.views.Eventbrite.get')
     def test_docs_redirect(self, mock_eventbrite_get):
-
         mock_eventbrite_get.return_value = MOCK_EVENTS_API
         new_event = Event.objects.create(eb_event_id=1)
         response = self.client.get('/event/{}/docs/'.format(new_event.id))
@@ -398,12 +396,6 @@ class EvaluatorTest(TestBase):
         self.assertEqual(
             str(Evaluator._meta.verbose_name_plural), "evaluators")
 
-    @skip("Don't want to test")
-    def test_evaluator_default_state(self):
-        evaluator = self.create_evaluator()
-        self.assertEquals(evaluator.state, 'pending')
-
-
 @patch('documentsManager.views.get_one_event_api')
 class EvaluatorListTest(TestBase):
     def test_evaluator_list_view_name(self, mock_get_one_event_api):
@@ -428,49 +420,60 @@ class EvaluatorListTest(TestBase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'evaluators_grid.html')
 
-    @skip("Don't want to test")
+
     def test_evaluator_list_response_content(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
         event = self.create_event()
         evaluator = self.create_evaluator()
-        evaluator.events.add(event)
-        evaluator.save()
+        EvaluatorEvent.objects.create(
+            event=event,
+            evaluator=evaluator,
+        )
         response = self.client.get(
-            reverse('evaluators', kwargs={'event_id': event.id}))
+            reverse(
+                'evaluators',
+                kwargs={'event_id': event.id}
+            )
+        )
         self.assertContains(response, evaluator)
 
 
 @patch('documentsManager.views.get_one_event_api')
 class EvaluatorUpdateTest(TestBase):
-    @skip("Don't want to test")
+
     def test_evaluator_redirect_on_update(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
         evaluator = self.create_evaluator()
         event = self.create_event()
-        evaluator.events.add(event)
-        evaluator.save()
-        data = {'name': 'Jack', 'email': 'test@mail.com',
-                'state': evaluator.state, 'events': evaluator.events}
+        data = {
+            'name': 'Jack',
+            'email': 'test@mail.com',
+        }
         response = self.client.post(
             reverse('evaluator_update', kwargs={
-                    'event_id': event.id, 'pk': evaluator.id}),
+                'event_id': event.id, 'pk': evaluator.id}),
             data
         )
         self.assertRedirects(response, reverse(
             'evaluators', kwargs={'event_id': event.id}))
 
-    @skip("Don't want to test")
+
     def test_evaluator_update_success(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = MOCK_EVENTS_API
         evaluator = self.create_evaluator()
         event = self.create_event()
-        evaluator.events.add(event)
-        evaluator.save()
-        data = {'name': 'Jack', 'email': 'test@mail.com',
-                'state': evaluator.state, 'events': evaluator.events}
+        data = {
+            'name': 'Jack',
+            'email': 'test@mail.com',
+        }
         response = self.client.post(
-            reverse('evaluator_update', kwargs={
-                    'event_id': event.id, 'pk': evaluator.id}),
+            reverse(
+                'evaluator_update',
+                kwargs={
+                    'event_id': event.id,
+                    'pk': evaluator.id,
+                }
+            ),
             data
         )
         self.assertEqual(response.status_code, 302)
@@ -483,52 +486,53 @@ class EvaluatorUpdateTest(TestBase):
 
 @patch('documentsManager.views.get_one_event_api')
 class EvaluatorDeleteTest(TestBase):
-    @skip("Don't want to test")
+
     def test_evaluator_success_redirect(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
         event = self.create_event()
         evaluator = self.create_evaluator()
-        evaluator.events.add(event)
-        evaluator.save()
         response = self.client.post(
-            reverse('evaluator_delete', kwargs={
-                    'event_id': event.id, 'pk': evaluator.id}),
+            reverse(
+                'evaluator_delete',
+                kwargs={
+                    'event_id': event.id,
+                    'pk': evaluator.id,
+                }
+            ),
         )
         self.assertRedirects(response, reverse(
-            'evaluators', kwargs={'event_id': event.id}))
+            'evaluators',
+            kwargs={'event_id': event.id}
+        ))
 
-    @skip("Don't want to test")
+
     def test_cannot_evaluator_delete_twice(self, mock_get_one_event_api):
         event = self.create_event()
         evaluator = self.create_evaluator()
-        evaluator.events.add(event)
-        evaluator.save()
-        response = self.client.post(
+        self.client.post(
             reverse('evaluator_delete', kwargs={
-                    'event_id': event.id, 'pk': evaluator.id}),
+                'event_id': event.id, 'pk': evaluator.id}),
         )
         response = self.client.post(
             reverse('evaluator_delete', kwargs={
-                    'event_id': event.id, 'pk': evaluator.id}),
+                'event_id': event.id, 'pk': evaluator.id}),
         )
         self.assertEquals(response.status_code, 404)
 
-    @skip("Don't want to test")
     def test_evaluator_dissapear_from_db(self, mock_get_one_event_api):
         event = self.create_event()
         evaluator = self.create_evaluator()
-        evaluator.events.add(event)
-        evaluator.save()
+
         self.client.post(
             reverse('evaluator_delete', kwargs={
-                    'event_id': event.id, 'pk': evaluator.id}),
+                'event_id': event.id, 'pk': evaluator.id}),
         )
         self.assertFalse(Evaluator.objects.filter(pk=evaluator.id).exists())
 
 
 class EvaluatorFormTest(TestBase):
     def test_valid_form(self):
-        e = self.create_evaluator(name='John', email='john@mail.com')
+        e = self.create_evaluator(email='john@mail.com')
         data = {'name': e.name, 'email': e.email, }
         form = EvaluatorForm(data=data)
         self.assertTrue(form.is_valid())
@@ -541,10 +545,15 @@ class EvaluatorFormTest(TestBase):
 
 
 class EvaluatorEventTest(TestBase):
-    @skip("Don't want to test")
     def test_create_a_model(self):
-        evaluator_event = EvaluatorEvent.objects.create()
+        event = Event.objects.create(eb_event_id=123)
+        evaluator = Evaluator.objects.create(name='Leo', email='leo@leo.com')
+        evaluator_event = EvaluatorEvent.objects.create(
+            event=event,
+            evaluator=evaluator
+        )
         self.assertTrue(isinstance(evaluator_event, EvaluatorEvent))
+
 
 class FormsTest(TestCase):
 
