@@ -2,7 +2,6 @@
 from datetime import datetime
 
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from django.forms import (
     CheckboxSelectMultiple,
     ModelForm,
@@ -17,6 +16,7 @@ from django.forms import (
 )
 from django.forms.widgets import EmailInput
 from django.utils.translation import gettext_lazy as _
+
 from .models import (
     FileDoc,
     FileType,
