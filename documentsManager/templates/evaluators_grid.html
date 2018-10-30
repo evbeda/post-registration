@@ -61,25 +61,21 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Email</th>
-                <th scope="col">Documentation</th>
-                <th scope="col">Evaluations</th>
                 <th scope="col">Status</th>
                 <th scope="col">Actions</th>
             </tr>
         </thead>
         <tbody>
-            {% for evaluator in evaluators %}
+        {% for evaluator_event in evaluator_events %}
             <tr>
-                <td>{{ evaluator.name }}</td>
-                <td>{{ evaluator.email }}</td>
-                <td>{{ evaluator.documentation }}</td>
-                <td>-</td>
+                <td>{{ evaluator_event.evaluator.name }}</td>
+                <td>{{ evaluator_event.evaluator.email }}</td>
                 <td>
-                    <span class="badge evaluators_states">{{ evaluator.state }}</span>
+                    <span class="badge evaluators_states">{{ evaluator_event.state }}</span>
                 </td>
                 <td>
                     <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
-                        <a href="{% url 'evaluator_update' event_id evaluator.id %}">
+                        <a href="{% url 'evaluator_update' event_id evaluator_event.id %}">
                             <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
                                 <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
                                     <svg id="eds-icon--pencil_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -94,7 +90,7 @@
                         </a>
                     </span>
                     <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
-                        <a href="{% url 'evaluator_delete' event_id evaluator.id %}">
+                        <a href="{% url 'evaluator_delete' event_id evaluator_event.id %}">
                             <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
                                 <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
                                     <svg id="eds-icon--trash_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
