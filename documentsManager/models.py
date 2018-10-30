@@ -115,9 +115,15 @@ class TextDoc(models.Model):
 
 
 class FileSubmission(models.Model):
+    STATES = (
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    )
     file_doc = models.ForeignKey(FileDoc)
     file = models.FileField()
     date = models.DateField(default=datetime.date.today)
+    state = models.CharField(max_length=20, choices=STATES, default='pending')
 
     class Meta(object):
         db_table = 'FileSubmission'

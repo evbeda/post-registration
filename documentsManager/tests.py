@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
+from django.core.files import File
 from django.core.urlresolvers import resolve, reverse
 from django.db.utils import DataError
 from django.test import TestCase
@@ -22,7 +23,7 @@ from documentsManager.models import (
     FileDoc,
     Evaluator,
     User,
-    EvaluatorEvent)
+    EvaluatorEvent, FileSubmission)
 from documentsManager.views import (
     add_event,
     filter_managed_event,
@@ -162,6 +163,13 @@ class ViewTest(TestBase):
 
     def test_redirect(self):
         response = self.client.get('/accounts/login/')
+        self.assertEqual(response.status_code, 200)
+
+    @patch('documentsManager.views.Eventbrite.get')
+    def test_access_submission_dashboard(self, mock_eventbrite_get):
+        mock_eventbrite_get.return_value = MOCK_EVENTS_API
+        event = Event.objects.create(eb_event_id=123, organizer=self.user)
+        response = self.client.get('/event/{}/submissions/'.format(event.id))
         self.assertEqual(response.status_code, 200)
 
     @patch('documentsManager.views.Eventbrite.get')
@@ -395,7 +403,6 @@ class EvaluatorTest(TestBase):
     def test_evaluator_verbose_name_plural(self):
         self.assertEqual(
             str(Evaluator._meta.verbose_name_plural), "evaluators")
-
 
 @patch('documentsManager.views.get_one_event_api')
 class EvaluatorListTest(TestBase):
@@ -648,3 +655,16 @@ class FormsTest(TestBase):
             },
         )
         self.assertEqual(form.is_valid(), True)
+
+
+class FileSubmissionTest(TestBase):
+    def test_create_a_file_submission(self):
+        event = Event.objects.create(eb_event_id=123, organizer=self.user)
+        file_doc = FileDoc.objects.create(event=event)
+        file = File(open('runtime.txt', 'rb'))
+        file_submission = FileSubmission.objects.create(
+            file_doc=file_doc,
+            file=file,
+        )
+        result = isinstance(file_submission, FileSubmission)
+        self.assertTrue(result)

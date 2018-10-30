@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import json
 from datetime import datetime
-from django.shortcuts import redirect
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -14,6 +15,7 @@ from django.views.generic import (
     CreateView,
     DeleteView,
     UpdateView,
+    ListView,
 )
 from django.views.generic.base import TemplateView
 from eventbrite import Eventbrite
@@ -28,13 +30,13 @@ from .forms import (
     SignUpForm,
     SubmissionForm,
 )
-
 from .models import (
     FileDoc,
     Event,
     TextDoc,
     Evaluator,
     EvaluatorEvent,
+    FileSubmission,
 )
 from .utils import (
     get_data,
@@ -379,6 +381,29 @@ class SubmissionView(TemplateView, LoginRequiredMixin):
 
     def get_context_data(self, **kwargs):
         context = super(SubmissionView, self).get_context_data(**kwargs)
+        return context
+
+
+class SubmissionsList(ListView, LoginRequiredMixin):
+    model = FileSubmission
+    template_name = 'filesubmission_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(SubmissionsList, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        our_event = Event.objects.get(id=event_id)
+        eb_event = get_one_event_api(
+            get_auth_token(self.request.user),
+            our_event.eb_event_id,
+        )
+        view_event = parse_events(eb_event)
+        ev_count = EvaluatorEvent.objects.filter(
+            event=our_event,
+            state='accepted'
+        ).count()
+        context['evaluators_cont'] = ev_count
+        context['event'] = view_event[0]
+        context['event_id'] = event_id
         return context
 
 

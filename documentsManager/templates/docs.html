@@ -33,10 +33,13 @@
     </div>
     <ul class="nav nav-tabs mb-3">
         <li class="nav-item">
-            <a class="nav-link active" href={% url 'docs' event.id %}>Requirements</a>
+            <a class="nav-link active" href="{% url 'docs' event.id %}">Requirements</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{% url 'evaluators' event.id %}">Evaluators</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'submissions' event.id %}">Submissions</a>
         </li>
     </ul>
     <div class="row pt-2 pb-2">
