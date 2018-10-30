@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
-from django.conf import settings
 
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -123,21 +123,29 @@ class FileSubmission(models.Model):
 
 
 class Evaluator(models.Model):
-    STATES = (
-        ('pending', 'Waiting for acceptance'),
-        ('active', 'Active'),
-        ('inactive', 'Inactive'),
-    )
     name = models.CharField(max_length=20)
     email = models.EmailField()
-    events = models.ManyToManyField(Event)
-    state = models.CharField(max_length=20, choices=STATES, default='pending')
+    event = models.ManyToManyField(Event, through='EvaluatorEvent')
 
     def __str__(self):
         return self.name
 
     class Meta(object):
         db_table = 'Evaluator'
+
+
+class EvaluatorEvent(models.Model):
+    STATES = (
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    )
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    evaluator = models.ForeignKey(Evaluator, on_delete=models.CASCADE)
+    state = models.CharField(max_length=20, choices=STATES, default='pending')
+
+    class Meta:
+        db_table = 'EvaluatorEvent'
 
 
 class UserWebhook(models.Model):

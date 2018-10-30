@@ -40,7 +40,7 @@
     </div>
     <ul class="nav nav-tabs mb-3">
         <li class="nav-item">
-            <a class="nav-link" href={% url 'docs' event_id %}>Requirements</a>
+            <a class="nav-link" href="{% url 'docs' event_id %}">Requirements</a>
         </li>
         <li class="nav-item">
             <a class="nav-link active" href="{% url 'evaluators' event_id %}">Evaluators</a>
@@ -63,19 +63,20 @@
                 <th scope="col">Email</th>
                 <th scope="col">Documentation</th>
                 <th scope="col">Evaluations</th>
-                <th scope="col">State</th>
+                <th scope="col">Status</th>
                 <th scope="col">Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for evaluator in evaluators %}
             <tr>
-                <!-- <th scope="row">{{ row }}</th> -->
                 <td>{{ evaluator.name }}</td>
                 <td>{{ evaluator.email }}</td>
                 <td>{{ evaluator.documentation }}</td>
                 <td>-</td>
-                <td>{{ evaluator.state }}</td>
+                <td>
+                    <span class="badge evaluators_states">{{ evaluator.state }}</span>
+                </td>
                 <td>
                     <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
                         <a href="{% url 'evaluator_update' event_id evaluator.id %}">
@@ -114,5 +115,6 @@
         </tbody>
     </table>
 </div>
-
+{% load static %}
+<script src="{% static 'js/evaluators.js' %}"></script>
 {% endblock content %}
