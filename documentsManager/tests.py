@@ -133,7 +133,7 @@ class TestBase(TestCase):
         return login
 
     def create_event(self, eb_event_id=1):
-        return Event.objects.create(eb_event_id=eb_event_id)
+        return Event.objects.create(eb_event_id=eb_event_id, organizer=self.user)
 
     def create_evaluator(self, name='John', email='john@email.com'):
         return Evaluator.objects.create(name=name, email=email)
@@ -167,7 +167,7 @@ class ViewTest(TestBase):
     @patch('documentsManager.views.Eventbrite.get')
     def test_docs_redirect(self, mock_eventbrite_get):
         mock_eventbrite_get.return_value = MOCK_EVENTS_API
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
         response = self.client.get('/event/{}/docs/'.format(new_event.id))
         self.assertEqual(response.status_code, 200)
 
@@ -178,7 +178,7 @@ class ViewTest(TestBase):
     @patch('documentsManager.views.Eventbrite.get')
     def test_doc_form_redirect(self, mock_api_evb):
         mock_api_evb.return_value = MOCK_EVENTS_API
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
         response = self.client.get('/doc_form/{}/'.format(new_event.id))
         self.assertEqual(response.status_code, 200)
 
@@ -208,7 +208,7 @@ class ViewTest(TestBase):
 
     def test_modify_event_dates(self):
         EVB_ID = 1234
-        new_event = add_event(EVB_ID, '2018-03-03')
+        new_event = add_event(EVB_ID, '2018-03-03', organizer=self.user)
         new_event.init_submission = datetime.strptime(
             '2018-01-01', '%Y-%m-%d').date()
         new_event.save()
@@ -228,20 +228,20 @@ class ViewTest(TestBase):
     @patch('documentsManager.views.Eventbrite.get')
     def test_response_with_landing_page(self, mock_api_evb):
         mock_api_evb.return_value = MOCK_EVENTS_API
-        event = Event.objects.create(eb_event_id=321)
+        event = Event.objects.create(eb_event_id=321, organizer=self.user)
         event.end_submission = '2018-02-25'
         response = self.client.get('/landing/{}/'.format(event.id))
         self.assertEqual(response.status_code, 200)
 
     def test_response_with_success(self):
-        event = Event.objects.create(eb_event_id=321)
+        event = Event.objects.create(eb_event_id=321, organizer=self.user)
         response = self.client.get('/landing/{}/success/'.format(event.id))
         self.assertEqual(response.status_code, 200)
 
     @patch('documentsManager.views.Eventbrite.get')
     def test_response_with_landing_page_with_text_doc(self, mock_api_evb):
         mock_api_evb.return_value = MOCK_EVENTS_API
-        event = Event.objects.create(eb_event_id=321)
+        event = Event.objects.create(eb_event_id=321, organizer=self.user)
         TextDoc.objects.create(event=event)
         FileDoc.objects.create(event=event)
         response = self.client.get('/landing/{}/'.format(event.id))
@@ -286,9 +286,9 @@ class AuthTokenTest(TestCase):
             'UserSocialAuth does not exists!' in str(context.exception))
 
 
-class ModelsTest(TestCase):
+class ModelsTest(TestBase):
     def test_model_text_exist(self):
-        new_event = Event.objects.create(eb_event_id=3)
+        new_event = Event.objects.create(eb_event_id=3, organizer=self.user)
         text_doc = TextDoc.objects.create(event=new_event)
         self.assertEqual(text_doc.name, '')
         self.assertEqual(text_doc.measure, 'Words')
@@ -302,49 +302,49 @@ class ModelsTest(TestCase):
         self.assertEqual(result, 'PDF ()')
 
     def test_model_text_error_max_word(self):
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
         text_doc = TextDoc.objects.create(event=new_event)
         text_doc.max = 'asd'
         result = isinstance(text_doc.max, int)
         self.assertFalse(result)
 
     def test_model_text_max_word(self):
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
         text_doc = TextDoc.objects.create(event=new_event)
         text_doc.max = 237
         result = isinstance(text_doc.max, int)
         self.assertTrue(result)
 
     def test_model_text_error_max_word_2(self):
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
         text_doc = TextDoc.objects.create(event=new_event)
         text_doc.min = 'asd'
         result = isinstance(text_doc.min, int)
         self.assertFalse(result)
 
     def test_model_text_max_word_2(self):
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
         text_doc = TextDoc.objects.create(event=new_event)
         text_doc.min = 4560
         result = isinstance(text_doc.min, int)
         self.assertTrue(result)
 
     def test_model_file_quantity_only_recieve_ints(self):
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
         file_doc = FileDoc.objects.create(event=new_event)
         file_doc.quantity = 'asd'
         with self.assertRaises(ValueError):
             file_doc.save()
 
     def test_model_file_quantity_is_int(self):
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
         file_doc = FileDoc.objects.create(event=new_event)
         file_doc.quantity = 123
         result = isinstance(file_doc.quantity, int)
         self.assertTrue(result)
 
     def test_model_file_name_submission_invalid(self):
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
         with self.assertRaises(DataError) as data_error:
             FileDoc.objects.create(
                 event=new_event,
@@ -354,13 +354,13 @@ class ModelsTest(TestCase):
                          ('value too long for type character varying(100)\n',))
 
     def test_model_file_name_submission_valid(self):
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
         file_doc = FileDoc.objects.create(event=new_event)
         file_doc.name = ('Documento')
         self.assertEqual(file_doc.name, 'Documento')
 
     def test_model_text_doc_name_submission_invalid(self):
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
         with self.assertRaises(DataError) as data_error:
             TextDoc.objects.create(
                 event=new_event,
@@ -370,7 +370,7 @@ class ModelsTest(TestCase):
                          ('value too long for type character varying(100)\n',))
 
     def test_model_text_doc_name_submission_valid(self):
-        new_event = Event.objects.create(eb_event_id=1)
+        new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
         file_doc = FileDoc.objects.create(event=new_event)
         file_doc.name = ('Foto')
         self.assertEqual(file_doc.name, 'Foto')
@@ -396,6 +396,7 @@ class EvaluatorTest(TestBase):
         self.assertEqual(
             str(Evaluator._meta.verbose_name_plural), "evaluators")
 
+
 @patch('documentsManager.views.get_one_event_api')
 class EvaluatorListTest(TestBase):
     def test_evaluator_list_view_name(self, mock_get_one_event_api):
@@ -419,7 +420,6 @@ class EvaluatorListTest(TestBase):
             reverse('evaluators', kwargs={'event_id': event.id}))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'evaluators_grid.html')
-
 
     def test_evaluator_list_response_content(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
@@ -456,7 +456,6 @@ class EvaluatorUpdateTest(TestBase):
         )
         self.assertRedirects(response, reverse(
             'evaluators', kwargs={'event_id': event.id}))
-
 
     def test_evaluator_update_success(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = MOCK_EVENTS_API
@@ -505,7 +504,6 @@ class EvaluatorDeleteTest(TestBase):
             kwargs={'event_id': event.id}
         ))
 
-
     def test_cannot_evaluator_delete_twice(self, mock_get_one_event_api):
         event = self.create_event()
         evaluator = self.create_evaluator()
@@ -546,7 +544,7 @@ class EvaluatorFormTest(TestBase):
 
 class EvaluatorEventTest(TestBase):
     def test_create_a_model(self):
-        event = Event.objects.create(eb_event_id=123)
+        event = Event.objects.create(eb_event_id=123, organizer=self.user)
         evaluator = Evaluator.objects.create(name='Leo', email='leo@leo.com')
         evaluator_event = EvaluatorEvent.objects.create(
             event=event,
@@ -555,7 +553,7 @@ class EvaluatorEventTest(TestBase):
         self.assertTrue(isinstance(evaluator_event, EvaluatorEvent))
 
 
-class FormsTest(TestCase):
+class FormsTest(TestBase):
 
     def test_is_valid_EventForm(self):
         form = EventForm()
@@ -608,7 +606,7 @@ class FormsTest(TestCase):
         self.assertEqual(user.email, 'juan@gmail.com')
 
     def test_validate_text_submissions(self):
-        event = Event.objects.create(eb_event_id=123)
+        event = Event.objects.create(eb_event_id=123, organizer=self.user)
         text_doc = TextDoc.objects.create(event=event)
         key = '{}_text'.format(text_doc.id)
         text_fields = {
@@ -619,7 +617,7 @@ class FormsTest(TestCase):
         self.assertEqual(result, expected)
 
     def test_validate_files_submissions(self):
-        event = Event.objects.create(eb_event_id=123)
+        event = Event.objects.create(eb_event_id=123, organizer=self.user)
         file_doc = FileDoc.objects.create(event=event)
         key = '{}_file'.format(file_doc.id)
         values = {
@@ -629,7 +627,7 @@ class FormsTest(TestCase):
         self.assertEqual(result, True)
 
     def test_Submission_Form(self):
-        event = Event.objects.create(eb_event_id=123)
+        event = Event.objects.create(eb_event_id=123, organizer=self.user)
         text_doc = TextDoc.objects.create(event=event)
         key = '{}_text'.format(text_doc.id)
         form = SubmissionForm({
@@ -638,7 +636,7 @@ class FormsTest(TestCase):
         self.assertEqual(form.is_valid(), True)
 
     def test_Submission_Form_with_files(self):
-        event = Event.objects.create(eb_event_id=123)
+        event = Event.objects.create(eb_event_id=123, organizer=self.user)
         file_doc = FileDoc.objects.create(event=event)
         key = '{}_file'.format(file_doc.id)
         form = SubmissionForm(

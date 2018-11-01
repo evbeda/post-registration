@@ -166,6 +166,88 @@
 	</div>
 	{% endif %}
 	<div class="container hidden_div" id="evaluate_events">
+		{% if events_to_evaluate %}
+		<div class="row">
+			{% for event in events_to_evaluate %}
+			<div class="col-4">
+				<a class="link-wrapper" href='{% url 'submission' event.event_id %}'>
+					<div class="eds-card eds-card--neutral" role="presentation">
+						<section class="eds-l-pad-all-6 eds-media-card-content eds-media-card-content--grid eds-media-card-content--standard eds-media-card-content--fixed"
+						 role="presentation">
+							<aside class="eds-media-card-content__image-container">
+								<div class="eds-media-card-content__image-wrapper eds-media-card-content__image-wrapper--with-width">
+									<div class="eds-media-card-content__image-content">
+										{% if event.logo %}
+											<div class="eds-media-card-content__image-placeholder" style="background-color:#EEEDF2;"></div>
+											<img class="eds-media-card-content__image eds-max-img" src="{{ event.logo }}" alt="Event image" />
+										{% else %}
+											<i class="eds-media-card-content__image eds-max-img d-flex eds-align--center" data-spec="icon" aria-hidden="true">
+											<svg width="144" height="144" viewBox="0 0 144 144" xmlns="http://www.w3.org/2000/svg">
+										    <title>
+										        ghost-graphic
+										    </title>
+										    <g id="Page-1" fill="none" fill-rule="evenodd">
+										        <g id="ghost-graphic-">
+										            <path id="Rectangle-path" d="M0 0h144v144H0z"></path>
+										            <path d="M108 110.352v-57c0-19.882-16.118-36-36-36-19.883 0-36 16.118-36 36v57l9-9 9 9 9-9 9 9 9-9 9 9 9-9 9 9z" id="Fill-1" fill="#F9F9FA"></path>
+										            <path d="M81 18.486a36.107 36.107 0 0 0-9-1.134c-19.883 0-36 16.118-36 36v57l9-9 9 9v-57c0-16.774 11.472-30.87 27-34.866" id="Fill-3" fill="#D2D6DF"></path>
+										            <path d="M81 99.231l9 9 9-9 7.5 7.5V53.352c0-19.023-15.475-34.5-34.5-34.5-19.023 0-34.5 15.477-34.5 34.5v53.38l7.5-7.5 9 9 9-9 9 9 9-9zm28.5 14.742l-10.5-10.5-9 9-9-9-9 9-9-9-9 9-9-9-10.5 10.5v-60.62c0-20.678 16.822-37.5 37.5-37.5 20.677 0 37.5 16.822 37.5 37.5v60.62z" id="Fill-5" fill="#363A43"></path>
+										            <path id="Fill-7" fill="#363A43" d="M61.5 84.852h21v-3h-21z"></path>
+										            <path d="M56.813 57.852a2.812 2.812 0 1 1-5.626 0 2.812 2.812 0 1 1 5.626 0" id="Fill-9" fill="#363A43"></path>
+										            <path d="M92.438 57.852a2.812 2.812 0 1 1-5.626 0 2.812 2.812 0 1 1 5.626 0" id="Fill-10" fill="#363A43"></path>
+										            <path id="Fill-11" fill="#363A43" d="M61.376 115.624h3v-3h-3z"></path>
+										            <path id="Fill-12" fill="#363A43" d="M61.376 121.624h3v-3h-3z"></path>
+										            <path id="Fill-13" fill="#363A43" d="M79.313 115.624h3v-3h-3z"></path>
+										            <path id="Fill-14" fill="#363A43" d="M79.313 121.624h3v-3h-3z"></path>
+										            <path id="Fill-15" fill="#363A43" d="M43.75 117h3v-3h-3z"></path>
+										            <path id="Fill-16" fill="#363A43" d="M43.75 123h3v-3h-3z"></path>
+										            <path id="Fill-17" fill="#363A43" d="M43.75 129h3v-3h-3z"></path>
+										            <path id="Fill-18" fill="#363A43" d="M97.25 115.5h3v-3h-3z"></path>
+										            <path id="Fill-19" fill="#363A43" d="M97.25 121.5h3v-3h-3z"></path>
+										            <path id="Fill-20" fill="#363A43" d="M97.25 127.5h3v-3h-3z"></path>
+										        </g>
+										    </g>
+											</svg>
+										</i>
+										{% endif %}
+									</div>
+								</div>
+							</aside>
+							<main class="eds-media-card-content__content-container">
+								<div class="eds-media-card-content__content">
+									<div class="eds-media-card-content__content__principal">
+										<div class="eds-media-card-content__primary-content">
+											<div class="eds-text-bs eds-text-color--grey-600"></div>
+											<h3 class="eds-media-card-content__title eds-text-color--grey-800 eds-text-bl">{{ event.name }}</h3>
+										</div>
+										<div class="eds-media-card-content__sub-content">
+											<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1">{{ event.start }}</div>
+											<div class="eds-media-card-content__sub-content-cropped">
+												<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1">
+												{% if event.venue_id == '' %}	
+                                                No location specified
+                                                {% else %}
+                                                {{ event.venue }}
+                                                {% endif %}
+												</div>
+												<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1">Free • on Eventbrite</div>
+												<div class="eds-text-bs--fixed eds-text-color--grey-600 eds-l-mar-top-1"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="eds-media-card-content__actions-container eds-media-card-content__actions-container--always-visible">
+									<span class="eds-media-card-content__actions-container__action eds-l-pad-all-1">
+									</span>
+								</div>
+							</main>
+						</section>
+					</div>
+				</a>
+			</div>
+			{% endfor %}
+		</div>
+		{% else %}
 	    <div class="eds-empty-state eds-align--center">
 	        <div class="eds-g-cell eds-text--center"><i class="eds-vector-image eds-graphic--small" data-spec="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
 			    <g fill="none" fill-rule="evenodd">
@@ -189,6 +271,7 @@
 	        </div>
 	        </div>
 	    </div>
+	    {% endif %}
 	</div>
 	<input type="hidden" id="eb_user" value="{{ is_eb_user }}">
 </div>
