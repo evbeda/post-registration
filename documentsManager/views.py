@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 from datetime import datetime
-
+from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
@@ -27,6 +27,7 @@ from .forms import (
     SignUpForm,
     SubmissionForm,
 )
+
 from .models import (
     FileDoc,
     Event,
@@ -162,11 +163,24 @@ class DocsView(FormView, LoginRequiredMixin):
 class HomeView(TemplateView, LoginRequiredMixin):
     template_name = 'home.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        self.accepted_events = evaluator_events(request)
+        if self.request.META.get('HTTP_REFERER') is None:
+            prev_page = 'none'
+        else:
+            prev_page = self.request.META.get('HTTP_REFERER')
+        if (len(self.accepted_events) == 1) and (prev_page.find('accounts/login') != (-1)):
+            event_id = self.accepted_events[0]['event_id']
+            return redirect(reverse('submission', kwargs={'event_id': event_id}))
+        else:
+            return super(HomeView, self).dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
         create_order_webhook_from_view(self.request.user,)
         context['user'] = self.request.user
         context['is_eb_user'] = self.request.user.social_auth.exists()
+        context['events_to_evaluate'] = self.accepted_events
         if context['is_eb_user']:
             api_events_w_venues = get_events_with_venues_api(
                 get_auth_token(self.request.user))
@@ -359,11 +373,11 @@ class EvaluatorDelete(DeleteView):
         )
 
 
-class DashboardView(TemplateView, LoginRequiredMixin):
-    template_name = 'dashboard.html'
+class SubmissionView(TemplateView, LoginRequiredMixin):
+    template_name = 'submission.html'
 
     def get_context_data(self, **kwargs):
-        context = super(DashboardView, self).get_context_data(**kwargs)
+        context = super(SubmissionView, self).get_context_data(**kwargs)
         return context
 
 
@@ -437,12 +451,12 @@ def select_event(request, eb_event_id):
     eb_event = get_one_event_api(get_auth_token(request.user), eb_event_id)
     view_event = parse_events(eb_event)
     default_end_submission = view_event[0]['start']
-    new_event = add_event(eb_event_id, default_end_submission)
+    new_event = add_event(eb_event_id, default_end_submission, request.user)
     return HttpResponseRedirect(reverse('docs', kwargs={'event_id': new_event.id}))
 
 
-def add_event(eb_event_id, end_submission):
-    new_event = Event(eb_event_id=eb_event_id, end_submission=end_submission)
+def add_event(eb_event_id, end_submission, organizer):
+    new_event = Event(eb_event_id=eb_event_id, end_submission=end_submission, organizer=organizer)
     new_event.save()
     return new_event
 
@@ -453,3 +467,30 @@ def update_dates(request, event_id):
     event.end_submission = request.POST['end_submission']
     event.save()
     return HttpResponseRedirect(reverse('docs', kwargs={'event_id': event_id}))
+
+
+def evaluator_events(request):
+    evaluators = Evaluator.objects.filter(email=request.user.email)
+    accepted_eval_event = []
+    event_list = []
+    accepted_events = []
+    for evaluator in evaluators:
+        accepted = EvaluatorEvent.objects.filter(evaluator_id=evaluator.id, state='accepted')
+        if len(accepted):
+            accepted_eval_event.append(accepted)
+    for event in accepted_eval_event:
+        event_list.append(Event.objects.filter(id=event[0].event_id))
+    for event in event_list:
+        auth_user = UserSocialAuth.objects.get(user_id=event[0].organizer_id)
+        token = auth_user.extra_data['access_token']
+        eb_event = get_one_event_api(
+            token,
+            event[0].eb_event_id
+        )
+        accepted_events.append(parse_events(eb_event)[0])
+    if len(accepted_events) != 0:
+        for ev in accepted_events:
+            eb_event_id = ev['eb_id']
+            event = Event.objects.get(eb_event_id=eb_event_id)
+            ev['event_id'] = event.id
+    return accepted_events

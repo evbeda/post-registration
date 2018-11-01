@@ -53,6 +53,7 @@ class Event(models.Model):
     eb_event_id = models.TextField(unique=True)
     init_submission = models.DateField(default=datetime.date.today)
     end_submission = models.DateField(null=True)
+    organizer = models.ForeignKey(User, blank=False)
 
     class Meta(object):
         db_table = 'Event'
