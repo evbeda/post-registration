@@ -104,9 +104,9 @@ urlpatterns = [
         name='events'
     ),
     url(
-        r'event/(?P<event_id>\d+)/submissions/$',
+        r'event/(?P<event_id>\d+)/submission/$',
         SubmissionView.as_view(),
-        name='submission'
+        name='submissionHome'
     ),
     url(
         r'signup/$',
