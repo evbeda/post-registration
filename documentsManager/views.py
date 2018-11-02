@@ -9,7 +9,6 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.core.mail import EmailMultiAlternatives
 from django.views.generic import (
     FormView,
     CreateView,
@@ -174,7 +173,7 @@ class HomeView(TemplateView, LoginRequiredMixin):
             prev_page = self.request.META.get('HTTP_REFERER')
         if (len(self.accepted_events) == 1) and (prev_page.find('accounts/login') != (-1)):
             event_id = self.accepted_events[0]['event_id']
-            return redirect(reverse('submission', kwargs={'event_id': event_id}))
+            return redirect(reverse('submissionHome', kwargs={'event_id': event_id}))
         else:
             return super(HomeView, self).dispatch(request, *args, **kwargs)
 

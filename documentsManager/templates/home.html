@@ -170,7 +170,7 @@
 		<div class="row">
 			{% for event in events_to_evaluate %}
 			<div class="col-4">
-				<a class="link-wrapper" href='{% url 'submission' event.event_id %}'>
+				<a class="link-wrapper" href="{% url 'submissionHome' event.event_id %}">
 					<div class="eds-card eds-card--neutral" role="presentation">
 						<section class="eds-l-pad-all-6 eds-media-card-content eds-media-card-content--grid eds-media-card-content--standard eds-media-card-content--fixed"
 						 role="presentation">
