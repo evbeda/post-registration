@@ -1,40 +1,29 @@
 {% load inlinecss %}
 {% inlinecss "css/email.css" %}
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<!-- If you delete this tag, the sky will fall on your head -->
 <meta name="viewport" content="width=device-width" />
-
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Documentation Evaluation Request</title>
-	
+<title>Documentation Evaluation Request</title>	
 </head>
- 
 <body bgcolor="#FFFFFF">
-
-<!-- BODY -->
 <table class="body-wrap">
 	<tr>
-		<td></td>
 		<td class="container" bgcolor="#FFFFFF">
-
 			<div class="content">
 			<table>
 				<tr>
 					<td>
 						<h3>You could be part of this event!</h3>
 						<p class="lead">You have been selected as official evaluator for {{ event.name }}.</p>
-						
-						<!-- A Real Hero (and a real human being) -->
-						<p><img src="{{ event.logo }}" /></p><!-- /hero -->
-						
+						<p><img src="{{ event.logo }}" /></p>
 						<h3>You want to join us?</h3>
 						<p>You just have to accept the invitation with the button below, and then, login into our app to start reviewing submissions.</p>
 						<small>
                             All of your confidential information is not going to be revealed.
                         </small>
+                        <br>
 						<!-- <a href="{% url 'accept-invitation' invitation_code %}" class="btn btn-success btn-lg mr-3">Accept</a> -->
 						<!-- <a href="{% url 'decline-invitation' invitation_code %}" class="btn btn-danger btn-lg ml-3">Decline</a> -->
 						<a href="http://127.0.0.1:8000/accept-invitation/{{ invitation_code }}" class="btn">Accept</a>
@@ -43,22 +32,15 @@
 					</td>
 				</tr>
 			</table>
-			</div>
-									
+			</div>						
 		</td>
-		<td></td>
 	</tr>
-</table><!-- /BODY -->
-
-<!-- FOOTER -->
+</table>
 <table class="footer-wrap">
 	<tr>
-		<td></td>
 		<td class="container">
-			
-				<!-- content -->
-				<div class="content">
-				<table>
+			<div class="content">
+			<table>
 				<tr>
 					<td align="center">
 						<p>
@@ -68,15 +50,11 @@
 						</p>
 					</td>
 				</tr>
-			</table>
-				</div><!-- /content -->
-				
+		    </table>
+			</div>
 		</td>
-		<td></td>
 	</tr>
-</table><!-- /FOOTER -->
-
+</table>
 </body>
 </html>
-
 {% endinlinecss %}
