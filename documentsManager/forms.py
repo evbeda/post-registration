@@ -214,7 +214,7 @@ class EvaluatorForm(ModelForm):
         FROM = 'kaizendev18@gmail.com'
         TO = email
         SUBJECT = 'Invitation to evaluate submissions for an event.'
-        html_content = render_to_string('partials/eval_confirmation.html', {
+        html_content = render_to_string('email/evaluation_request.html', {
             'event': event,
             'invitation_code': invitation_code[0].hex
         })
