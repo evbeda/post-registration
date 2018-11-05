@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
 from datetime import datetime
-from urllib import request
-from .utils import create_order_webhook_from_view, get_data
-from astroid import objects
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import EmailMultiAlternatives, send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -21,13 +17,10 @@ from django.views.generic import (
     UpdateView,
     ListView,
 )
-import json
 from django.template.base import logger
 from django.template.loader import render_to_string
-from django.utils.decorators import method_decorator
 from django.utils.html import strip_tags
 from django.views import View
-from django.views.decorators.csrf import csrf_exempt
 from eventbrite import Eventbrite
 from multi_form_view import MultiFormView
 from social_django.models import UserSocialAuth
@@ -46,6 +39,11 @@ from .models import (
     Evaluator,
     EvaluatorEvent,
     FileSubmission,
+)
+
+from .utils import (
+    get_data,
+    create_order_webhook_from_view,
 )
 
 
