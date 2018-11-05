@@ -1,5 +1,6 @@
 from datetime import datetime
 from unittest.mock import patch
+from django.test import Client
 
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
@@ -15,7 +16,10 @@ from documentsManager.forms import (
     TextDocForm,
     SignUpForm,
     EvaluatorForm,
-    validate_text_submissions, validate_files_submissions, SubmissionForm)
+    validate_text_submissions,
+    validate_files_submissions,
+    SubmissionForm,
+)
 from documentsManager.models import (
     Event,
     TextDoc,
@@ -23,7 +27,9 @@ from documentsManager.models import (
     FileDoc,
     Evaluator,
     User,
-    EvaluatorEvent, FileSubmission)
+    EvaluatorEvent,
+    FileSubmission,
+)
 from documentsManager.views import (
     add_event,
     filter_managed_event,
@@ -114,9 +120,92 @@ MOCK_EVENTS_API = {
     }
 }
 
+MOCK_EVENTS_API_2 = {
+    'name': {
+        'text': 'EventoCualquiera2',
+        'html': 'EventoCualquiera2'
+    },
+    'description': {
+        'text': None,
+        'html': None
+    },
+    'id': '50607739120',
+    'url': 'https://www.eventbrite.com.ar/e/eventocualquiera-tickets-50607739110',
+    'start': {
+        'timezone': 'America/Caracas',
+        'local': '2018-11-03T19:00:00',
+        'utc': '2018-11-03T23:00:00Z'
+    },
+    'end': {
+        'timezone': 'America/Caracas',
+        'local': '2018-11-03T22:00:00',
+        'utc': '2018-11-04T02:00:00Z'
+    },
+    'organization_id': '226660633266',
+    'created': '2018-09-24T17:32:37Z',
+    'changed': '2018-09-26T17:07:55Z',
+    'capacity': 10,
+    'capacity_is_custom': False,
+    'status': 'live',
+    'currency': 'ARS',
+    'listed': False,
+    'shareable': True,
+    'invite_only': False,
+    'online_event': False,
+    'show_remaining': False,
+    'tx_time_limit': 480,
+    'hide_start_date': False,
+    'hide_end_date': False,
+    'locale': 'es_AR',
+    'is_locked': False,
+    'privacy_setting': 'unlocked',
+    'is_series': False,
+    'is_series_parent': False,
+    'is_reserved_seating': False,
+    'show_pick_a_seat': False,
+    'show_seatmap_thumbnail': False,
+    'show_colors_in_seatmap_thumbnail': False,
+    'source': 'create_2.0',
+    'is_free': True,
+    'version': '3.0.0',
+    'logo_id': '50285339',
+    'organizer_id': '17688321548',
+    'venue_id': None,
+    'category_id': None,
+    'subcategory_id': None,
+    'format_id': None,
+    'resource_uri': 'https://www.eventbriteapi.com/v3/events/50607739110/',
+    'is_externally_ticketed': False,
+    'logo': {
+        'crop_mask': {
+            'top_left': {
+                'x': 0,
+                'y': 43
+            },
+            'width': 524,
+            'height': 262
+        },
+        'original': {
+            'url': 'https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2F'
+                   'images%2F50285339%2F226660633266%2F1%2Foriginal.jpg?'
+                   'auto=compress&s=76bcc2208a37ed4a6cf52ec9d204fe1c',
+            'width': 525,
+            'height': 350
+        },
+        'id': '50285339',
+        'url': 'https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages'
+               '%2F50285339%2F226660633266%2F1%2Foriginal.jpg?h=200&w=450&'
+               'auto=compress&rect=0%2C43%2C524%2C262&s=393615fb1d44a82eb37a2cb2fafa9ac7',
+        'aspect_ratio': '2',
+        'edge_color': '#6b7384',
+        'edge_color_set': True
+    }
+}
+
 
 class TestBase(TestCase):
     def setUp(self):
+        self.client = Client()
         self.user = User.objects.create_superuser(
             email='kaizen@email.com',
             password='awesome1234',
@@ -393,6 +482,9 @@ class SignUpView(TestBase):
 
 class EvaluatorTest(TestBase):
 
+    def setUp(self):
+        super(EvaluatorTest, self).setUp()
+
     def test_create_evaluator(self):
         evaluator = self.create_evaluator()
         self.assertTrue(isinstance(evaluator, Evaluator))
@@ -404,6 +496,58 @@ class EvaluatorTest(TestBase):
     def test_evaluator_verbose_name_plural(self):
         self.assertEqual(
             str(Evaluator._meta.verbose_name_plural), "evaluators")
+
+    @patch('documentsManager.views.Eventbrite.get')
+    def test_login_with_Eval_1_accepted(self, mock_eventbrite_get):
+        mock_eventbrite_get.return_value = MOCK_EVENTS_API
+        new_event = Event.objects.create(eb_event_id=50607739110, organizer=self.user)
+        evaluator = Evaluator.objects.create(email='john@email.com')
+        EvaluatorEvent.objects.create(
+            event=new_event,
+            evaluator=evaluator,
+            state='accepted',
+        )
+        EvaluatorEvent.objects.create(
+            event=new_event,
+            evaluator=evaluator,
+            state='pending',
+        )
+        User.objects.create_superuser(
+            email='john@email.com',
+            password='john1234',
+        )
+        self.client.login(email='john@email.com', password='john1234')
+        response = self.client.get('/accounts/login/', follow=True)
+        response2 = self.client.get(response.context_data['next'], follow=True, **{'HTTP_REFERER': 'accounts/login'})
+        self.assertEquals(response2.wsgi_request.path, '/event/{}/submission/'.format(new_event.id))
+
+    @patch('documentsManager.views.Eventbrite.get')
+    @patch('documentsManager.views.Eventbrite.get')
+    def test_login_with_Eval_2_accepted(self, mock_eventbrite_get, mock_eventbrite_get_2):
+        mock_eventbrite_get.return_value = MOCK_EVENTS_API
+        mock_eventbrite_get_2.return_value = MOCK_EVENTS_API_2
+        new_event_1 = Event.objects.create(eb_event_id=50607739110, organizer=self.user)
+        new_event_2 = Event.objects.create(eb_event_id=50607739120, organizer=self.user)
+        evaluator_1 = Evaluator.objects.create(email='john@email.com')
+        evaluator_2 = Evaluator.objects.create(email='john@email.com')
+        EvaluatorEvent.objects.create(
+            event=new_event_1,
+            evaluator=evaluator_1,
+            state='accepted',
+        )
+        EvaluatorEvent.objects.create(
+            event=new_event_2,
+            evaluator=evaluator_2,
+            state='accepted',
+        )
+        User.objects.create_superuser(
+            email='john@email.com',
+            password='john1234',
+        )
+        self.client.login(email='john@email.com', password='john1234')
+        response = self.client.get('/accounts/login/', follow=True)
+        response2 = self.client.get(response.context_data['next'], follow=True, **{'HTTP_REFERER': 'accounts/login'})
+        self.assertEquals(response2.wsgi_request.path, '/')
 
 
 @patch('documentsManager.views.get_one_event_api')

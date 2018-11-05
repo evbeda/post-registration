@@ -19,6 +19,7 @@ from .views import (
     EvaluatorDelete,
     accept_webhook,
     SubmissionsList,
+    SubmissionView,
     AcceptInvitationView,
     DeclineInvitationView,
 )
@@ -106,6 +107,11 @@ urlpatterns = [
         r'event/(?P<event_id>\d+)/submissions/$',
         SubmissionsList.as_view(),
         name='submissions'
+    ),
+    url(
+        r'event/(?P<event_id>\d+)/submission/$',
+        SubmissionView.as_view(),
+        name='submissionHome'
     ),
     url(
         r'signup/$',
