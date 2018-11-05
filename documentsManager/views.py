@@ -436,7 +436,7 @@ class AcceptInvitationView(TemplateView):
         FROM = 'kaizendev18@gmail.com'
         TO = 'martinvalles@eventbrite.com'
         SUBJECT = 'A new Evaluator for your event has accepted.'
-        html_content = render_to_string('partials/new_evaluator_email.html', {
+        html_content = render_to_string('email/new_evaluator.html', {
                                         'evaluator': evaluator})
         text_content = strip_tags(html_content)
         msg = EmailMultiAlternatives(
