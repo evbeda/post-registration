@@ -1,31 +1,35 @@
 # -*- coding: utf-8 -*-
+from builtins import object
 from datetime import datetime
 
-from django.contrib.auth.forms import UserCreationForm
-from django.forms import (
-    CheckboxSelectMultiple,
-    ModelForm,
-    ModelMultipleChoiceField,
-    Textarea,
-    NumberInput,
-    CheckboxInput,
-    Select,
-    EmailField,
-    Form,
-    TextInput,
-)
-from django.forms.widgets import EmailInput
-from django.utils.translation import gettext_lazy as _
-
 from .models import (
+    Evaluator,
+    Event,
     FileDoc,
+    FileSubmission,
     FileType,
     TextDoc,
-    Event,
-    FileSubmission,
-    Evaluator,
     User,
+    EvaluatorEvent,
 )
+from django.contrib.auth.forms import UserCreationForm
+from django.core.mail import EmailMultiAlternatives, send_mail
+from django.forms import (
+    CheckboxInput,
+    CheckboxSelectMultiple,
+    EmailField,
+    Form,
+    ModelForm,
+    ModelMultipleChoiceField,
+    NumberInput,
+    Select, TextInput,
+    Textarea,
+)
+from django.forms.widgets import EmailInput, HiddenInput
+from django.template.base import logger
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.utils.translation import gettext_lazy as _
 
 
 class FileDocForm(ModelForm):
@@ -203,31 +207,29 @@ class EvaluatorForm(ModelForm):
             'email': EmailInput(attrs={'class': 'form-control'}),
         }
 
-    def send_email(self, form):
-        import smtplib
+    def send_email(self, form, event):
+        email = form.cleaned_data['email']
+        invitation_code = EvaluatorEvent.objects.filter(
+            event=event['id']).values_list('invitation_code', flat=True)
         FROM = 'kaizendev18@gmail.com'
-        TO = form.cleaned_data['email']
+        TO = email
         SUBJECT = 'Invitation to evaluate submissions for an event.'
-        TEXT = 'Hello, {}. You have been selected as official evaluator for this event.'.format(
-            form.cleaned_data['name'])
-
-        # Prepare actual message
-        message = """From: %s\nTo: %s\nSubject: %s\n\n%s
-        """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
+        html_content = render_to_string('partials/eval_confirmation.html', {
+            'event': event,
+            'invitation_code': invitation_code[0].hex
+        })
+        text_content = strip_tags(html_content)
+        msg = EmailMultiAlternatives(SUBJECT, text_content, FROM, [TO])
+        msg.attach_alternative(html_content, "text/html")
         try:
-            server = smtplib.SMTP("smtp.gmail.com", 587)
-            server.ehlo()
-            server.starttls()
-            server.login('kaizendev18@gmail.com', 'teamkaizen')
-            server.sendmail(FROM, TO, message)
-            server.close()
-            print('successfully sent the mail')
-        except Exception:
-            print("failed to send mail")
+            msg.send()
+        except Exception as e:
+            logger.exception(e)
 
-
-def save(self, event_id):
-    instance = super().save()
-    instance.events.add(Event.objects.get(pk=event_id))
-    instance.save()
-    return instance
+    def save(self, update=True, event_id=None):
+        evaluator = super().save()
+        if not update:
+            event = Event.objects.get(pk=event_id)
+            EvaluatorEvent.objects.create(event=event, evaluator=evaluator)
+            evaluator.save()
+        return evaluator

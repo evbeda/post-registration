@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 import json
 from datetime import datetime
-
+from urllib import request
+from .utils import create_order_webhook_from_view, get_data
+from astroid import objects
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMultiAlternatives, send_mail
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.base import TemplateView
 from django.views.generic import (
     FormView,
     CreateView,
@@ -16,11 +21,16 @@ from django.views.generic import (
     UpdateView,
     ListView,
 )
-from django.views.generic.base import TemplateView
+import json
+from django.template.base import logger
+from django.template.loader import render_to_string
+from django.utils.decorators import method_decorator
+from django.utils.html import strip_tags
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from eventbrite import Eventbrite
 from multi_form_view import MultiFormView
 from social_django.models import UserSocialAuth
-
 from .forms import (
     EvaluatorForm,
     EventForm,
@@ -36,10 +46,6 @@ from .models import (
     Evaluator,
     EvaluatorEvent,
     FileSubmission,
-)
-from .utils import (
-    get_data,
-    create_order_webhook_from_view,
 )
 
 
@@ -304,7 +310,8 @@ class EvaluatorList(TemplateView):
         view_event = parse_events(eb_event)
         context['event'] = view_event[0]
         context['event_id'] = event_id
-        context['evaluator_events'] = EvaluatorEvent.objects.filter(event=event).select_related('evaluator')
+        context['evaluator_events'] = EvaluatorEvent.objects.filter(
+            event=event).select_related('evaluator')
         return context
 
 
@@ -321,8 +328,14 @@ class EvaluatorCreate(CreateView):
         return context
 
     def form_valid(self, form):
-        form.save()
-        form.send_email(form)
+        event_id = self.kwargs['event_id']
+        form.save(update=False, event_id=event_id)
+        event = Event.objects.get(pk=event_id)
+        eb_event = get_one_event_api(get_auth_token(
+            self.request.user), event.eb_event_id)
+        parsed_event = parse_events(eb_event)
+        parsed_event[0]['id'] = event_id
+        form.send_email(form, parsed_event[0])
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
@@ -345,6 +358,11 @@ class EvaluatorUpdate(UpdateView):
         event_id = self.kwargs['event_id']
         context['event_id'] = event_id
         return context
+
+    def form_valid(self, form):
+        event_id = self.kwargs['event_id']
+        form.save(update=True, event_id=event_id)
+        return super(EvaluatorUpdate, self).form_valid(form)
 
     def get_success_url(self):
         return reverse(
@@ -406,6 +424,44 @@ class SubmissionsList(ListView, LoginRequiredMixin):
         return context
 
 
+class AcceptInvitationView(TemplateView):
+    template_name = "thanks.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(AcceptInvitationView, self).get_context_data(**kwargs)
+        invitation_code = self.kwargs['invitation_code']
+        evaluator_event = EvaluatorEvent.objects.get(
+            invitation_code=invitation_code)
+        evaluator_event.state = 'accepted'
+        evaluator_event.save()
+        evaluator = Evaluator.objects.get(pk=evaluator_event.evaluator.id)
+        FROM = 'kaizendev18@gmail.com'
+        TO = 'martinvalles@eventbrite.com'
+        SUBJECT = 'A new Evaluator for your event has accepted.'
+        html_content = render_to_string('partials/new_evaluator_email.html', {
+                                        'evaluator': evaluator})
+        text_content = strip_tags(html_content)
+        msg = EmailMultiAlternatives(
+            SUBJECT, text_content, FROM, [TO])
+        msg.attach_alternative(html_content, "text/html")
+        try:
+            msg.send()
+        except Exception as e:
+            logger.exception(e)
+        return context
+
+
+class DeclineInvitationView(View):
+    def get(self, request, *args, **kwargs):
+        invitation_code = self.kwargs['invitation_code']
+        invitation_code = self.kwargs['invitation_code']
+        evaluator_event = EvaluatorEvent.objects.get(
+            invitation_code=invitation_code)
+        evaluator_event.state = 'rejected'
+        evaluator_event.save()
+        return HttpResponse('GET request!')
+
+
 def parse_events(api_events):
     events = []
     for event in api_events:
@@ -420,7 +476,8 @@ def parse_events(api_events):
             'venue_id': event.get('venue_id', {}),
         }
         if view_event['venue_id']:
-            view_event['venue'] = event.get('venue', {}).get('address', {}).get('localized_address_display', None)
+            view_event['venue'] = event.get('venue', {}).get(
+                'address', {}).get('localized_address_display', None)
         else:
             view_event['venue'] = ''
         events.append(view_event)
@@ -481,7 +538,8 @@ def select_event(request, eb_event_id):
 
 
 def add_event(eb_event_id, end_submission, organizer):
-    new_event = Event(eb_event_id=eb_event_id, end_submission=end_submission, organizer=organizer)
+    new_event = Event(eb_event_id=eb_event_id,
+                      end_submission=end_submission, organizer=organizer)
     new_event.save()
     return new_event
 
@@ -500,7 +558,8 @@ def evaluator_events(request):
     event_list = []
     accepted_events = []
     for evaluator in evaluators:
-        accepted = EvaluatorEvent.objects.filter(evaluator_id=evaluator.id, state='accepted')
+        accepted = EvaluatorEvent.objects.filter(
+            evaluator_id=evaluator.id, state='accepted')
         if len(accepted):
             accepted_eval_event.append(accepted)
     for event in accepted_eval_event:

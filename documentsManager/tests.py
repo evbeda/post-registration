@@ -130,7 +130,8 @@ class TestBase(TestCase):
                 "token_type": "bearer"
             },
         )
-        login = self.client.login(username='kaizen@email.com', password='awesome1234')
+        login = self.client.login(
+            username='kaizen@email.com', password='awesome1234')
         return login
 
     def create_event(self, eb_event_id=1):
@@ -404,6 +405,7 @@ class EvaluatorTest(TestBase):
         self.assertEqual(
             str(Evaluator._meta.verbose_name_plural), "evaluators")
 
+
 @patch('documentsManager.views.get_one_event_api')
 class EvaluatorListTest(TestBase):
     def test_evaluator_list_view_name(self, mock_get_one_event_api):
@@ -467,6 +469,7 @@ class EvaluatorUpdateTest(TestBase):
     def test_evaluator_update_success(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = MOCK_EVENTS_API
         evaluator = self.create_evaluator()
+        evaluator.save()
         event = self.create_event()
         data = {
             'name': 'Jack',
@@ -486,8 +489,6 @@ class EvaluatorUpdateTest(TestBase):
         evaluator.refresh_from_db()
         self.assertEqual(evaluator.name, 'Jack')
         self.assertEqual(evaluator.email, 'test@mail.com')
-
-    # test_evaluator_update_invalid
 
 
 @patch('documentsManager.views.get_one_event_api')
@@ -606,11 +607,11 @@ class FormsTest(TestBase):
         form = SignUpForm({
             'password1': 'password27',
             'password2': 'password27',
-            'email': 'juan@gmail.com',
+            'email': 'juan@ejemplo.com',
         })
         form.save()
-        user = User.objects.get(email='juan@gmail.com')
-        self.assertEqual(user.email, 'juan@gmail.com')
+        user = User.objects.get(email='juan@ejemplo.com')
+        self.assertEqual(user.email, 'juan@ejemplo.com')
 
     def test_validate_text_submissions(self):
         event = Event.objects.create(eb_event_id=123, organizer=self.user)
