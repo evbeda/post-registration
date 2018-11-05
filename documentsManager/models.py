@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import uuid
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
@@ -150,6 +151,8 @@ class EvaluatorEvent(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     evaluator = models.ForeignKey(Evaluator, on_delete=models.CASCADE)
     state = models.CharField(max_length=20, choices=STATES, default='pending')
+    invitation_code = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True)
 
     class Meta:
         db_table = 'EvaluatorEvent'

@@ -78,7 +78,7 @@
                 </td>
                 <td>
                     <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
-                        <a href="{% url 'evaluator_update' event_id evaluator_event.id %}">
+                        <a href="{% url 'evaluator_update' event_id evaluator_event.evaluator.id %}">
                             <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
                                 <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
                                     <svg id="eds-icon--pencil_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -93,7 +93,7 @@
                         </a>
                     </span>
                     <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
-                        <a href="{% url 'evaluator_delete' event_id evaluator_event.id %}">
+                        <a href="{% url 'evaluator_delete' event_id evaluator_event.evaluator.id %}">
                             <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
                                 <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
                                     <svg id="eds-icon--trash_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

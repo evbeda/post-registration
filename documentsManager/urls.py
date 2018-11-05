@@ -18,11 +18,20 @@ from .views import (
     EvaluatorUpdate,
     EvaluatorDelete,
     accept_webhook,
-    SubmissionView,
     SubmissionsList,
+    AcceptInvitationView,
+    DeclineInvitationView,
 )
 
 urlpatterns = [
+    url(r'accept-invitation/(?P<invitation_code>[\w\-]+)/$',
+        AcceptInvitationView.as_view(),
+        name='accept-invitation'
+        ),
+    url(r'decline-invitation/(?P<invitation_code>[\w\-]+)/$',
+        DeclineInvitationView.as_view(),
+        name='decline-invitation'
+        ),
     url(
         r'landing/(?P<event_id>\d+)/$',
         LandingView.as_view(),
@@ -30,11 +39,6 @@ urlpatterns = [
     ),
     url(
         r'success/$',
-        SuccessView.as_view(),
-        name='success'
-    ),
-    url(
-        r'landing/(?P<event_id>\d+)/success/$',
         SuccessView.as_view(),
         name='success'
     ),
@@ -69,11 +73,6 @@ urlpatterns = [
         name='evaluators'
     ),
     url(
-        r'^event/(?P<event_id>\d+)/submissions/$',
-        SubmissionsList.as_view(),
-        name='submissions'
-    ),
-    url(
         r'^event/(?P<event_id>\d+)/docs/text/(?P<pk>\d+)/edit/$',
         TextDocUpdate.as_view(),
         name="edit-textdoc"
@@ -104,9 +103,9 @@ urlpatterns = [
         name='events'
     ),
     url(
-        r'event/(?P<event_id>\d+)/submission/$',
-        SubmissionView.as_view(),
-        name='submissionHome'
+        r'event/(?P<event_id>\d+)/submissions/$',
+        SubmissionsList.as_view(),
+        name='submissions'
     ),
     url(
         r'signup/$',
@@ -122,5 +121,5 @@ urlpatterns = [
         r'^$',
         HomeView.as_view(),
         name='home'
-    ),
+    )
 ]

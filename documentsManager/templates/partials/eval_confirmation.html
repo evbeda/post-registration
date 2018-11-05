@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Evaluator's Invitation</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.evbstatic.com/s3-build/30226-rc2018-10-03_16.04-d2023ac/js/node_modules/eventbrite_design_system/css/eds.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-10 col-md-8">
+                <h1 class="mb-3">You could be part of this event!</h1>
+                <div class="card">
+                    <img class="card-img-top img-fluid" src="{{ event.logo }}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event.name }}</h5>
+                        <p class="card-text">
+                            You have been selected as official evaluator for this event. 
+                        </p>
+                        <small>
+                            All of your confidential information is not going to be revealed.
+                        </small>
+                        <p class="card-text">
+                            Greetings
+                        </p>
+                        <div class="row justify-content-center mt-5">
+                            <!-- <a href="{% url 'accept-invitation' invitation_code %}" class="btn btn-success btn-lg mr-3">Accept</a> -->
+                            <!-- <a href="{% url 'decline-invitation' invitation_code %}" class="btn btn-danger btn-lg ml-3">Decline</a> -->
+                            <a href="http://127.0.0.1:8000/accept-invitation/{{ invitation_code }}" class="btn btn-success btn-lg mr-3">Accept</a>
+                            <a href="http://127.0.0.1:8000/decline-invitation/{{ invitation_code }}" class="btn btn-danger btn-lg ml-3">Decline</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <h1>footer</h1>
+        </div>
+    </div>
+</body>
+
+</html>

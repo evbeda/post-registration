@@ -1,0 +1,79 @@
+{% load static %}
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.evbstatic.com/s3-build/30226-rc2018-10-03_16.04-d2023ac/js/node_modules/eventbrite_design_system/css/eds.css">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <title>Invitation accepted</title>
+</head>
+
+<body>
+    <div class="container content pt-4">
+        <div class="row justify-content-center">
+            <div class="col-10 col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event_name }}</h5>
+                        <div class="eds-empty-state eds-align--center">
+                            <div>
+                                <div class="eds-empty-state__graphic eds-align--center">
+                                    <span class="eds-graphic--halo eds-graphic-halo--xsmall">
+                                        <i class="eds-vector-image eds-graphic--small eds-vector-image-size--reset eds-align--center eds-vector-image-halo-size-override" data-spec="icon" aria-hidden="true">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
+                                                <g fill="none" fill-rule="evenodd">
+                                                    <path d="M0 0h144v144H0z"></path>
+                                                    <g>
+                                                        <path fill="#F6682F" fill-rule="nonzero" d="M94.835 68.22L81.358 81.725 57.954 58.272 31.988 84.289c.095.44.193.882.302 1.318 4.56 17.789 20.672 30.94 39.848 30.94 11.862 0 22.545-5.04 30.052-13.086a41.152 41.152 0 0 0 9.833-18.018L94.835 68.22z"></path>
+                                                        <path stroke="#363A43" stroke-width="3" d="M90.588 38.476c13.454 6.776 22.688 20.734 22.688 36.852 0 22.764-18.42 41.218-41.138 41.218-22.719 0-41.136-18.454-41.136-41.218 0-12.435 5.495-23.584 14.184-31.14"></path>
+                                                        <path stroke="#363A43" stroke-width="3" d="M32.419 83.856L57.952 58.27l43.976 44.063m-19.86-21.32L94.835 68.22l17.023 17.056"></path>
+                                                        <path fill="#D2D6DF" fill-rule="nonzero" d="M57.954 41.214h21.277V27H57.954z"></path>
+                                                        <path stroke="#363A43" stroke-width="3" d="M57.953 58.271V27.002m32.626 75.33c-5.246 3.61-11.597 5.686-18.441 5.686-14.555 0-27.007-9.552-31.207-22.741"></path>
+                                                        <path stroke="#363A43" stroke-width="2.563" d="M57.953 65.378v2.842m0 2.843v2.844m0 2.842v2.843"></path>
+                                                    </g>
+                                                </g>
+                                            </svg>
+                                        </i>
+                                    </span>
+                                </div>
+                                <h1 class="eds-empty-state__title eds-text--center eds-text-hs eds-text-color--grey-900 eds-l-sn-mar-top-6 eds-l-sm-mar-top-6 eds-l-sw-mar-top-6 eds-l-mn-mar-top-6 eds-l-md-mar-top-6 eds-l-md-mar-top-8 eds-l-mw-mar-top-8 eds-l-ln-mar-top-8 eds-l-lg-mar-top-8 eds-l-lw-mar-top-8">
+                                    Congrats! You are part of the evaluators staff.
+                                </h1>
+                                <div class="eds-align--center">
+                                    <p class="eds-empty-state__description eds-text--center eds-text-bl eds-text-color--grey-600 eds-l-sn-mar-top-3 eds-l-sm-mar-top-3 eds-l-sw-mar-top-3 eds-l-mn-mar-top-3 eds-l-md-mar-top-3 eds-l-md-mar-top-1 eds-l-mw-mar-top-1 eds-l-ln-mar-top-1 eds-l-lg-mar-top-1 eds-l-lw-mar-top-1">
+                                        Now you have to sign up in the app to get access to the submissions.
+                                    </p>
+                                </div>
+                                <div class="eds-empty-state__actions eds-align--center eds-l-sn-mar-top-4 eds-l-sm-mar-top-4 eds-l-sw-mar-top-4 eds-l-mn-mar-top-4 eds-l-md-mar-top-4 eds-l-md-mar-top-6 eds-l-mw-mar-top-6 eds-l-ln-mar-top-6 eds-l-lg-mar-top-6 eds-l-lw-mar-top-6">
+                                    <a href="{% url 'signup' %}">
+                                        <button data-spec="eds-empty-state__primary-button" class="eds-btn eds-btn--button eds-btn--fill" type="button">
+                                            Sign up
+                                        </button>
+                                    </a>
+                                    I already have an&nbsp;
+                                    <a href="{% url 'login' %}" data-spec="eds-link" href="https://www.eventbrite.com/" class="eds-link">
+                                         account
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include "partials/footer.html" %}
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
+
+</html>
