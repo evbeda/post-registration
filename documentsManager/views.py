@@ -49,7 +49,7 @@ from .utils import (
 
 @csrf_exempt
 def accept_webhook(request):
-    get_data(json.loads(request.body), request.build_absolute_uri)
+    get_data(json.loads(request.body), request.build_absolute_uri(0))
     return HttpResponse()
 
 

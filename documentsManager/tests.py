@@ -1,7 +1,6 @@
 from datetime import datetime
 from unittest.mock import patch
 from django.test import Client
-
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files import File
@@ -37,7 +36,6 @@ from documentsManager.views import (
     get_auth_token,
 )
 from post_registration.settings import get_env_variable
-
 MOCK_EVENTS_API = {
     'name': {
         'text': 'EventoCualquiera',
@@ -813,3 +811,29 @@ class FileSubmissionTest(TestBase):
         )
         result = isinstance(file_submission, FileSubmission)
         self.assertTrue(result)
+
+
+@patch('documentsManager.views.create_order_webhook_from_view', return_value='')
+class DashboardView(TestBase):
+    def setUp(self):
+        super(DashboardView, self).setUp()
+
+    def test_home_status_code(self, mock_create_order_webhook_from_view):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_home_charset(self, mock_create_order_webhook_from_view):
+        response = self.client.get('/')
+        self.assertEqual(response.charset, 'utf-8')
+
+    def test_home_status_code_two(self, mock_create_order_webhook_from_view):
+        response = self.client.get('')
+        self.assertEqual(response.status_code, 200)
+
+    def test_home_resolve_home_not_args(self, mock_create_order_webhook_from_view):
+        found = resolve('/')
+        self.assertEquals(found.args, ())
+
+    def test_home_url_name(self, mock_create_order_webhook_from_view):
+        found = resolve('/')
+        self.assertEqual(found.url_name, 'home')
