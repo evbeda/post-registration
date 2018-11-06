@@ -115,20 +115,41 @@ class TextDoc(models.Model):
         db_table = 'TextDoc'
 
 
-class FileSubmission(models.Model):
+class Submission(models.Model):
     STATES = (
         ('pending', 'Pending'),
         ('accepted', 'Accepted'),
         ('rejected', 'Rejected'),
+        ('evaluated', 'Evaluated'),
     )
-    file_doc = models.ForeignKey(FileDoc)
-    file = models.FileField()
-    date = models.DateField(default=datetime.date.today)
     state = models.CharField(max_length=20, choices=STATES, default='pending')
-    EB_user_id = models.CharField(max_length=100, null=False)
+    date = models.DateField(default=datetime.date.today)
+    eb_user_id = models.CharField(max_length=100, null=False)
+
+    class Meta(object):
+        db_table = 'Submission'
+
+
+class FileSubmission(Submission):
+    file = models.FileField()
+    file_doc = models.ForeignKey(FileDoc)
+
+    def description(self):
+        return self.file_doc.name
 
     class Meta(object):
         db_table = 'FileSubmission'
+
+
+class TextSubmission(Submission):
+    text_doc = models.ForeignKey(TextDoc)
+    content = models.TextField()
+
+    def description(self):
+        return self.text_doc.description
+
+    class Meta(object):
+        db_table = 'TextSubmission'
 
 
 class Evaluator(models.Model):
@@ -165,6 +186,9 @@ class Review(models.Model):
     date_time = models.DateTimeField(
         default=datetime.datetime.now, editable=False)
     aproved = models.BooleanField(unique=True)
+
+    class Meta:
+        db_table = 'Review'
 
 
 class UserWebhook(models.Model):

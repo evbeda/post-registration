@@ -38,7 +38,7 @@ from .models import (
     TextDoc,
     Evaluator,
     EvaluatorEvent,
-    FileSubmission,
+    Submission,
 )
 
 from .utils import (
@@ -332,8 +332,6 @@ class EvaluatorCreate(CreateView):
             evaluator = Evaluator.objects.get(email=form.cleaned_data['email'])
         except Evaluator.DoesNotExist:
             evaluator = form.save(update=False, event_id=event_id)
-        EvaluatorEvent.objects.create(evaluator=evaluator, event=event)
-
         eb_event = get_one_event_api(get_auth_token(
             self.request.user), event.eb_event_id)
         parsed_event = parse_events(eb_event)
@@ -405,7 +403,7 @@ class SubmissionView(TemplateView, LoginRequiredMixin):
 
 
 class SubmissionsList(ListView, LoginRequiredMixin):
-    model = FileSubmission
+    model = Submission
     template_name = 'filesubmission_list.html'
 
     def get_context_data(self, **kwargs):
