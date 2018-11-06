@@ -57,25 +57,21 @@
     <table class="table table-striped">
         <thead>
             <tr class="text-center">
-                <th scope="col">Situation</th>
+                <th scope="col">State</th>
                 <th scope="col">ID</th>
-                <th scope="col">Title</th>
-                <th scope="col">Type of Requirement</th>
+                <th scope="col">Requirement</th>
                 <th scope="col">Evaluators</th>
                 <th scope="col">Evaluation</th>
             </tr>
         </thead>
         <tbody>
-        {% for submission in filesubmission_list %}
+        {% for submission in object_list %}
             <tr class="text-center">
                 <td>
                     <span class="badge evaluators_states">{{ submission.state }}</span>
                 </td>
                 <td>{{ submission.id }}</td>
-                <td>
-                    <a href="{{ submission.file.url }}" target="_blank">{{ submission.file }}</a>
-                </td>
-                <td >{{ submission.file_doc.name }}</td>
+                <td >{{ submission.filesubmission.description }}</td>
                 <td>
                     {% if evaluators_cont %}
                     <a href="{% url 'evaluators' event_id %}"> {{ evaluators_cont }} evaluator{{ evaluators_cont|pluralize }}</a>
