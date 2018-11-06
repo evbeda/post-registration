@@ -125,6 +125,7 @@ class FileSubmission(models.Model):
     file = models.FileField()
     date = models.DateField(default=datetime.date.today)
     state = models.CharField(max_length=20, choices=STATES, default='pending')
+    EB_user_id = models.CharField(max_length=100, null=False)
 
     class Meta(object):
         db_table = 'FileSubmission'
@@ -132,7 +133,7 @@ class FileSubmission(models.Model):
 
 class Evaluator(models.Model):
     name = models.CharField(max_length=20)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     event = models.ManyToManyField(Event, through='EvaluatorEvent')
 
     def __str__(self):
@@ -156,6 +157,14 @@ class EvaluatorEvent(models.Model):
 
     class Meta:
         db_table = 'EvaluatorEvent'
+
+
+class Review(models.Model):
+    evaluator = models.ForeignKey(Evaluator)
+    event = models.ForeignKey(Event)
+    date_time = models.DateTimeField(
+        default=datetime.datetime.now, editable=False)
+    aproved = models.BooleanField(unique=True)
 
 
 class UserWebhook(models.Model):

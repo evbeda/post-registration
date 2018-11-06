@@ -498,7 +498,8 @@ class EvaluatorTest(TestBase):
     @patch('documentsManager.views.Eventbrite.get')
     def test_login_with_Eval_1_accepted(self, mock_eventbrite_get):
         mock_eventbrite_get.return_value = MOCK_EVENTS_API
-        new_event = Event.objects.create(eb_event_id=50607739110, organizer=self.user)
+        new_event = Event.objects.create(
+            eb_event_id=50607739110, organizer=self.user)
         evaluator = Evaluator.objects.create(email='john@email.com')
         EvaluatorEvent.objects.create(
             event=new_event,
@@ -516,18 +517,22 @@ class EvaluatorTest(TestBase):
         )
         self.client.login(email='john@email.com', password='john1234')
         response = self.client.get('/accounts/login/', follow=True)
-        response2 = self.client.get(response.context_data['next'], follow=True, **{'HTTP_REFERER': 'accounts/login'})
-        self.assertEquals(response2.wsgi_request.path, '/event/{}/submission/'.format(new_event.id))
+        response2 = self.client.get(
+            response.context_data['next'], follow=True, **{'HTTP_REFERER': 'accounts/login'})
+        self.assertEquals(response2.wsgi_request.path,
+                          '/event/{}/submission/'.format(new_event.id))
 
     @patch('documentsManager.views.Eventbrite.get')
     @patch('documentsManager.views.Eventbrite.get')
     def test_login_with_Eval_2_accepted(self, mock_eventbrite_get, mock_eventbrite_get_2):
         mock_eventbrite_get.return_value = MOCK_EVENTS_API
         mock_eventbrite_get_2.return_value = MOCK_EVENTS_API_2
-        new_event_1 = Event.objects.create(eb_event_id=50607739110, organizer=self.user)
-        new_event_2 = Event.objects.create(eb_event_id=50607739120, organizer=self.user)
-        evaluator_1 = Evaluator.objects.create(email='john@email.com')
-        evaluator_2 = Evaluator.objects.create(email='john@email.com')
+        new_event_1 = Event.objects.create(
+            eb_event_id=50607739110, organizer=self.user)
+        new_event_2 = Event.objects.create(
+            eb_event_id=50607739120, organizer=self.user)
+        evaluator_1 = Evaluator.objects.create(email='morty@ejemplo.com')
+        evaluator_2 = Evaluator.objects.create(email='rick@ejemplo.com')
         EvaluatorEvent.objects.create(
             event=new_event_1,
             evaluator=evaluator_1,
@@ -544,7 +549,8 @@ class EvaluatorTest(TestBase):
         )
         self.client.login(email='john@email.com', password='john1234')
         response = self.client.get('/accounts/login/', follow=True)
-        response2 = self.client.get(response.context_data['next'], follow=True, **{'HTTP_REFERER': 'accounts/login'})
+        response2 = self.client.get(
+            response.context_data['next'], follow=True, **{'HTTP_REFERER': 'accounts/login'})
         self.assertEquals(response2.wsgi_request.path, '/')
 
 

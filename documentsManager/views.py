@@ -327,8 +327,13 @@ class EvaluatorCreate(CreateView):
 
     def form_valid(self, form):
         event_id = self.kwargs['event_id']
-        form.save(update=False, event_id=event_id)
         event = Event.objects.get(pk=event_id)
+        try:
+            evaluator = Evaluator.objects.get(email=form.cleaned_data['email'])
+        except Evaluator.DoesNotExist:
+            evaluator = form.save(update=False, event_id=event_id)
+        EvaluatorEvent.objects.create(evaluator=evaluator, event=event)
+
         eb_event = get_one_event_api(get_auth_token(
             self.request.user), event.eb_event_id)
         parsed_event = parse_events(eb_event)
