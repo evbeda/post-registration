@@ -228,19 +228,13 @@
                         </th>
                         <th class="eds-data-table-header__column" data-spec="data-table-header-column">
                             <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
-                                <span class="eds-text-bm">File Format Accepted</span><span class="eds-data-table-header__column__icon"></span>
-                            </button>
-                        </th>
-                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
-                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
-                                <span class="eds-text-bm">Quantity</span>
-                                <span class="eds-data-table-header__column__icon"></span>
-                            </button>
-                        </th>
-                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
-                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
                                 <span class="eds-text-bm">Is Required</span>
                                 <span class="eds-data-table-header__column__icon"></span>
+                            </button>
+                        </th>
+                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                <span class="eds-text-bm">Restrictions</span><span class="eds-data-table-header__column__icon"></span>
                             </button>
                         </th>
                         <th class="eds-data-table-header__column" data-spec="data-table-header-column">
@@ -252,23 +246,21 @@
                     </tr>
                 </thead>
                 <tbody class="eds-table-list">
-                {% if not docs_file %}
-                <tr class="eds-data-table-list-item">
-                    <td class="eds-data-table-list-item__column">
-                        - To add a new <b>files requirement</b> click on <b>'New Submission'</b>
-                    </td>
-                </tr>
-                {% endif %}
+                {% if docs_file or docs_text %}
                     {% for doc in docs_file %}
                     <tr class="eds-data-table-list-item">
                         <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.id }}</td>
                         <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.name }}</td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
+                            {% if doc.is_optional %} Optional {% else %} Mandatory {% endif %}
+                        </td>
                         <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
                             <div>
                                 {% for file_type in doc.file_types %}
                                 <div class="eds-list-item eds-list-item--align-middle pb-2" data-spec="eds-list-item">
                                     <span class="eds-list-item__aside eds-list-item__icon">
                                         {% if file_type.name == "image" %}
+                                            {{ doc.quantity}} - 
                                             <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
                                                 <svg id="eds-icon--photo_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                     <path id="eds-icon--photo_base" fill-rule="evenodd" clip-rule="evenodd" d="M2 20h20V4H2v16zm1-1h18V5H3v14z"></path>
@@ -277,6 +269,7 @@
                                                 </svg>
                                             </i>
                                         {% elif file_type.name == 'text' %}
+                                            {{ doc.quantity}} - 
                                             <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
                                                 <svg id="eds-icon--document_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                     <path id="eds-icon--document_base" fill-rule="evenodd" clip-rule="evenodd" d="M16 6h2.5L16 3.5V6zM5 3v18h14V7h-4V3H5zM4 22V2h12l4 4v16H4z"></path>
@@ -286,6 +279,7 @@
                                                 </svg>
                                             </i>
                                         {% elif file_type.name == 'presentation' %}
+                                            {{ doc.quantity}} - 
                                             <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
                                                 <svg id="eds-icon--business_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                     <path id="eds-icon--business_base" fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M4 17h16V4H4v13zm7.5-15v1H3v14H2v1h8.3L7 21.3l.7.7 3.8-3.8V22h1v-3.8l3.8 3.8.7-.7-3.3-3.3H22v-1h-1V3h-8.5V2h-1z"></path>
@@ -296,18 +290,21 @@
                                                 </svg>
                                             </i>
                                         {% elif file_type.name == 'audio' %}
+                                            {{ doc.quantity}} - 
                                             <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
                                                 <svg id="eds-icon--microphone_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                     <path id="eds-icon--microphone_base" fill-rule="evenodd" clip-rule="evenodd" d="M17 12c0 2.6-2 4.7-4.5 5v-1c2-.2 3.5-1.9 3.5-4V6c0-2.2-1.8-4-4-4S8 3.8 8 6v6c0 2 1.5 3.7 3.5 4v1C9 16.7 7 14.6 7 12H6c0 3.1 2.4 5.7 5.5 6v3H10v1h4v-1h-1.5v-3c3.1-.3 5.5-2.8 5.5-6h-1zm-8 0h2v-1H9v-1h2V9H9V8h2V7H9V6c0-1.7 1.3-3 3-3s3 1.3 3 3v6c0 1.7-1.3 3-3 3s-3-1.3-3-3"></path>
                                                 </svg>
                                             </i>
                                         {% elif file_type.name == 'video' %}
+                                            {{ doc.quantity}} - 
                                         <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
                                             <svg id="eds-icon--film-camera_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                 <path id="eds-icon--film-camera_base" fill-rule="evenodd" clip-rule="evenodd" d="M22 12.5l-5 1.7v-2.3c1.7-.4 3-2 3-3.9 0-2.2-1.7-3.9-3.9-4H5.8C3.7 4.1 2 5.9 2 8c0 1.9 1.3 3.4 3 3.9V20h12v-3.2l5 1.7v-6zM19 8c0 1.7-1.3 3-3 3s-3-1.3-3-3 1.3-3 3-3c1.6 0 3 1.3 3 3zm-5.6-3c-.9.7-1.4 1.8-1.4 3s.5 2.3 1.4 3H8.6c.9-.7 1.4-1.8 1.4-3s-.5-2.3-1.4-3h4.8zM3 8c0-1.7 1.3-3 3-3s3 1.3 3 3-1.3 3-3 3-3-1.3-3-3zm13 11H6v-7h10v7zm5-1.9l-4-1.3v-.6l4-1.3v3.2z"></path>
                                             </svg>
                                         </i>
                                         {% elif file_type.name == 'formated' %}
+                                            {{ doc.quantity}} - 
                                             <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true"><svg id="eds-icon--book_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                     <path id="eds-icon--book_base" fill-rule="evenodd" clip-rule="evenodd" d="M20 2H4v20h15v-3h1V2zm-2 19H5.2c.4-1.2 1.5-2 2.8-2h10v2zm1-3H8c-1.2 0-2.3.5-3 1.4V3h14v15z"></path>
                                                     <path id="eds-icon--book_line_2_" fill-rule="evenodd" clip-rule="evenodd" d="M8 13h8v1H8z"></path>
@@ -321,10 +318,6 @@
                                 </div>
                                 {% endfor %}
                             </div>
-                        </td>
-                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.quantity}}</td>
-                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
-                            {% if doc.is_optional %} Optional {% else %} Mandatory {% endif %}
                         </td>
                         <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
                             <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
@@ -361,85 +354,16 @@
                         </td>
                     </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="eds-g-cell eds-g-cell-12-12">
-            <div class="eds-align--right"></div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <p class="lead">Text Documentation</p>
-        </div>
-    </div>
-    <div class="eds-data-table mb-5">
-        <div class="eds-data-table__wrapper">
-            <table class="eds-data-table__main eds-l-mar-vert-2" data-spec="data-table-main">
-                <thead>
-                    <tr data-spec="data-table-header" class="eds-data-table-header">
-                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
-                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
-                                <span class="eds-text-bm">ID</span><span class="eds-data-table-header__column__icon"></span>
-                            </button>
-                        </th>
-                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
-                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
-                                <span class="eds-text-bm">Title of the Document</span>
-                                <span class="eds-data-table-header__column__icon"></span>
-                            </button>
-                        </th>
-                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
-                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
-                                <span class="eds-text-bm">Type of Limitation</span>
-                                <span class="eds-data-table-header__column__icon"></span>
-                            </button>
-                        </th>
-                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
-                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
-                                <span class="eds-text-bm">Min</span>
-                                <span class="eds-data-table-header__column__icon"></span>
-                            </button>
-                        </th>
-                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
-                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
-                                <span class="eds-text-bm">Max</span>
-                                <span class="eds-data-table-header__column__icon"></span>
-                            </button>
-                        </th>
-                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
-                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
-                                <span class="eds-text-bm">Is Required</span>
-                                <span class="eds-data-table-header__column__icon"></span>
-                            </button>
-                        </th>
-                        <th class="eds-data-table-header__column" data-spec="data-table-header-column">
-                            <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
-                                <span class="eds-text-bm">Actions</span>
-                                <span class="eds-data-table-header__column__icon"></span>
-                            </button>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="eds-table-list">
-                {% if not docs_text %}
-                <tr class="eds-data-table-list-item">
-                    <td class="eds-data-table-list-item__column">
-                        - To add a new <b>text requirement</b> click on <b>'New Submission'</b>
-                    </td>
-                </tr>
-                {% endif %}
                     {% for doc in docs_text %}
                     <tr class="eds-data-table-list-item">
                         <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.id }}</td>
                         <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.name }}
                         </td>
-                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.measure }}
-                        </td>
-                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.min }}</td>
-                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ doc.max }}</td>
                         <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
                             {% if doc.is_optional %} Optional {% else %} Mandatory {% endif %}
+                        </td>
+                        <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
+                            {{ doc.min }}-{{ doc.max }} {{ doc.measure }}
                         </td>
                         <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
                             <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
@@ -476,11 +400,23 @@
                         </td>
                     </tr>
                     {% endfor %}
+                {% else %}
+                    <tr class="eds-data-table-list-item">
+                        <td colspan="5" class="eds-data-table-list-item__column">
+                            - To add a new <b>files requirement</b> click on <b>'New Submission'</b>
+                        </td>
+                    </tr>
+                {% endif %}
                 </tbody>
             </table>
         </div>
         <div class="eds-g-cell eds-g-cell-12-12">
             <div class="eds-align--right"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p class="lead">Text Documentation</p>
         </div>
     </div>
 </div>

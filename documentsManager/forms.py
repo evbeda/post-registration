@@ -196,6 +196,7 @@ class SubmissionForm(Form):
 
 
 class EvaluatorForm(ModelForm):
+
     class Meta:
         model = Evaluator
         fields = [
@@ -233,3 +234,6 @@ class EvaluatorForm(ModelForm):
             EvaluatorEvent.objects.create(event=event, evaluator=evaluator)
             evaluator.save()
         return evaluator
+
+    def validate_unique(self):
+        pass
