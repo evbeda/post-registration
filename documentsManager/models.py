@@ -125,6 +125,7 @@ class Submission(models.Model):
     state = models.CharField(max_length=20, choices=STATES, default='pending')
     date = models.DateField(default=datetime.date.today)
     eb_user_id = models.CharField(max_length=100, null=False)
+    event = models.ForeignKey(Event, blank=False)
 
     class Meta(object):
         db_table = 'Submission'
@@ -182,7 +183,7 @@ class EvaluatorEvent(models.Model):
 
 class Review(models.Model):
     evaluator = models.ForeignKey(Evaluator)
-    event = models.ForeignKey(Event)
+    submission = models.ForeignKey(Submission)
     date_time = models.DateTimeField(
         default=datetime.datetime.now, editable=False)
     aproved = models.BooleanField(unique=True)

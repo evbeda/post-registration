@@ -1,0 +1,151 @@
+{% extends "base.html" %} 
+
+{% block content %}
+{%include "partials/jumbotron.html" %} 
+<div class="container">
+    <div class="row mb-3">
+        <div class="col">
+            <ul class="eds-breadcrumbs">
+                <li class="eds-breadcrumbs__item">
+                    <a class="eds-breadcrumbs__item--link eds-text-bm eds-text-color--grey-600" href="/" data-spec="breadcrumbs-link">
+                        {% if is_eb_user %}
+                        Managed Events
+                        {% else %}
+                        Events to Evaluate
+                        {% endif %}
+                    </a>
+                    <span class="eds-l-mar-hor-1">
+                        <i class="eds-vector-image eds-icon--xsmall eds-vector-image--grey-400" data-spec="icon" aria-hidden="true">
+                            <svg id="eds-icon--chevron-right-chunky_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path id="eds-icon--chevron-right-chunky_base" fill-rule="evenodd" clip-rule="evenodd" d="M10.2 17l5-5-5-5-1.4 1.4 3.6 3.6-3.6 3.6z">
+                                </path>
+                            </svg>
+                        </i>
+                    </span>
+                </li>
+                {% if is_eb_user %}
+                <li class="eds-breadcrumbs__item">
+                    <a class="eds-breadcrumbs__item--link eds-text-bm eds-text-color--grey-600" href="{% url 'docs' event_id %}" data-spec="breadcrumbs-link">
+                        {{ event.name }}
+                    </a>
+                    <span class="eds-l-mar-hor-1">
+                        <i class="eds-vector-image eds-icon--xsmall eds-vector-image--grey-400" data-spec="icon" aria-hidden="true">
+                            <svg id="eds-icon--chevron-right-chunky_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path id="eds-icon--chevron-right-chunky_base" fill-rule="evenodd" clip-rule="evenodd" d="M10.2 17l5-5-5-5-1.4 1.4 3.6 3.6-3.6 3.6z">
+                                </path>
+                            </svg>
+                        </i>
+                    </span>
+                </li>
+                <li class="eds-breadcrumbs__item">
+                    <span data-spec="breadcrumbs-active" class="eds-text-bm eds-text-color--grey-900">Evaluators</span>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    <ul class="nav nav-tabs mb-3">
+        {% if is_eb_user %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'docs' event_id %}">Requirements</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link " href="{% url 'evaluators' event_id %}">Evaluators</a>
+        </li>
+        {% endif %}
+         <li class="nav-item">
+            <a class="nav-link active" href="{% url 'submissions' event_id %}">Submissions</a>
+        </li>
+    </ul>
+    {% if is_eb_user %}
+    <div class="container" id='organizer-div'>
+        <div class="row pb-2">
+            <div class="col">
+                <h1>Submissions</h1>
+            </div>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr class="text-center">
+                    <th scope="col">State</th>
+                    <th scope="col">ID</th>
+                    <th scope="col">Requirement</th>
+                    <th scope="col">Evaluators</th>
+                    <th scope="col">Evaluation</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for submission in object_list %}
+                <tr class="text-center">
+                    <td>
+                        <span class="badge evaluators_states">{{ submission.state }}</span>
+                    </td>
+                    <td>{{ submission.id }}</td>
+                    <td >{{ submission.filesubmission.description }}</td>
+                    <td>
+                        {% if evaluators_cont %}
+                        <a href="{% url 'evaluators' event_id %}"> {{ evaluators_cont }} evaluator{{ evaluators_cont|pluralize }}</a>
+                        {% else %}
+                        <a class="eds-text-color--ui-red" href="{% url 'evaluators' event_id %}"> No evaluators yet</a>
+                        {% endif %}
+                    </td>
+                    <td><button class="btn btn-primary btn-sm">Final Opinion</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="container" id='evaluator-div'>
+        <div class="row pb-2">
+            <div class="col">
+                <h1>Submissions</h1>
+            </div>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr class="text-center">
+                    <th scope="col">Status</th>
+                    <th scope="col">ID</th>
+                    <th scope="col">Requirement</th>
+                    <th scope="col">Preview/Download</th>
+                    <th scope="col">Evaluate</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for submission in submissions_without_review %}
+                <tr class="text-center">
+                    <td>
+                        <span class="badge evaluators_states">
+                            {% if submission.state == 'pending' or submission.state == 'evaluated' %}
+                                pending
+                            {% else %}
+                                evaluated
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>{{ submission.id }}</td>
+                    <td >{{ submission.textsubmission.description }}
+                        {{ submission.filesubmission.description }}</td>
+                    <td>
+                        <a class="btn btn-primary btn-sm">Preview</a>
+                        <a class="btn btn-primary btn-sm" href="{{ submission.file.url }}" target="_blank">Download</a>
+                    </td>
+                    <td>
+                        {% if submission.state == 'pending' or submission.state == 'evaluated'  %}
+                            <button class="btn btn-success btn-sm">Approve</button>
+                            <button class="btn btn-danger btn-sm">Reject</button>
+                        {% else %}
+                            <span class="badge evaluators_states">Choice</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% load static %}
+<script src="{% static 'js/evaluators.js' %}"></script>
+{% endblock content %}
