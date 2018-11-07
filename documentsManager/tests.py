@@ -519,8 +519,10 @@ class EvaluatorTest(TestBase):
         response = self.client.get('/accounts/login/', follow=True)
         response2 = self.client.get(
             response.context_data['next'], follow=True, **{'HTTP_REFERER': 'accounts/login'})
-        self.assertEquals(response2.wsgi_request.path,
-                          '/event/{}/submission/'.format(new_event.id))
+        self.assertEquals(
+            response2.wsgi_request.path,
+            '/event/{}/submissions/'.format(new_event.id),
+        )
 
     @patch('documentsManager.views.Eventbrite.get')
     @patch('documentsManager.views.Eventbrite.get')
@@ -814,6 +816,7 @@ class FileSubmissionTest(TestBase):
         file_submission = FileSubmission.objects.create(
             file_doc=file_doc,
             file=file,
+            event=event,
         )
         result = isinstance(file_submission, FileSubmission)
         self.assertTrue(result)

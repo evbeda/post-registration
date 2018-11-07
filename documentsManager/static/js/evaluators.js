@@ -12,7 +12,7 @@ const paint = function(index,element){
         case 'rejected':
             $(element).addClass('badge-danger');
             break;
-         default:
+        default:
             $(element).addClass('badge-dark');
             break;
     }

@@ -178,6 +178,7 @@ def validate_files_submissions(files, id_event):
         FileSubmission.objects.create(
             file_doc=file_doc,
             file=files[name],
+            event=event,
         )
     return True
 

@@ -39,6 +39,9 @@ from .models import (
     Evaluator,
     EvaluatorEvent,
     Submission,
+    FileSubmission,
+    TextSubmission,
+    Review,
 )
 
 from .utils import (
@@ -177,7 +180,7 @@ class HomeView(TemplateView, LoginRequiredMixin):
             prev_page = self.request.META.get('HTTP_REFERER')
         if (len(self.accepted_events) == 1) and (prev_page.find('accounts/login') != (-1)):
             event_id = self.accepted_events[0]['event_id']
-            return redirect(reverse('submissionHome', kwargs={'event_id': event_id}))
+            return redirect(reverse('submissions', kwargs={'event_id': event_id}))
         else:
             return super(HomeView, self).dispatch(request, *args, **kwargs)
 
@@ -329,9 +332,9 @@ class EvaluatorCreate(CreateView):
         event_id = self.kwargs['event_id']
         event = Event.objects.get(pk=event_id)
         try:
-            evaluator = Evaluator.objects.get(email=form.cleaned_data['email'])
+            Evaluator.objects.get(email=form.cleaned_data['email'])
         except Evaluator.DoesNotExist:
-            evaluator = form.save(update=False, event_id=event_id)
+            form.save(update=False, event_id=event_id)
         eb_event = get_one_event_api(get_auth_token(
             self.request.user), event.eb_event_id)
         parsed_event = parse_events(eb_event)
@@ -394,34 +397,38 @@ class EvaluatorDelete(DeleteView):
         )
 
 
-class SubmissionView(TemplateView, LoginRequiredMixin):
-    template_name = 'submission.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(SubmissionView, self).get_context_data(**kwargs)
-        return context
-
-
 class SubmissionsList(ListView, LoginRequiredMixin):
     model = Submission
-    template_name = 'filesubmission_list.html'
+    template_name = 'submissions.html'
 
     def get_context_data(self, **kwargs):
         context = super(SubmissionsList, self).get_context_data(**kwargs)
         event_id = self.kwargs['event_id']
-        our_event = Event.objects.get(id=event_id)
-        eb_event = get_one_event_api(
-            get_auth_token(self.request.user),
-            our_event.eb_event_id,
-        )
-        view_event = parse_events(eb_event)
-        ev_count = EvaluatorEvent.objects.filter(
-            event=our_event,
-            state='accepted'
-        ).count()
-        context['evaluators_cont'] = ev_count
-        context['event'] = view_event[0]
         context['event_id'] = event_id
+        event = Event.objects.get(id=event_id)
+        context['is_eb_user'] = self.request.user.social_auth.exists()
+        if context['is_eb_user']:
+            token = get_auth_token(self.request.user)
+        else:
+            token = get_access_token_of_event(event)
+        eb_event = get_one_event_api(token, event.eb_event_id)
+        context['event'] = parse_events(eb_event)[0]
+        context['evaluators_cont'] = EvaluatorEvent.objects.filter(event=event, state='accepted',).count()
+        context['submissions'] = Submission.objects.filter(event_id=event_id)
+        evaluator = Evaluator.objects.filter(email=self.request.user.email)
+        if evaluator.exists():
+            context['eval_id'] = evaluator[0].id
+            context['submissions_with_review'] = []
+            context['submissions_without_review'] = []
+            for submission in context['submissions']:
+                aux = []
+                if Review.objects.filter(evaluator_id=context['eval_id'], submission_id=submission.id).exists():
+                    aux.append(submission)
+                    review = Review.objects.filter(evaluator_id=context['eval_id'], submission_id=submission.id).first()
+                    aux.append(review.aproved)
+                    context['submissions_with_review'].append(aux)
+                else:
+                    context['submissions_without_review'].append(submission)
         return context
 
 
@@ -553,6 +560,11 @@ def update_dates(request, event_id):
     return HttpResponseRedirect(reverse('docs', kwargs={'event_id': event_id}))
 
 
+def get_access_token_of_event(event):
+    auth_user = UserSocialAuth.objects.get(user_id=event.organizer_id)
+    return auth_user.extra_data['access_token']
+
+
 def evaluator_events(request):
     evaluators = Evaluator.objects.filter(email=request.user.email)
     accepted_eval_event = []
@@ -566,8 +578,7 @@ def evaluator_events(request):
     for event in accepted_eval_event:
         event_list.append(Event.objects.filter(id=event[0].event_id))
     for event in event_list:
-        auth_user = UserSocialAuth.objects.get(user_id=event[0].organizer_id)
-        token = auth_user.extra_data['access_token']
+        token = get_access_token_of_event(event[0])
         eb_event = get_one_event_api(
             token,
             event[0].eb_event_id
