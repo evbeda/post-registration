@@ -24,6 +24,7 @@ from django.forms import (
     NumberInput,
     Select, TextInput,
     Textarea,
+    DateInput,
 )
 from django.forms.widgets import EmailInput, HiddenInput
 from django.template.base import logger
@@ -123,6 +124,37 @@ class EventForm(ModelForm):
                 'min': datetime.now().strftime('%Y-%m-%d'),
             }),
             'end_submission': TextInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+            }),
+        }
+
+
+class EvaluationDateForm(ModelForm):
+
+    def is_valid(self):
+        valid = super(EvaluationDateForm, self).is_valid()
+        if not valid:
+            return valid
+        if self.cleaned_data['start_evaluation'] >= self.cleaned_data['end_evaluation']:
+            self.add_error(
+                'end_evaluation', 'End date cannot be less than start date of Evaluations .')
+            return False
+        return True
+
+    class Meta:
+        model = Event
+        fields = [
+            'start_evaluation',
+            'end_evaluation'
+        ]
+        widgets = {
+            'start_evaluation': DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+                'min': datetime.now().strftime('%Y-%m-%d'),
+            }),
+            'end_evaluation': DateInput(attrs={
                 'type': 'date',
                 'class': 'form-control',
             }),

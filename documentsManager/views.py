@@ -31,6 +31,7 @@ from .forms import (
     TextDocForm,
     SignUpForm,
     SubmissionForm,
+    EvaluationDateForm,
 )
 from .models import (
     FileDoc,
@@ -297,8 +298,9 @@ class SignUpView(CreateView):
 
 
 @method_decorator(login_required, name='dispatch')
-class EvaluatorList(TemplateView):
+class EvaluatorList(FormView, LoginRequiredMixin):
     template_name = 'evaluators_grid.html'
+    form_class = EvaluationDateForm
 
     def get_context_data(self, **kwargs):
         context = super(EvaluatorList, self).get_context_data(**kwargs)
@@ -310,10 +312,29 @@ class EvaluatorList(TemplateView):
         )
         view_event = parse_events(eb_event)
         context['event'] = view_event[0]
-        context['event_id'] = event_id
+        context['event_model'] = event
         context['evaluator_events'] = EvaluatorEvent.objects.filter(
             event=event).select_related('evaluator')
+        context['form'] = EvaluationDateForm(initial={
+            'start_evaluation': event.start_evaluation,
+            'end_evaluation': event.end_evaluation,
+        })
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = EvaluationDateForm(request.POST)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        event_id = self.kwargs['event_id']
+        event = Event.objects.get(id=event_id)
+        event.start_evaluation = self.request.POST['start_evaluation']
+        event.end_evaluation = self.request.POST['end_evaluation']
+        event.save()
+        return HttpResponseRedirect(reverse('evaluators', kwargs={'event_id': event_id}))
 
 
 @method_decorator(login_required, name='dispatch')

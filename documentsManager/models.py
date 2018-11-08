@@ -55,7 +55,8 @@ class Event(models.Model):
     organizer = models.ForeignKey(User, blank=False)
     init_submission = models.DateField(default=datetime.date.today)
     end_submission = models.DateField(null=True)
-    organizer = models.ForeignKey(User, blank=False)
+    start_evaluation = models.DateField(default=datetime.date.today)
+    end_evaluation = models.DateField(blank=True, null=True)
 
     class Meta(object):
         db_table = 'Event'
