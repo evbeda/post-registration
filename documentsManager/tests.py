@@ -504,12 +504,12 @@ class EvaluatorTest(TestBase):
         EvaluatorEvent.objects.create(
             event=new_event,
             evaluator=evaluator,
-            state='accepted',
+            status='accepted',
         )
         EvaluatorEvent.objects.create(
             event=new_event,
             evaluator=evaluator,
-            state='pending',
+            status='pending',
         )
         User.objects.create_superuser(
             email='john@email.com',
@@ -538,12 +538,12 @@ class EvaluatorTest(TestBase):
         EvaluatorEvent.objects.create(
             event=new_event_1,
             evaluator=evaluator_1,
-            state='accepted',
+            status='accepted',
         )
         EvaluatorEvent.objects.create(
             event=new_event_2,
             evaluator=evaluator_2,
-            state='accepted',
+            status='accepted',
         )
         User.objects.create_superuser(
             email='john@email.com',
