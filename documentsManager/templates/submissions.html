@@ -171,12 +171,19 @@
                         </span>
                     </td>
                     <td>
-                        {% if submission.state == 'pending' or submission.state == 'evaluated'  %}
-                            <button class="btn btn-success btn-sm">Approve</button>
-                            <button class="btn btn-danger btn-sm">Reject</button>
-                        {% else %}
-                            <span class="badge evaluators_states">Choice</span>
-                        {% endif %}
+                        <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                            <a href="{% url 'review' event_id submission.id %}">
+                                <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
+                                    <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <g id="Clipboard" fill="none" fill-rule="evenodd">
+                                                <path d="M18 3h-3V2H9v1H6.052L6 4H4v18h16V4h-2V3zm-1 2H7V4v.026h2l1.027.004L10.025 3H14v1h3v1zM7 19V8H6v12h12V8h-1v11H7zm-2 2V5h1v-.159V6h12V5h1v16H5zm4-9v1h6v-1H9zm0-3v1h6V9H9zm0 6v1h6v-1H9z" id="Combined-Shape" fill="#45494E"/>
+                                            </g>
+                                        </svg>
+                                    </i>
+                                </button>
+                            </a>
+                        </span>
                     </td>
                 </tr>
                 {% endfor %}
@@ -249,11 +256,10 @@
                         </span>
                     </td>
                     <td>
-                        {% if submission.0.state == 'pending'%}
-                            <button class="btn btn-success btn-sm">Approve</button>
-                            <button class="btn btn-danger btn-sm">Reject</button>
+                        {% if submission.1 %}
+                            <span class="badge evaluators_states">accepted</span>
                         {% else %}
-                            <span class="badge evaluators_states">{{ submission.1 }}</span>
+                            <span class="badge evaluators_states">rejected</span>
                         {% endif %}
                     </td>
                 </tr>

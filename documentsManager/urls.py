@@ -21,6 +21,7 @@ from .views import (
     SubmissionsList,
     AcceptInvitationView,
     DeclineInvitationView,
+    ReviewView,
 )
 
 urlpatterns = [
@@ -106,6 +107,11 @@ urlpatterns = [
         r'event/(?P<event_id>\d+)/submissions/$',
         SubmissionsList.as_view(),
         name='submissions'
+    ),
+    url(
+        r'event/(?P<event_id>\d+)/submissions/(?P<submission_id>\d+)/review/$',
+        ReviewView.as_view(),
+        name='review'
     ),
     url(
         r'signup/$',

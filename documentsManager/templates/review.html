@@ -1,0 +1,70 @@
+{% extends "base.html" %} 
+
+{% block content %}
+{%include "partials/jumbotron.html" %} 
+<div class="container">
+    <div class="row mb-3">
+        <div class="col">
+            <ul class="eds-breadcrumbs">
+                <li class="eds-breadcrumbs__item">
+                    <a class="eds-breadcrumbs__item--link eds-text-bm eds-text-color--grey-600" href="/" data-spec="breadcrumbs-link">
+                        {% if is_eb_user %}
+                        Managed Events
+                        {% else %}
+                        Events to Evaluate
+                        {% endif %}
+                    </a>
+                    <span class="eds-l-mar-hor-1">
+                        <i class="eds-vector-image eds-icon--xsmall eds-vector-image--grey-400" data-spec="icon" aria-hidden="true">
+                            <svg id="eds-icon--chevron-right-chunky_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path id="eds-icon--chevron-right-chunky_base" fill-rule="evenodd" clip-rule="evenodd" d="M10.2 17l5-5-5-5-1.4 1.4 3.6 3.6-3.6 3.6z">
+                                </path>
+                            </svg>
+                        </i>
+                    </span>
+                </li>
+                <li class="eds-breadcrumbs__item">
+                    <a class="eds-breadcrumbs__item--link eds-text-bm eds-text-color--grey-600" href="{% url 'submissions' event_id %}" data-spec="breadcrumbs-link">
+                        {{ event.name }}
+                    </a>
+                    <span class="eds-l-mar-hor-1">
+                        <i class="eds-vector-image eds-icon--xsmall eds-vector-image--grey-400" data-spec="icon" aria-hidden="true">
+                            <svg id="eds-icon--chevron-right-chunky_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path id="eds-icon--chevron-right-chunky_base" fill-rule="evenodd" clip-rule="evenodd" d="M10.2 17l5-5-5-5-1.4 1.4 3.6 3.6-3.6 3.6z">
+                                </path>
+                            </svg>
+                        </i>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="content">
+        <h2>Review Submission</h2>
+        <hr class="eds-divider__hr eds-bg-color--grey-200 eds-divider--horizontal" data-spec="divider-hr" aria-hidden="true" />
+        <div class="container signup-container">
+            <div class="row justify-content-center">
+                <div class="col-10 col-md-4">
+                    <div class="card mt-3">
+                        <div class="card-body errors">
+                            <form method="post">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col text-center">
+                                    <input type="submit" class="btn btn-success" value="Approve" name="approve">
+                                </div>
+                                <div class="col text-center">
+                                    <input type="submit" class="btn btn-success" value="Reject" name="reject">
+                                </div>
+                            </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+{% load static %}
+<script src="{% static 'js/evaluators.js' %}"></script>
+{% endblock content %}

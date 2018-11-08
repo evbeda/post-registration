@@ -11,7 +11,9 @@ from .models import (
     TextDoc,
     User,
     EvaluatorEvent,
+    Review,
 )
+from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.mail import EmailMultiAlternatives, send_mail
 from django.forms import (
@@ -270,3 +272,15 @@ class EvaluatorForm(ModelForm):
 
     def validate_unique(self):
         pass
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = []
+
+    def is_valid(self):
+        valid = super(ReviewForm, self).is_valid()
+        if not valid:
+            return valid
+        return True
