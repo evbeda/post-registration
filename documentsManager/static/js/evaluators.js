@@ -7,6 +7,10 @@ const $form = $('#evalPeriodForm');
 const $datesView = $('#datesView');
 const $warningDiv = $('#warning_div');
 const $errorDiv = $('#error_div');
+const $submissionToReview = $('#evaluator-submissions-without-review');
+const $submissionReviewed = $('#evaluator-submissions-with-review');
+const $toReview = $('#to_review');
+const $Reviewed = $('#reviewed');
 
 
 const toggleEditForm = () => {
@@ -20,7 +24,7 @@ const submitForm = (event) => {
 }
 
 const paint = function(index,element){
-    const state = $(element).text();
+    const state = $(element).text().trim();
     switch(state){
         case 'pending':
             $(element).addClass('badge-warning');
@@ -37,11 +41,25 @@ const paint = function(index,element){
     }
 };
 
+const toggleReview = function () {
+    $submissionToReview.hide();
+    $submissionReviewed.show();
+};
+
+const toggleToReview = function () {
+    $submissionToReview.show();
+    $submissionReviewed.hide();
+};
+
 const switcher = function () {
+    $submissionToReview.show();
+    $submissionReviewed.hide();
     $statusEvaluators.each(paint);
     $showEditBtn.on('click', toggleEditForm);
     $submitBtn.on('click', submitForm);
     $cancelBtn.on('click', toggleEditForm);
+    $toReview.on("click", toggleToReview);
+    $Reviewed.on("click", toggleReview);
 };
 
 $(document).ready(switcher);

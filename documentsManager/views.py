@@ -40,8 +40,6 @@ from .models import (
     Evaluator,
     EvaluatorEvent,
     Submission,
-    FileSubmission,
-    TextSubmission,
     Review,
 )
 
@@ -187,11 +185,11 @@ class HomeView(TemplateView, LoginRequiredMixin):
 
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
-        create_order_webhook_from_view(self.request.user,)
         context['user'] = self.request.user
         context['is_eb_user'] = self.request.user.social_auth.exists()
         context['events_to_evaluate'] = self.accepted_events
         if context['is_eb_user']:
+            create_order_webhook_from_view(self.request.user,)
             api_events_w_venues = get_events_with_venues_api(
                 get_auth_token(self.request.user))
             parse_api_events = parse_events(api_events_w_venues)
@@ -590,27 +588,25 @@ def get_access_token_of_event(event):
 
 
 def evaluator_events(request):
-    evaluators = Evaluator.objects.filter(email=request.user.email)
-    accepted_eval_event = []
+    evaluator = Evaluator.objects.filter(email=request.user.email)
     event_list = []
     accepted_events = []
-    for evaluator in evaluators:
-        accepted = EvaluatorEvent.objects.filter(
-            evaluator_id=evaluator.id, status='accepted')
-        if len(accepted):
-            accepted_eval_event.append(accepted)
-    for event in accepted_eval_event:
-        event_list.append(Event.objects.filter(id=event[0].event_id))
-    for event in event_list:
-        token = get_access_token_of_event(event[0])
-        eb_event = get_one_event_api(
-            token,
-            event[0].eb_event_id
-        )
-        accepted_events.append(parse_events(eb_event)[0])
-    if len(accepted_events) != 0:
-        for ev in accepted_events:
-            eb_event_id = ev['eb_id']
-            event = Event.objects.get(eb_event_id=eb_event_id)
-            ev['event_id'] = event.id
-    return accepted_events
+    if not evaluator:
+        return accepted_events
+    else:
+        accepted_eval_event = EvaluatorEvent.objects.filter(evaluator_id=evaluator[0].id, status='accepted')
+        for event in accepted_eval_event:
+            event_list.append(Event.objects.filter(id=event.event_id))
+        for event in event_list:
+            token = get_access_token_of_event(event[0])
+            eb_event = get_one_event_api(
+                token,
+                event[0].eb_event_id
+            )
+            accepted_events.append(parse_events(eb_event)[0])
+        if len(accepted_events) != 0:
+            for ev in accepted_events:
+                eb_event_id = ev['eb_id']
+                event = Event.objects.get(eb_event_id=eb_event_id)
+                ev['event_id'] = event.id
+        return accepted_events

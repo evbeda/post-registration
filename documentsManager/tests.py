@@ -29,6 +29,8 @@ from documentsManager.models import (
     User,
     EvaluatorEvent,
     FileSubmission,
+    Review,
+    Submission,
 )
 from documentsManager.views import (
     add_event,
@@ -345,6 +347,40 @@ class ViewTest(TestBase):
         self.assertTrue('text_docs' in response.context)
         self.assertTrue('file_docs' in response.context)
 
+    @patch('documentsManager.views.Eventbrite.get')
+    def test_submission_view_review(self, mock_eventbrite_get):
+        mock_eventbrite_get.return_value = MOCK_EVENTS_API
+        event = Event.objects.create(eb_event_id=50607739110, organizer=self.user)
+        file_doc = FileDoc.objects.create(event=event)
+        file = File(open('runtime.txt', 'rb'))
+        file_submission_1 = FileSubmission.objects.create(
+            file_doc=file_doc,
+            file=file,
+            event=event,
+        )
+        FileSubmission.objects.create(
+            file_doc=file_doc,
+            file=file,
+            event=event,
+        )
+        evaluator = Evaluator.objects.create(email='eval@eval.com')
+        EvaluatorEvent.objects.create(
+            event=event,
+            evaluator=evaluator,
+            status='accepted',
+        )
+        User.objects.create_superuser(
+            email='eval@eval.com',
+            password='john1234',
+        )
+        submission = Submission.objects.get(id=file_submission_1.submission_ptr_id)
+        Review.objects.create(aproved=True, evaluator=evaluator, submission=submission)
+        self.client.login(email='eval@eval.com', password='john1234')
+        response = self.client.get('/accounts/login/', follow=True)
+        response2 = self.client.get(response.context_data['next'], follow=True, **{'HTTP_REFERER': 'accounts/login'})
+        self.assertEqual(len(response2.context['submissions_without_review']), 1)
+        self.assertEqual(len(response2.context['submissions_with_review']), 1)
+
 
 class DocumentsmanagerConfigTest(TestCase):
     def test_apps(self):
@@ -534,8 +570,7 @@ class EvaluatorTest(TestBase):
             eb_event_id=50607739110, organizer=self.user)
         new_event_2 = Event.objects.create(
             eb_event_id=50607739120, organizer=self.user)
-        evaluator_1 = Evaluator.objects.create(email='morty@ejemplo.com')
-        evaluator_2 = Evaluator.objects.create(email='rick@ejemplo.com')
+        evaluator_1 = Evaluator.objects.create(email='john@email.com')
         EvaluatorEvent.objects.create(
             event=new_event_1,
             evaluator=evaluator_1,
@@ -543,7 +578,7 @@ class EvaluatorTest(TestBase):
         )
         EvaluatorEvent.objects.create(
             event=new_event_2,
-            evaluator=evaluator_2,
+            evaluator=evaluator_1,
             status='accepted',
         )
         User.objects.create_superuser(
