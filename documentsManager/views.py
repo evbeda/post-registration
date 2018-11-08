@@ -332,9 +332,10 @@ class EvaluatorCreate(CreateView):
         event_id = self.kwargs['event_id']
         event = Event.objects.get(pk=event_id)
         try:
-            Evaluator.objects.get(email=form.cleaned_data['email'])
+            evaluator = Evaluator.objects.get(email=form.cleaned_data['email'])
+            EvaluatorEvent.objects.create(evaluator=evaluator, event=event)
         except Evaluator.DoesNotExist:
-            form.save(update=False, event_id=event_id)
+            evaluator = form.save(update=False, event_id=event_id)
         eb_event = get_one_event_api(get_auth_token(
             self.request.user), event.eb_event_id)
         parsed_event = parse_events(eb_event)
@@ -413,7 +414,8 @@ class SubmissionsList(ListView, LoginRequiredMixin):
             token = get_access_token_of_event(event)
         eb_event = get_one_event_api(token, event.eb_event_id)
         context['event'] = parse_events(eb_event)[0]
-        context['evaluators_cont'] = EvaluatorEvent.objects.filter(event=event, state='accepted',).count()
+        context['evaluators_cont'] = EvaluatorEvent.objects.filter(
+            event=event, status='accepted',).count()
         context['submissions'] = Submission.objects.filter(event_id=event_id)
         evaluator = Evaluator.objects.filter(email=self.request.user.email)
         if evaluator.exists():
@@ -424,7 +426,8 @@ class SubmissionsList(ListView, LoginRequiredMixin):
                 aux = []
                 if Review.objects.filter(evaluator_id=context['eval_id'], submission_id=submission.id).exists():
                     aux.append(submission)
-                    review = Review.objects.filter(evaluator_id=context['eval_id'], submission_id=submission.id).first()
+                    review = Review.objects.filter(
+                        evaluator_id=context['eval_id'], submission_id=submission.id).first()
                     aux.append(review.aproved)
                     context['submissions_with_review'].append(aux)
                 else:
@@ -440,7 +443,7 @@ class AcceptInvitationView(TemplateView):
         invitation_code = self.kwargs['invitation_code']
         evaluator_event = EvaluatorEvent.objects.get(
             invitation_code=invitation_code)
-        evaluator_event.state = 'accepted'
+        evaluator_event.status = 'accepted'
         evaluator_event.save()
         evaluator = Evaluator.objects.get(pk=evaluator_event.evaluator.id)
         FROM = 'kaizendev18@gmail.com'
@@ -465,7 +468,7 @@ class DeclineInvitationView(View):
         invitation_code = self.kwargs['invitation_code']
         evaluator_event = EvaluatorEvent.objects.get(
             invitation_code=invitation_code)
-        evaluator_event.state = 'rejected'
+        evaluator_event.status = 'rejected'
         evaluator_event.save()
         return HttpResponse('GET request!')
 
@@ -572,7 +575,7 @@ def evaluator_events(request):
     accepted_events = []
     for evaluator in evaluators:
         accepted = EvaluatorEvent.objects.filter(
-            evaluator_id=evaluator.id, state='accepted')
+            evaluator_id=evaluator.id, status='accepted')
         if len(accepted):
             accepted_eval_event.append(accepted)
     for event in accepted_eval_event:

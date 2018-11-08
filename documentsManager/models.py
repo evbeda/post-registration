@@ -52,6 +52,7 @@ class User(AbstractUser):
 
 class Event(models.Model):
     eb_event_id = models.TextField(unique=True)
+    organizer = models.ForeignKey(User, blank=False)
     init_submission = models.DateField(default=datetime.date.today)
     end_submission = models.DateField(null=True)
     organizer = models.ForeignKey(User, blank=False)
@@ -166,14 +167,14 @@ class Evaluator(models.Model):
 
 
 class EvaluatorEvent(models.Model):
-    STATES = (
+    STATUS = (
         ('pending', 'Pending'),
         ('accepted', 'Accepted'),
         ('rejected', 'Rejected'),
     )
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     evaluator = models.ForeignKey(Evaluator, on_delete=models.CASCADE)
-    state = models.CharField(max_length=20, choices=STATES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS, default='pending')
     invitation_code = models.UUIDField(
         default=uuid.uuid4, editable=False, unique=True)
 
