@@ -19,7 +19,6 @@ from documentsManager.forms import (
     validate_text_submissions,
     validate_files_submissions,
     SubmissionForm,
-    EvaluationDateForm,
 )
 from documentsManager.models import (
     Event,

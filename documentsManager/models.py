@@ -185,13 +185,13 @@ class EvaluatorEvent(models.Model):
 
 
 class Review(models.Model):
-    # import ipdb; ipdb.set_trace()
     evaluator = models.ForeignKey(Evaluator)
     submission = models.ForeignKey(Submission)
     date = models.DateField(default=timezone.now)
     aproved = models.BooleanField(unique=True)
 
     class Meta:
+        unique_together = ('evaluator', 'submission',)
         db_table = 'Review'
 
 

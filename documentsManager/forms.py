@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from builtins import object
 from datetime import datetime
 
 from .models import (
@@ -11,9 +10,11 @@ from .models import (
     TextDoc,
     User,
     EvaluatorEvent,
+    Review,
 )
+from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.core.mail import EmailMultiAlternatives, send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.forms import (
     CheckboxInput,
     CheckboxSelectMultiple,
@@ -26,7 +27,7 @@ from django.forms import (
     Textarea,
     DateInput,
 )
-from django.forms.widgets import EmailInput, HiddenInput
+from django.forms.widgets import EmailInput
 from django.template.base import logger
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -270,3 +271,15 @@ class EvaluatorForm(ModelForm):
 
     def validate_unique(self):
         pass
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = []
+
+    def is_valid(self):
+        valid = super(ReviewForm, self).is_valid()
+        if not valid:
+            return valid
+        return True
