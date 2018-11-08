@@ -7,6 +7,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -53,7 +54,7 @@ class User(AbstractUser):
 class Event(models.Model):
     eb_event_id = models.TextField(unique=True)
     organizer = models.ForeignKey(User, blank=False)
-    init_submission = models.DateField(default=datetime.date.today)
+    init_submission = models.DateField(default=timezone.now)
     end_submission = models.DateField(null=True)
     start_evaluation = models.DateField(default=datetime.date.today)
     end_evaluation = models.DateField(blank=True, null=True)
@@ -125,7 +126,7 @@ class Submission(models.Model):
         ('evaluated', 'Evaluated'),
     )
     state = models.CharField(max_length=20, choices=STATES, default='pending')
-    date = models.DateField(default=datetime.date.today)
+    date = models.DateField(default=timezone.now)
     eb_user_id = models.CharField(max_length=100, null=False)
     event = models.ForeignKey(Event, blank=False)
 
@@ -184,10 +185,10 @@ class EvaluatorEvent(models.Model):
 
 
 class Review(models.Model):
+    # import ipdb; ipdb.set_trace()
     evaluator = models.ForeignKey(Evaluator)
     submission = models.ForeignKey(Submission)
-    date_time = models.DateTimeField(
-        default=datetime.datetime.now, editable=False)
+    date = models.DateField(default=timezone.now)
     aproved = models.BooleanField(unique=True)
 
     class Meta:
