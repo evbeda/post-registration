@@ -43,7 +43,7 @@ ALLOWED_HOSTS = [
     'post-registration.herokuapp.com',
     'release-post-registration.herokuapp.com',
     '127.0.0.1',
-    'a3e118f5.ngrok.io',
+    '.ngrok.io',
 ]
 
 # Application definition
@@ -80,6 +80,7 @@ TEMPLATES = [
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': True,
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',

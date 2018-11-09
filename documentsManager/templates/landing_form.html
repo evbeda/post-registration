@@ -21,6 +21,9 @@
                 <form action="" method="post" enctype="multipart/form-data" id="submission_form">
                     {% csrf_token %}
                     <input type="hidden" name="event_id" value="{{ event.id }}" required>
+                    {% if code %}
+                    <input type="hidden" name="code" value="{{ code }}" required>
+                    {% endif %}
                     <div class="card shadow bg-white rounded ">
                         <div class="card-header">
                             The submissions can be sent until: <strong> {{ event.end_submission }}</strong>
@@ -81,7 +84,7 @@
                         </div>
                         <div class="card-footer d-flex justify-content-between d-flex align-items-center">
                             <span class="ml-2 text-danger">* Required</span>
-                            {% if not text_docs and not file_docs %}
+                            {% if not code %}
                             <button class="eds-btn eds-btn--button eds-btn--fill" onclick="window.close();">Back to
                                 Manage
                                 Docs

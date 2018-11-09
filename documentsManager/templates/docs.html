@@ -202,14 +202,18 @@
     </div>
     <hr/>
     <div class='row justify-content-end no-gutters pt-3'>
-        <a class="eds-btn eds-btn--button eds-btn--neutral" href="{% url 'landing' event.id %}" target=”_blank”>Preview</a>
-        <a class="eds-btn eds-btn--button eds-btn--fill" href="{% url 'doc_form' event.id %}" role="button"> New
+        <a class="eds-btn eds-btn--button eds-btn--neutral"
+           href="{% url 'preview' event.id %}"
+           target=”_blank”>Preview</a>
+        <a class="eds-btn eds-btn--button eds-btn--fill"
+           href="{% url 'doc_form' event.id %}" role="button"> New
             Submission</a>
     </div>
     <div class="row">
         <div class="col">
             <p class="lead">Documentation</p>
         </div>
+    </div>
     </div>
     <div class="eds-data-table mb-5">
         <div class="eds-data-table__wrapper">

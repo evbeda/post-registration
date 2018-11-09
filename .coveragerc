@@ -1,4 +1,7 @@
 [run]
+branch = True
+plugins =
+    django_coverage_plugin
 source =
   documentsManager
   post_registration
@@ -18,9 +21,8 @@ omit =
     manage.py,
     fabfile.py,
     */app_settings.py,
-
-
 [report]
+show_missing =  True
 exclude_lines =
     pragma: no cover
     def setUp

@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
 import json
 from datetime import datetime
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import MultipleObjectsReturned
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import (
-    redirect,
-)
+from django.shortcuts import redirect
+from django.template.base import logger
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.html import strip_tags
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic.base import TemplateView
 from django.views.generic import (
     FormView,
     CreateView,
@@ -19,13 +22,11 @@ from django.views.generic import (
     UpdateView,
     ListView,
 )
-from django.template.base import logger
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
-from django.views import View
+from django.views.generic.base import TemplateView
 from eventbrite import Eventbrite
 from multi_form_view import MultiFormView
 from social_django.models import UserSocialAuth
+
 from .forms import (
     EvaluatorForm,
     EventForm,
@@ -44,8 +45,8 @@ from .models import (
     EvaluatorEvent,
     Submission,
     Review,
+    AttendeeCode,
 )
-
 from .utils import (
     get_data,
     create_order_webhook_from_view,
@@ -54,7 +55,7 @@ from .utils import (
 
 @csrf_exempt
 def accept_webhook(request):
-    get_data(json.loads(request.body), request.build_absolute_uri(0))
+    get_data(json.loads(request.body), request.META['URL_LOCAL'])
     return HttpResponse()
 
 
@@ -152,10 +153,10 @@ class DocsView(FormView, LoginRequiredMixin):
         context['docs_file'] = FileDoc.objects.filter(event__id=event_id)
         context['docs_text'] = TextDoc.objects.filter(event__id=event_id)
         context['attendee_url'] = self.request.get_host() + reverse(
-            'landing',
+            'preview',
             kwargs={
                 'event_id': event_id
-            },)
+            }, )
         return context
 
     def post(self, request, *args, **kwargs):
@@ -192,7 +193,7 @@ class HomeView(TemplateView, LoginRequiredMixin):
         context['is_eb_user'] = self.request.user.social_auth.exists()
         context['events_to_evaluate'] = self.accepted_events
         if context['is_eb_user']:
-            create_order_webhook_from_view(self.request.user,)
+            create_order_webhook_from_view(self.request.user)
             api_events_w_venues = get_events_with_venues_api(
                 get_auth_token(self.request.user))
             parse_api_events = parse_events(api_events_w_venues)
@@ -268,14 +269,28 @@ class LandingView(FormView):
     success_url = '/success/'
     form_class = SubmissionForm
 
+    def dispatch(self, request, *args, **kwargs):
+        is_preview = 'preview' in request.path
+        if not is_preview:
+            code = self.kwargs['code']
+            try:
+                attende_code = AttendeeCode.objects.get(code=code)
+            except MultipleObjectsReturned:
+                return redirect(reverse('success'))
+            if not attende_code.available:
+                return redirect(reverse('success'))
+        return super(LandingView, self).dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(LandingView, self).get_context_data(**kwargs)
         event_id = self.kwargs['event_id']
         event = Event.objects.filter(pk=event_id).first()
+        if 'code' in self.kwargs:
+            context['code'] = self.kwargs['code']
         if event:
             context['event'] = event
             eb_event = get_one_event_api(
-                get_auth_token(self.request.user),
+                get_access_token_of_event(event),
                 event.eb_event_id
             )
             context['eb_event'] = parse_events(eb_event)[0]
@@ -442,7 +457,7 @@ class SubmissionsList(ListView, LoginRequiredMixin):
         eb_event = get_one_event_api(token, event.eb_event_id)
         context['event'] = parse_events(eb_event)[0]
         context['evaluators_cont'] = EvaluatorEvent.objects.filter(
-            event=event, status='accepted',).count()
+            event=event, status='accepted', ).count()
         context['submissions'] = Submission.objects.filter(event_id=event_id)
         evaluator = Evaluator.objects.filter(email=self.request.user.email)
         if evaluator.exists():
@@ -525,7 +540,7 @@ class AcceptInvitationView(TemplateView):
         TO = 'martinvalles@eventbrite.com'
         SUBJECT = 'A new Evaluator for your event has accepted.'
         html_content = render_to_string('email/new_evaluator.html', {
-                                        'evaluator': evaluator})
+            'evaluator': evaluator})
         text_content = strip_tags(html_content)
         msg = EmailMultiAlternatives(
             SUBJECT, text_content, FROM, [TO])
