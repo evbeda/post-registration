@@ -242,7 +242,7 @@ class EvaluatorForm(ModelForm):
             'email': EmailInput(attrs={'class': 'form-control'}),
         }
 
-    def send_email(self, form, event):
+    def send_email(self, form, event, accept_url, decline_url):
         email = form.cleaned_data['email']
         invitation_code = EvaluatorEvent.objects.filter(
             event=event['id']).values_list('invitation_code', flat=True)
@@ -251,7 +251,9 @@ class EvaluatorForm(ModelForm):
         SUBJECT = 'Invitation to evaluate submissions for an event.'
         html_content = render_to_string('email/evaluation_request.html', {
             'event': event,
-            'invitation_code': invitation_code[0].hex
+            'invitation_code': invitation_code[0].hex,
+            'accept_url': accept_url,
+            'decline_url': decline_url,
         })
         text_content = strip_tags(html_content)
         msg = EmailMultiAlternatives(SUBJECT, text_content, FROM, [TO])

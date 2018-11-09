@@ -355,14 +355,19 @@ class EvaluatorCreate(CreateView):
         event = Event.objects.get(pk=event_id)
         try:
             evaluator = Evaluator.objects.get(email=form.cleaned_data['email'])
-            EvaluatorEvent.objects.create(evaluator=evaluator, event=event)
         except Evaluator.DoesNotExist:
             evaluator = form.save(update=False, event_id=event_id)
+        eval_event = EvaluatorEvent.objects.create(
+            evaluator=evaluator, event=event)
         eb_event = get_one_event_api(get_auth_token(
             self.request.user), event.eb_event_id)
         parsed_event = parse_events(eb_event)
+        accept_url = self.request.build_absolute_uri(
+            reverse('accept-invitation', kwargs={'invitation_code': eval_event.invitation_code}))
+        decline_url = self.request.build_absolute_uri(
+            reverse('decline-invitation', kwargs={'invitation_code': eval_event.invitation_code}))
         parsed_event[0]['id'] = event_id
-        form.send_email(form, parsed_event[0])
+        form.send_email(form, parsed_event[0], accept_url, decline_url)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
@@ -645,7 +650,8 @@ def evaluator_events(request):
     if not evaluator:
         return accepted_events
     else:
-        accepted_eval_event = EvaluatorEvent.objects.filter(evaluator_id=evaluator[0].id, status='accepted')
+        accepted_eval_event = EvaluatorEvent.objects.filter(
+            evaluator_id=evaluator[0].id, status='accepted')
         for event in accepted_eval_event:
             event_list.append(Event.objects.filter(id=event.event_id))
         for event in event_list:
