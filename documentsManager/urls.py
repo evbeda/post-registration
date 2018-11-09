@@ -34,9 +34,14 @@ urlpatterns = [
         name='decline-invitation'
         ),
     url(
-        r'landing/(?P<event_id>\d+)/$',
+        r'landing/(?P<event_id>\d+)/(?P<code>[\w\-]+)$',
         LandingView.as_view(),
         name='landing'
+    ),
+    url(
+        r'landing/(?P<event_id>\d+)/preview/$',
+        LandingView.as_view(),
+        name='preview'
     ),
     url(
         r'success/$',

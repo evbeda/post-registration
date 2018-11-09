@@ -1,4 +1,5 @@
 from datetime import datetime
+from unittest.mock import patch
 
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
@@ -6,9 +7,9 @@ from django.core.files import File
 from django.core.urlresolvers import resolve, reverse
 from django.db.utils import DataError
 from django.template.loader import render_to_string
-from django.test import Client, TestCase
+from django.test import Client
+from django.test import TestCase
 from social_django.models import UserSocialAuth
-from unittest.mock import patch
 
 from documentsManager.apps import DocumentsmanagerConfig
 from documentsManager.forms import (
@@ -31,15 +32,27 @@ from documentsManager.models import (
     FileSubmission,
     Review,
     Submission,
-)
+    UserWebhook,
+    AttendeeCode)
+from documentsManager.utils import (
+    social_user_exists,
+    get_data,
+    webhook_available_to_process,
+    get_social_user,
+    send_email_to_attende,
+    create_order_webhook_from_view,
+    get_access_token_form_user_id,
+    get_eventbrite_data,
+    get_parsed_event,
+    create_code_from_url)
 from documentsManager.views import (
     add_event,
     filter_managed_event,
     filter_no_managed_event,
     get_auth_token,
 )
+from post_registration import settings
 from post_registration.settings import get_env_variable
-
 
 MOCK_EVENTS_API = {
     'name': {
@@ -223,7 +236,9 @@ class TestBase(TestCase):
             },
         )
         login = self.client.login(
-            username='kaizen@email.com', password='awesome1234')
+            username='kaizen@email.com',
+            password='awesome1234'
+        )
         return login
 
     def create_event(self, eb_event_id=1):
@@ -331,7 +346,7 @@ class ViewTest(TestBase):
         mock_api_evb.return_value = MOCK_EVENTS_API
         event = Event.objects.create(eb_event_id=321, organizer=self.user)
         event.end_submission = '2018-02-25'
-        response = self.client.get('/landing/{}/'.format(event.id))
+        response = self.client.get('/landing/{}/preview/'.format(event.id))
         self.assertEqual(response.status_code, 200)
 
     def test_response_with_success(self):
@@ -345,7 +360,7 @@ class ViewTest(TestBase):
         event = Event.objects.create(eb_event_id=321, organizer=self.user)
         TextDoc.objects.create(event=event)
         FileDoc.objects.create(event=event)
-        response = self.client.get('/landing/{}/'.format(event.id))
+        response = self.client.get('/landing/{}/preview/'.format(event.id))
         self.assertTrue('text_docs' in response.context)
         self.assertTrue('file_docs' in response.context)
 
@@ -574,10 +589,14 @@ class EvaluatorTest(TestBase):
         mock_eventbrite_get.return_value = MOCK_EVENTS_API
         mock_eventbrite_get_2.return_value = MOCK_EVENTS_API_2
         new_event_1 = Event.objects.create(
-            eb_event_id=50607739110, organizer=self.user)
+            eb_event_id=50607739110,
+            organizer=self.user,
+        )
         new_event_2 = Event.objects.create(
-            eb_event_id=50607739120, organizer=self.user)
-        evaluator_1 = Evaluator.objects.create(email='john@email.com')
+            eb_event_id=50607739120,
+            organizer=self.user,
+        )
+        evaluator_1 = Evaluator.objects.create(email='morty@ejemplo.com')
         EvaluatorEvent.objects.create(
             event=new_event_1,
             evaluator=evaluator_1,
@@ -592,10 +611,19 @@ class EvaluatorTest(TestBase):
             email='john@email.com',
             password='john1234',
         )
-        self.client.login(email='john@email.com', password='john1234')
-        response = self.client.get('/accounts/login/', follow=True)
+        self.client.login(
+            email='john@email.com',
+            password='john1234',
+        )
+        response = self.client.get(
+            '/accounts/login/',
+            follow=True,
+        )
         response2 = self.client.get(
-            response.context_data['next'], follow=True, **{'HTTP_REFERER': 'accounts/login'})
+            response.context_data['next'],
+            follow=True,
+            **{'HTTP_REFERER': 'accounts/login'}
+        )
         self.assertEquals(response2.wsgi_request.path, '/')
 
 
@@ -1016,3 +1044,96 @@ class DashboardView(TestBase):
     def test_home_url_name(self, mock_create_order_webhook_from_view):
         found = resolve('/')
         self.assertEqual(found.url_name, 'home')
+
+
+class UtilsTest(TestBase):
+    def test_social_user_exists_not_valid(self):
+        result = social_user_exists(1)
+        self.assertEqual(result, False)
+
+    def test_social_user_exists_valid(self):
+        result = social_user_exists(self.auth.uid)
+        self.assertEqual(result, True)
+
+    def test_get_data_utils_invalid(self):
+        body = {
+            'config': {
+                'user_id': 1
+            },
+            'api_url': 'http://algo.com',
+        }
+        result = get_data(body, 'http://algo.com')
+        expected = {
+            'status': False,
+            'email': False,
+        }
+        self.assertEqual(result, expected)
+
+    def test_webhook_available_to_process_invalid(self):
+        result = webhook_available_to_process(1)
+        self.assertEqual(result, False)
+
+    def test_webhook_available_to_process(self):
+        result = webhook_available_to_process(self.auth.uid)
+        self.assertEqual(result, True)
+
+    def test_get_social_user_not_valid(self):
+        result = get_social_user(1)
+        expected = None
+        self.assertEqual(result, expected)
+
+    def test_get_social_user_valid(self):
+        result = get_social_user(self.auth.uid)
+        self.assertTrue(isinstance(result, UserSocialAuth))
+
+    def test_send_email_to_attende_not_valid(self):
+        context = {
+            'host': '',
+            'code': 'example',
+            'event': 1,
+            'id': 1,
+        }
+        result = send_email_to_attende('', context)
+        self.assertEqual(result, 0)
+
+    def test_send_email_to_attende(self):
+        context = {
+            'host': '',
+            'code': 'example',
+            'event': 1,
+            'id': 1,
+        }
+        result = send_email_to_attende('familiambc1o@gmail.com', context)
+        self.assertEqual(result, 1)
+
+    @patch('documentsManager.utils.create_webhook')
+    def test_create_order_webhook_from_view(self, mock):
+        mock.return_value = True
+        init = UserWebhook.objects.count()
+        create_order_webhook_from_view(self.user)
+        expected = UserWebhook.objects.count()
+        self.assertNotEqual(init, expected)
+
+    def test_get_access_token_form_user_id(self):
+        result = get_access_token_form_user_id(self.auth.uid)
+        self.assertEqual(result, 'hsadfkjashdbfkjahsdbf')
+
+    def test_get_eventbrite_data(self):
+        access_token = settings.SOCIAL_AUTH_EVENTBRITE_KEY
+        url = 'https://www.eventbriteapi.com/v3/users/me/events/'
+        result = get_eventbrite_data(access_token, url)
+        self.assertTrue(isinstance(result, dict))
+
+    @patch('documentsManager.views.Eventbrite.get')
+    def test_get_parsed_event(self, mock):
+        mock.return_value = MOCK_EVENTS_API
+        result = get_parsed_event('access_token', 1)
+        self.assertTrue(isinstance(result, dict))
+
+    def test_create_code_from_url(self):
+        init = AttendeeCode.objects.count()
+        expected = 'example_text'
+        result = create_code_from_url(expected)
+        finish = AttendeeCode.objects.count()
+        self.assertNotEqual(result, expected)
+        self.assertGreater(finish, init)

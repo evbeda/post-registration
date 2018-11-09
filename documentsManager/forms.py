@@ -1,17 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from .models import (
-    Evaluator,
-    Event,
-    FileDoc,
-    FileSubmission,
-    FileType,
-    TextDoc,
-    User,
-    EvaluatorEvent,
-    Review,
-)
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.mail import EmailMultiAlternatives
@@ -32,6 +21,19 @@ from django.template.base import logger
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
+
+from .models import (
+    Evaluator,
+    Event,
+    FileDoc,
+    FileSubmission,
+    FileType,
+    TextDoc,
+    User,
+    EvaluatorEvent,
+    AttendeeCode,
+    Review,
+)
 
 
 class FileDocForm(ModelForm):
@@ -219,6 +221,8 @@ def validate_files_submissions(files, id_event):
 class SubmissionForm(Form):
 
     def is_valid(self):
+        if not self.data.get('code'):
+            return True
         files_validation = True
         if len(self.files):
             files_validation = validate_files_submissions(
@@ -226,11 +230,14 @@ class SubmissionForm(Form):
                 self.data.get('event_id')
             )
         text_validation = validate_text_submissions(self.data.keys())
+        if files_validation and text_validation:
+            attendee_code = AttendeeCode.objects.get(code=self.data.get('code'))
+            attendee_code.available = False
+            attendee_code.save()
         return files_validation and text_validation
 
 
 class EvaluatorForm(ModelForm):
-
     class Meta:
         model = Evaluator
         fields = [

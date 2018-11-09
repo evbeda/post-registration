@@ -2,12 +2,13 @@
 import datetime
 import uuid
 
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+
+from post_registration import settings
 
 
 class UserManager(BaseUserManager):
@@ -201,3 +202,8 @@ class UserWebhook(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
+
+
+class AttendeeCode(models.Model):
+    code = models.CharField(max_length=512, blank=False)
+    available = models.BooleanField(default=True)
