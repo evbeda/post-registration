@@ -24,10 +24,8 @@
                             All of your confidential information is not going to be revealed.
                         </small>
                         <br>
-						<!-- <a href="{% url 'accept-invitation' invitation_code %}" class="btn btn-success btn-lg mr-3">Accept</a> -->
-						<!-- <a href="{% url 'decline-invitation' invitation_code %}" class="btn btn-danger btn-lg ml-3">Decline</a> -->
-						<a href="http://127.0.0.1:8000/accept-invitation/{{ invitation_code }}" class="btn">Accept</a>
-						<a href="http://127.0.0.1:8000/decline-invitation/{{ invitation_code }}" class="btn">Decline</a>
+						<a href="{{ accept_url }}" class="btn">Accept</a>
+						<a href="{{ decline_url }}" class="btn">Decline</a>
 												
 					</td>
 				</tr>
