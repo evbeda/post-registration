@@ -870,6 +870,83 @@ class EvaluatorEventTest(TestBase):
         self.assertEqual(evaluator_event.status, 'pending')
 
 
+class EvaluatorCreateReview(TestBase):
+    def setUp(self):
+        super(EvaluatorCreateReview, self).setUp()
+        self.event = self.create_event()
+        self.evaluator = self.create_evaluator()
+        EvaluatorEvent.objects.create(
+            event=self.event,
+            evaluator=self.evaluator,
+            status='accepted',
+        )
+        file_doc = FileDoc.objects.create(event=self.event)
+        file = File(open('runtime.txt', 'rb'))
+        file_submission = FileSubmission.objects.create(
+            file_doc=file_doc,
+            file=file,
+            event=self.event,
+        )
+        self.submission = Submission.objects.get(id=file_submission.submission_ptr_id)
+        User.objects.create_superuser(
+            email='john@email.com',
+            password='john1234',
+        )
+        self.client.login(
+            email='john@email.com',
+            password='john1234',
+        )
+
+    def test_evaluator_approve_submission(self):
+        r = {
+            'approve': 'Approve',
+        }
+        self.client.post(
+            reverse(
+                'review',
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.submission.id,
+                }
+            ),
+            r,
+        )
+        review = Review.objects.filter(evaluator=self.evaluator, submission=self.submission).first()
+        self.assertTrue(review.aproved)
+
+    def test_evaluator_reject_submission(self):
+        r = {
+            'reject': 'Reject',
+        }
+        self.client.post(
+            reverse(
+                'review',
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.submission.id,
+                }
+            ),
+            r,
+        )
+        review = Review.objects.filter(evaluator=self.evaluator, submission=self.submission).first()
+        self.assertFalse(review.aproved)
+
+    @patch('documentsManager.views.get_one_event_api')
+    def test_review_view(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        self.client.login(email='john@email.com', password='john1234')
+        response = self.client.get(
+            reverse(
+                'review',
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.submission.id,
+                }
+            ),
+        )
+        self.assertEqual(response.context_data['evaluator'], self.evaluator)
+
+
 class AcceptInvitationViewTest(TestBase):
 
     @patch('documentsManager.views.render_to_string')
