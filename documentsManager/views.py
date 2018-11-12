@@ -484,17 +484,12 @@ class ReviewView(FormView, LoginRequiredMixin):
 
     def get_context_data(self, **kwargs):
         context = super(ReviewView, self).get_context_data(**kwargs)
-        context['user'] = self.request.user
-        context['is_eb_user'] = self.request.user.social_auth.exists()
         context['evaluator'] = Evaluator.objects.filter(email=self.request.user.email).first()
         context['submissions'] = Submission.objects.filter(event_id=self.kwargs['submission_id']).first()
         event_id = self.kwargs['event_id']
         context['event_id'] = event_id
         event = Event.objects.get(id=event_id)
-        if context['is_eb_user']:
-            token = get_auth_token(self.request.user)
-        else:
-            token = get_access_token_of_event(event)
+        token = get_access_token_of_event(event)
         eb_event = get_one_event_api(token, event.eb_event_id)
         context['event'] = parse_events(eb_event)[0]
         return context
@@ -516,10 +511,8 @@ class ReviewView(FormView, LoginRequiredMixin):
 
     def add_review(self, form):
         new_review = form.save(commit=False)
-        submission = Submission.objects.get(id=self.kwargs['submission_id'])
-        new_review.submission = submission
-        evaluator = Evaluator.objects.get(email=self.request.user.email)
-        new_review.evaluator = evaluator
+        new_review.submission = Submission.objects.get(id=self.kwargs['submission_id'])
+        new_review.evaluator = Evaluator.objects.get(email=self.request.user.email)
         new_review.aproved = self.is_aprove
         new_review.save()
         return
