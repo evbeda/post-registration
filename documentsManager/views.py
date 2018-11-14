@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
-from datetime import datetime
-from os.path import getatime
+
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -15,21 +13,21 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.html import strip_tags
 from django.views import View
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import (
     CreateView,
     DeleteView,
     FormView,
-    ListView,
     UpdateView,
 )
 from django.views.generic.base import TemplateView
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
-from eventbrite import Eventbrite
 from multi_form_view import MultiFormView
-from social_django.models import UserSocialAuth
 
+from documentsManager.utils import evaluator_events, parse_events, get_auth_token, get_all_events_api, \
+    get_events_with_venues_api, get_one_event_api, filter_managed_event, filter_no_managed_event, update_dates, \
+    get_access_token_of_event
+from .filters import SubmissionFilter
 from .forms import (
     EvaluatorForm,
     EventForm,
@@ -47,21 +45,12 @@ from .models import (
     Evaluator,
     EvaluatorEvent,
     Submission,
-    Review,
     AttendeeCode,
 )
+from .tables import SubmissionsTable
 from .utils import (
-    get_data,
     create_order_webhook_from_view,
 )
-from .filters import SubmissionFilter
-from .tables import SubmissionsTable
-
-
-@csrf_exempt
-def accept_webhook(request):
-    get_data(json.loads(request.body), request.META['URL_LOCAL'])
-    return HttpResponse()
 
 
 @method_decorator(login_required, name='dispatch')
@@ -120,7 +109,10 @@ class DocFormView(MultiFormView, LoginRequiredMixin):
 
     def form_valid(self, form):
         self.add_doc(form, self.kwargs['event_id'])
-        return HttpResponseRedirect(reverse('docs', kwargs={'event_id': self.kwargs['event_id']}))
+        return HttpResponseRedirect(
+            reverse(
+                'docs', kwargs={
+                    'event_id': self.kwargs['event_id']}))
 
     def add_doc(self, form, event_id):
         new_doc = form.save(commit=False)
@@ -173,7 +165,10 @@ class DocsView(FormView, LoginRequiredMixin):
 
     def form_valid(self, form):
         update_dates(self.request, self.kwargs['event_id'])
-        return HttpResponseRedirect(reverse('docs', kwargs={'event_id': self.kwargs['event_id']}))
+        return HttpResponseRedirect(
+            reverse(
+                'docs', kwargs={
+                    'event_id': self.kwargs['event_id']}))
 
 
 @method_decorator(login_required, name='dispatch')
@@ -186,11 +181,14 @@ class HomeView(TemplateView, LoginRequiredMixin):
             prev_page = 'none'
         else:
             prev_page = self.request.META.get('HTTP_REFERER')
-        if (len(self.accepted_events) == 1) and (prev_page.find('accounts/login') != (-1)):
+        if (len(self.accepted_events) == 1) and (
+                prev_page.find('accounts/login') != (-1)):
             event_id = self.accepted_events[0]['event_id']
-            return redirect(reverse('submissions', kwargs={'event_id': event_id}))
-        else:
-            return super(HomeView, self).dispatch(request, *args, **kwargs)
+            return redirect(
+                reverse(
+                    'submissions', kwargs={
+                        'event_id': event_id}))
+        return super(HomeView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
@@ -355,7 +353,10 @@ class EvaluatorList(FormView, LoginRequiredMixin):
         event.start_evaluation = self.request.POST['start_evaluation']
         event.end_evaluation = self.request.POST['end_evaluation']
         event.save()
-        return HttpResponseRedirect(reverse('evaluators', kwargs={'event_id': event_id}))
+        return HttpResponseRedirect(
+            reverse(
+                'evaluators', kwargs={
+                    'event_id': event_id}))
 
 
 @method_decorator(login_required, name='dispatch')
@@ -528,7 +529,10 @@ class ReviewView(FormView, LoginRequiredMixin):
 
     def form_valid(self, form):
         self.add_review(form)
-        return HttpResponseRedirect(reverse('submissions', kwargs={'event_id': self.kwargs['event_id']}))
+        return HttpResponseRedirect(
+            reverse(
+                'submissions', kwargs={
+                    'event_id': self.kwargs['event_id']}))
 
     def add_review(self, form):
         new_review = form.save(commit=False)
@@ -569,130 +573,8 @@ class AcceptInvitationView(TemplateView):
 class DeclineInvitationView(View):
     def get(self, request, *args, **kwargs):
         invitation_code = self.kwargs['invitation_code']
-        invitation_code = self.kwargs['invitation_code']
         evaluator_event = EvaluatorEvent.objects.get(
             invitation_code=invitation_code)
         evaluator_event.status = 'rejected'
         evaluator_event.save()
         return HttpResponse('GET request!')
-
-
-def parse_events(api_events):
-    events = []
-    for event in api_events:
-        view_event = {
-            'eb_id': event.get('id', None),
-            'name': event.get('name', {}).get('text', 'Unnamed'),
-            'start': datetime.strptime(event['start']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
-            'end': datetime.strptime(event['end']['utc'], '%Y-%m-%dT%H:%M:%SZ'),
-            'description': event.get('description', {}).get('text', 'No description'),
-            'logo': (event.get('logo', {}) or {}).get('original', {}).get('url', None),
-            'is_free': event.get('is_free', {}),
-            'venue_id': event.get('venue_id', {}),
-        }
-        if view_event['venue_id']:
-            view_event['venue'] = event.get('venue', {}).get(
-                'address', {}).get('localized_address_display', None)
-        else:
-            view_event['venue'] = ''
-        events.append(view_event)
-    return events
-
-
-def get_auth_token(user):
-    try:
-        token = user.social_auth.get(
-            provider='eventbrite'
-        ).access_token
-    except UserSocialAuth.DoesNotExist:
-        error_msg = 'UserSocialAuth does not exists!'
-        raise Exception(error_msg)
-    return token
-
-
-def get_all_events_api(token):
-    eventbrite = Eventbrite(token)
-    return eventbrite.get('/users/me/events/').get('events', [])
-
-
-def get_events_with_venues_api(token):
-    eventbrite = Eventbrite(token)
-    return eventbrite.get(path='/users/me/events/', expand=('venue',)).get('events', [])
-
-
-def get_one_event_api(token, eb_event_id):
-    eventbrite = Eventbrite(token)
-    one_event = [eventbrite.get('/events/{}/'.format(eb_event_id))]
-    return one_event
-
-
-def filter_managed_event(api_events, model_events):
-    events = []
-    for api_event in api_events:
-        for docs_event in model_events:
-            if api_event['eb_id'] in docs_event[0]:
-                api_event['id'] = docs_event[1]
-                events.append(api_event)
-    return events
-
-
-def filter_no_managed_event(api_events, model_events):
-    events = []
-    for eb_event in api_events:
-        if eb_event['eb_id'] not in model_events:
-            events.append(eb_event)
-    return events
-
-
-def select_event(request, eb_event_id):
-    eb_event = get_one_event_api(get_auth_token(request.user), eb_event_id)
-    view_event = parse_events(eb_event)
-    default_end_submission = view_event[0]['start']
-    new_event = add_event(eb_event_id, default_end_submission, request.user)
-    return HttpResponseRedirect(reverse('docs', kwargs={'event_id': new_event.id}))
-
-
-def add_event(eb_event_id, end_submission, organizer):
-    new_event = Event(eb_event_id=eb_event_id,
-                      end_submission=end_submission, organizer=organizer)
-    new_event.save()
-    return new_event
-
-
-def update_dates(request, event_id):
-    event = Event.objects.get(id=event_id)
-    event.init_submission = request.POST['init_submission']
-    event.end_submission = request.POST['end_submission']
-    event.save()
-    return HttpResponseRedirect(reverse('docs', kwargs={'event_id': event_id}))
-
-
-def get_access_token_of_event(event):
-    auth_user = UserSocialAuth.objects.get(user_id=event.organizer_id)
-    return auth_user.extra_data['access_token']
-
-
-def evaluator_events(request):
-    evaluator = Evaluator.objects.filter(email=request.user.email)
-    event_list = []
-    accepted_events = []
-    if not evaluator:
-        return accepted_events
-    else:
-        accepted_eval_event = EvaluatorEvent.objects.filter(
-            evaluator_id=evaluator[0].id, status='accepted')
-        for event in accepted_eval_event:
-            event_list.append(Event.objects.filter(id=event.event_id))
-        for event in event_list:
-            token = get_access_token_of_event(event[0])
-            eb_event = get_one_event_api(
-                token,
-                event[0].eb_event_id
-            )
-            accepted_events.append(parse_events(eb_event)[0])
-        if len(accepted_events) != 0:
-            for ev in accepted_events:
-                eb_event_id = ev['eb_id']
-                event = Event.objects.get(eb_event_id=eb_event_id)
-                ev['event_id'] = event.id
-        return accepted_events

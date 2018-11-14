@@ -22,16 +22,19 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
 
+from documentsManager.utils import (
+    notify_attendee_from_attende_code,
+    validate_files_submissions,
+    validate_text_submissions,
+)
 from .models import (
     Evaluator,
     Event,
     FileDoc,
-    FileSubmission,
     FileType,
     TextDoc,
     User,
     EvaluatorEvent,
-    AttendeeCode,
     Review,
 )
 
@@ -58,9 +61,18 @@ class FileDocForm(ModelForm):
             'quantity': _('Quantity'),
         }
         widgets = {
-            'quantity': TextInput(attrs={'min': '1', 'max': '100', 'type': 'number', 'class': 'form-control col-3'}),
-            'name': TextInput(attrs={'class': 'form-control col-10'}),
-            'is_optional': CheckboxInput(attrs={'class': 'form-check-input'}),
+            'quantity': TextInput(
+                attrs={
+                    'min': '1',
+                    'max': '100',
+                    'type': 'number',
+                    'class': 'form-control col-3'}),
+            'name': TextInput(
+                attrs={
+                    'class': 'form-control col-10'}),
+            'is_optional': CheckboxInput(
+                attrs={
+                    'class': 'form-check-input'}),
         }
 
 
@@ -94,12 +106,25 @@ class TextDocForm(ModelForm):
             'max': _('Maximum'),
         }
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control col-10'}),
-            'description': Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'is_optional': CheckboxInput(attrs={'class': 'form-check-input'}),
-            'measure': Select(attrs={'class': 'form-control'}),
-            'min': NumberInput(attrs={'class': 'form-control'}),
-            'max': NumberInput(attrs={'class': 'form-control'}),
+            'name': TextInput(
+                attrs={
+                    'class': 'form-control col-10'}),
+            'description': Textarea(
+                attrs={
+                    'rows': 3,
+                    'class': 'form-control'}),
+            'is_optional': CheckboxInput(
+                attrs={
+                    'class': 'form-check-input'}),
+            'measure': Select(
+                attrs={
+                    'class': 'form-control'}),
+            'min': NumberInput(
+                attrs={
+                    'class': 'form-control'}),
+            'max': NumberInput(
+                attrs={
+                    'class': 'form-control'}),
         }
 
 
@@ -110,7 +135,8 @@ class EventForm(ModelForm):
             return valid
         if self.cleaned_data['init_submission'] >= self.cleaned_data['end_submission']:
             self.add_error(
-                'end_submission', 'End date cannot be less than Init date of Submissions .')
+                'end_submission',
+                'End date cannot be less than Init date of Submissions .')
             return False
         return True
 
@@ -141,7 +167,8 @@ class EvaluationDateForm(ModelForm):
             return valid
         if self.cleaned_data['start_evaluation'] >= self.cleaned_data['end_evaluation']:
             self.add_error(
-                'end_evaluation', 'End date cannot be less than start date of Evaluations .')
+                'end_evaluation',
+                'End date cannot be less than start date of Evaluations .')
             return False
         return True
 
@@ -190,34 +217,6 @@ class SignUpForm(UserCreationForm):
         return user
 
 
-def validate_text_submissions(text_fields):
-    for text_field in text_fields:
-        if '_text' in text_field:
-            text_id = text_field.replace('_text', '')
-            text_doc = TextDoc.objects.get(pk=text_id)
-            quantity = len(text_field)
-            if text_doc.measure == 'Words':
-                quantity = len(text_field.split(' '))
-            if not (quantity < text_doc.min or quantity > text_doc.max):
-                return False
-    return True
-
-
-def validate_files_submissions(files, id_event):
-    event = Event.objects.get(pk=id_event)
-    file_docs = FileDoc.objects.filter(event=event)
-    for file_doc in file_docs:
-        name = '{}_file'.format(file_doc.id)
-        if name not in files.keys():
-            return False
-        FileSubmission.objects.create(
-            file_doc=file_doc,
-            file=files[name],
-            event=event,
-        )
-    return True
-
-
 class SubmissionForm(Form):
 
     def is_valid(self):
@@ -231,9 +230,7 @@ class SubmissionForm(Form):
             )
         text_validation = validate_text_submissions(self.data.keys())
         if files_validation and text_validation:
-            attendee_code = AttendeeCode.objects.get(code=self.data.get('code'))
-            attendee_code.available = False
-            attendee_code.save()
+            notify_attendee_from_attende_code(self.data.get('code'))
         return files_validation and text_validation
 
 

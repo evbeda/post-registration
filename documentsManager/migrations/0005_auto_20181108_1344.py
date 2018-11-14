@@ -17,12 +17,15 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='end_evaluation',
-            field=models.DateField(blank=True, default=django.utils.timezone.now),
+            field=models.DateField(
+                blank=True,
+                default=django.utils.timezone.now),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='event',
             name='start_evaluation',
-            field=models.DateField(default=datetime.date.today),
+            field=models.DateField(
+                default=datetime.date.today),
         ),
     ]

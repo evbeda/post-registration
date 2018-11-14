@@ -5,7 +5,7 @@
 <head>
     <meta name="viewport" content="width=device-width"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Thanks For Buying a ticket</title>
+    <title>Submissions Uploaded</title>
 </head>
 <body bgcolor="#FFFFFF">
 <table class="body-wrap">
@@ -16,16 +16,17 @@
                 <table>
                     <tr>
                         <td>
-                            <h3>{{ name }}: Thanks For Buying a ticket</h3>
-                            <p class="lead">We are glad for your visit to the {{ event.name }} event.</p>
-                            <p><img src="{{ event.logo }}" alt="event logo"/></p>
-                            <h3>You want to join us?</h3>
+                            <h3>Your submission was succesful uploaded</h3>
+                            {% for doc in docs %}
+                                <p class="lead">Your {{ doc.name }} was succesful uploaded</p>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             <p class="callout">
-                                For complete your registration we need you to upload the submissions that we request for
-                                the event. Do it in the link below
+                                We will contact you shortly to inform you of the final decision on your submissions
                             </p>
-                            <a href="{{ host }}{% url 'landing' id code %}" target=”_blank”
-                               class="btn">Complete registration</a>
                         </td>
                     </tr>
                 </table>

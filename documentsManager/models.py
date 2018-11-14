@@ -5,8 +5,8 @@ import uuid
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 from post_registration import settings
 
@@ -50,6 +50,9 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = UserManager()
+
+    class Meta(object):
+        db_table = 'User'
 
 
 class Event(models.Model):
@@ -170,16 +173,23 @@ class Evaluator(models.Model):
 
 
 class EvaluatorEvent(models.Model):
-    STATUS = (
+    STATES = (
         ('pending', 'Pending'),
         ('accepted', 'Accepted'),
         ('rejected', 'Rejected'),
     )
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     evaluator = models.ForeignKey(Evaluator, on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, choices=STATUS, default='pending')
+    status = models.CharField(
+        max_length=20,
+        choices=STATES,
+        default='pending',
+    )
     invitation_code = models.UUIDField(
-        default=uuid.uuid4, editable=False, unique=True)
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
 
     def __str__(self):
         return self.evaluator.name
@@ -195,7 +205,7 @@ class Review(models.Model):
     aproved = models.BooleanField(unique=True)
 
     class Meta:
-        unique_together = ('evaluator', 'submission',)
+        unique_together = ('evaluator', 'submission')
         db_table = 'Review'
 
 
@@ -206,7 +216,27 @@ class UserWebhook(models.Model):
         on_delete=models.CASCADE,
     )
 
+    class Meta:
+        db_table = 'UserWebhook'
+
+
+class Attendee(models.Model):
+    email = models.EmailField()
+    name = models.CharField(blank=False, max_length=255)
+
+    class Meta:
+        db_table = 'Attendee'
+
 
 class AttendeeCode(models.Model):
-    code = models.CharField(max_length=512, blank=False)
+    code = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
     available = models.BooleanField(default=True)
+    attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('attendee', 'event')

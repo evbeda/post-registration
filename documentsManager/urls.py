@@ -1,5 +1,6 @@
 from django.conf.urls import url
 
+from documentsManager.utils import select_event, accept_webhook
 from .views import (
     EventsView,
     DocFormView,
@@ -9,7 +10,6 @@ from .views import (
     TextDocUpdate,
     FileDocDelete,
     TextDocDelete,
-    select_event,
     LandingView,
     SuccessView,
     SignUpView,
@@ -17,7 +17,6 @@ from .views import (
     EvaluatorCreate,
     EvaluatorUpdate,
     EvaluatorDelete,
-    accept_webhook,
     SubmissionsList,
     AcceptInvitationView,
     DeclineInvitationView,
