@@ -20,7 +20,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='review',
             name='submission',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='documentsManager.Submission'),
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                to='documentsManager.Submission'),
             preserve_default=False,
         ),
     ]

@@ -17,10 +17,7 @@ from documentsManager.forms import (
     TextDocForm,
     SignUpForm,
     EvaluatorForm,
-    validate_text_submissions,
-    validate_files_submissions,
-    SubmissionForm,
-)
+    SubmissionForm)
 from documentsManager.models import (
     Event,
     TextDoc,
@@ -33,7 +30,9 @@ from documentsManager.models import (
     Review,
     Submission,
     UserWebhook,
-    AttendeeCode)
+    Attendee,
+    AttendeeCode,
+)
 from documentsManager.utils import (
     social_user_exists,
     get_data,
@@ -44,13 +43,9 @@ from documentsManager.utils import (
     get_access_token_form_user_id,
     get_eventbrite_data,
     get_parsed_event,
-    create_code_from_url)
-from documentsManager.views import (
-    add_event,
-    filter_managed_event,
-    filter_no_managed_event,
-    get_auth_token,
-)
+    create_attendee_code,
+    notify_attendee_from_attende_code, get_docs_from_event, send_success_submission_email, validate_files_submissions,
+    validate_text_submissions, get_auth_token, filter_managed_event, filter_no_managed_event, add_event)
 from post_registration import settings
 from post_registration.settings import get_env_variable
 
@@ -242,7 +237,9 @@ class TestBase(TestCase):
         return login
 
     def create_event(self, eb_event_id=1):
-        return Event.objects.create(eb_event_id=eb_event_id, organizer=self.user)
+        return Event.objects.create(
+            eb_event_id=eb_event_id,
+            organizer=self.user)
 
     def create_evaluator(self, name='John', email='john@email.com'):
         return Evaluator.objects.create(name=name, email=email)
@@ -273,14 +270,14 @@ class ViewTest(TestBase):
         response = self.client.get('/accounts/login/')
         self.assertEqual(response.status_code, 200)
 
-    @patch('documentsManager.views.Eventbrite.get')
+    @patch('documentsManager.utils.Eventbrite.get')
     def test_access_submission_dashboard(self, mock_eventbrite_get):
         mock_eventbrite_get.return_value = MOCK_EVENTS_API
         event = Event.objects.create(eb_event_id=123, organizer=self.user)
         response = self.client.get('/event/{}/submissions/'.format(event.id))
         self.assertEqual(response.status_code, 200)
 
-    @patch('documentsManager.views.Eventbrite.get')
+    @patch('documentsManager.utils.Eventbrite.get')
     def test_docs_redirect(self, mock_eventbrite_get):
         mock_eventbrite_get.return_value = MOCK_EVENTS_API
         new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
@@ -291,7 +288,7 @@ class ViewTest(TestBase):
         response = self.client.get('/events/')
         self.assertEqual(response.status_code, 200)
 
-    @patch('documentsManager.views.Eventbrite.get')
+    @patch('documentsManager.utils.Eventbrite.get')
     def test_doc_form_redirect(self, mock_api_evb):
         mock_api_evb.return_value = MOCK_EVENTS_API
         new_event = Event.objects.create(eb_event_id=1, organizer=self.user)
@@ -314,7 +311,7 @@ class ViewTest(TestBase):
         result = filter_no_managed_event(api_events, model_events)
         self.assertEqual(len(result), 1)
 
-    @patch('documentsManager.views.Eventbrite.get')
+    @patch('documentsManager.utils.Eventbrite.get')
     def test_create_and_save_event(self, mock_api_evb):
         mock_api_evb.return_value = MOCK_EVENTS_API
         response = self.client.get('/events/50285339/')
@@ -341,7 +338,7 @@ class ViewTest(TestBase):
         self.assertEqual(result.init_submission, expected)
         self.assertEqual(response.url, '/event/{}/docs/'.format(new_event.id))
 
-    @patch('documentsManager.views.Eventbrite.get')
+    @patch('documentsManager.utils.Eventbrite.get')
     def test_response_with_landing_page(self, mock_api_evb):
         mock_api_evb.return_value = MOCK_EVENTS_API
         event = Event.objects.create(eb_event_id=321, organizer=self.user)
@@ -354,7 +351,7 @@ class ViewTest(TestBase):
         response = self.client.get('/landing/{}/success/'.format(event.id))
         self.assertEqual(response.status_code, 200)
 
-    @patch('documentsManager.views.Eventbrite.get')
+    @patch('documentsManager.utils.Eventbrite.get')
     def test_response_with_landing_page_with_text_doc(self, mock_api_evb):
         mock_api_evb.return_value = MOCK_EVENTS_API
         event = Event.objects.create(eb_event_id=321, organizer=self.user)
@@ -515,7 +512,7 @@ class EvaluatorTest(TestBase):
         self.assertEqual(
             str(Evaluator._meta.verbose_name_plural), "evaluators")
 
-    @patch('documentsManager.views.Eventbrite.get')
+    @patch('documentsManager.utils.Eventbrite.get')
     def test_login_with_Eval_1_accepted(self, mock_eventbrite_get):
         mock_eventbrite_get.return_value = MOCK_EVENTS_API
         new_event = Event.objects.create(
@@ -544,9 +541,10 @@ class EvaluatorTest(TestBase):
             '/event/{}/submissions/'.format(new_event.id),
         )
 
-    @patch('documentsManager.views.Eventbrite.get')
-    @patch('documentsManager.views.Eventbrite.get')
-    def test_login_with_Eval_2_accepted(self, mock_eventbrite_get, mock_eventbrite_get_2):
+    @patch('documentsManager.utils.Eventbrite.get')
+    @patch('documentsManager.utils.Eventbrite.get')
+    def test_login_with_Eval_2_accepted(
+            self, mock_eventbrite_get, mock_eventbrite_get_2):
         mock_eventbrite_get.return_value = MOCK_EVENTS_API
         mock_eventbrite_get_2.return_value = MOCK_EVENTS_API_2
         new_event_1 = Event.objects.create(
@@ -653,7 +651,10 @@ class EvaluatorCreateTest(TestBase):
 
     @patch('documentsManager.forms.render_to_string')
     @patch('documentsManager.views.get_one_event_api')
-    def test_evaluator_success_url(self, mock_get_one_event_api, mock_render_to_string):
+    def test_evaluator_success_url(
+            self,
+            mock_get_one_event_api,
+            mock_render_to_string):
         mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
         mock_render_to_string.return_value = render_to_string('empty.html', {})
         event = self.create_event()
@@ -1226,16 +1227,79 @@ class UtilsTest(TestBase):
         result = get_eventbrite_data(access_token, url)
         self.assertTrue(isinstance(result, dict))
 
-    @patch('documentsManager.views.Eventbrite.get')
+    @patch('documentsManager.utils.Eventbrite.get')
     def test_get_parsed_event(self, mock):
         mock.return_value = MOCK_EVENTS_API
         result = get_parsed_event('access_token', 1)
         self.assertTrue(isinstance(result, dict))
 
-    def test_create_code_from_url(self):
-        init = AttendeeCode.objects.count()
-        expected = 'example_text'
-        result = create_code_from_url(expected)
-        finish = AttendeeCode.objects.count()
-        self.assertNotEqual(result, expected)
-        self.assertGreater(finish, init)
+    def test_create_attendee_code(self):
+        init_a = Attendee.objects.count()
+        init_ac = AttendeeCode.objects.count()
+        event = self.create_event()
+        create_attendee_code('leo@leo.com', 'leonardo araoz', event)
+        end_a = Attendee.objects.count()
+        end_ac = AttendeeCode.objects.count()
+        self.assertGreater(end_a, init_a)
+        self.assertGreater(end_ac, init_ac)
+
+    def test_create_order_webhook_from_view_wrong(self):
+        user = User.objects.create_user('leo@leo.com')
+        webhook_id = 1
+        UserWebhook.objects.create(
+            user=user,
+            webhook_id=webhook_id,
+        )
+        result = UserWebhook.objects.filter(user=user).count()
+        create_order_webhook_from_view(user)
+        expected = UserWebhook.objects.filter(user=user).count()
+        self.assertEqual(result, expected)
+
+
+class AttendeeCodeTest(TestBase):
+    def test_create_attendee_code(self):
+        event = self.create_event()
+        attendee = Attendee.objects.create(
+            email='leonard@araoz.com',
+            name='leonardo araoz',
+        )
+        attende_code = AttendeeCode.objects.create(
+            event=event,
+            attendee=attendee,
+        )
+        self.assertEqual(attende_code.available, True)
+
+    def test_send_success_submission_email(self):
+        attendee = Attendee.objects.create(
+            email='leonardo.araoz.dev@gmail.com',
+            name='leonard'
+        )
+        docs = [{'name': 'example name'}]
+        result = send_success_submission_email(attendee, docs)
+        self.assertEqual(result, True)
+
+    def test_get_docs_from_event(self):
+        event = self.create_event()
+        TextDoc.objects.create(
+            name='leo',
+            event=event,
+        )
+        result = get_docs_from_event(event)
+        self.assertEqual(len(result), 1)
+
+    def test_notify_attendee_from_attende_code(self):
+        event = self.create_event()
+        TextDoc.objects.create(
+            name='leo',
+            event=event,
+        )
+        attendee_code = AttendeeCode.objects.create(
+            event=event,
+            attendee=Attendee.objects.create(
+                email='leo@leo.com',
+                name='leo',
+            )
+        )
+        notify_attendee_from_attende_code(attendee_code.code)
+        attendee_updated = AttendeeCode.objects.get(id=attendee_code.id)
+        self.assertEqual(attendee_updated.available, False)
