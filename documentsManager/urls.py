@@ -22,6 +22,7 @@ from .views import (
     AcceptInvitationView,
     DeclineInvitationView,
     ReviewView,
+    SubmissionView,
 )
 
 urlpatterns = [
@@ -69,7 +70,7 @@ urlpatterns = [
         name='evaluator_update'
     ),
     url(
-        r'^event/(?P<event_id>\d+)/evaluator/(?P<pk>\d+)/delete/$',
+        r'^event/(?P<event_id>\d+)/evaluator/(?P<evaluator_id>\d+)/delete/$',
         EvaluatorDelete.as_view(),
         name='evaluator_delete'
     ),
@@ -107,6 +108,16 @@ urlpatterns = [
         r'events/(?P<eb_event_id>\d+)/$',
         select_event,
         name='events'
+    ),
+    url(
+        r'event/(?P<event_id>\d+)/submissions/(?P<submission_id>\d+)/close/$',
+        SubmissionsList.as_view(),
+        name='close_submission'
+    ),
+    url(
+        r'event/(?P<event_id>\d+)/submissions/(?P<submission_id>\d+)/$',
+        SubmissionView.as_view(),
+        name='submission'
     ),
     url(
         r'event/(?P<event_id>\d+)/submissions/$',

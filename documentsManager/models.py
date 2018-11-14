@@ -181,6 +181,9 @@ class EvaluatorEvent(models.Model):
     invitation_code = models.UUIDField(
         default=uuid.uuid4, editable=False, unique=True)
 
+    def __str__(self):
+        return self.evaluator.name
+
     class Meta:
         db_table = 'EvaluatorEvent'
 
