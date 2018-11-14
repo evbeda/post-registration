@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_inlinecss',
+    'django_tables2',
+    'django_filters',
     'social_django',
     'documentsManager',
 ]

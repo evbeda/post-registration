@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 from datetime import datetime
+from os.path import getatime
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -16,13 +17,15 @@ from django.utils.html import strip_tags
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import (
-    FormView,
     CreateView,
     DeleteView,
-    UpdateView,
+    FormView,
     ListView,
+    UpdateView,
 )
 from django.views.generic.base import TemplateView
+from django_filters.views import FilterView
+from django_tables2.views import SingleTableMixin
 from eventbrite import Eventbrite
 from multi_form_view import MultiFormView
 from social_django.models import UserSocialAuth
@@ -51,6 +54,8 @@ from .utils import (
     get_data,
     create_order_webhook_from_view,
 )
+from .filters import SubmissionFilter
+from .tables import SubmissionsTable
 
 
 @csrf_exempt
@@ -370,17 +375,19 @@ class EvaluatorCreate(CreateView):
         event = Event.objects.get(pk=event_id)
         try:
             evaluator = Evaluator.objects.get(email=form.cleaned_data['email'])
+            EvaluatorEvent.objects.create(
+                evaluator=evaluator, event=event)
         except Evaluator.DoesNotExist:
             evaluator = form.save(update=False, event_id=event_id)
-        eval_event = EvaluatorEvent.objects.create(
-            evaluator=evaluator, event=event)
+        evaluator_event = EvaluatorEvent.objects.get(
+            event=event, evaluator=evaluator)
         eb_event = get_one_event_api(get_auth_token(
             self.request.user), event.eb_event_id)
         parsed_event = parse_events(eb_event)
         accept_url = self.request.build_absolute_uri(
-            reverse('accept-invitation', kwargs={'invitation_code': eval_event.invitation_code}))
+            reverse('accept-invitation', kwargs={'invitation_code': evaluator_event.invitation_code}))
         decline_url = self.request.build_absolute_uri(
-            reverse('decline-invitation', kwargs={'invitation_code': eval_event.invitation_code}))
+            reverse('decline-invitation', kwargs={'invitation_code': evaluator_event.invitation_code}))
         parsed_event[0]['id'] = event_id
         form.send_email(form, parsed_event[0], accept_url, decline_url)
         return HttpResponseRedirect(self.get_success_url())
@@ -422,8 +429,16 @@ class EvaluatorUpdate(UpdateView):
 
 @method_decorator(login_required, name='dispatch')
 class EvaluatorDelete(DeleteView):
-    model = Evaluator
+    model = EvaluatorEvent
     template_name = 'evaluator_confirm_delete.html'
+
+    def get_object(self):
+        pk = EvaluatorEvent.objects.get(
+            event=self.kwargs['event_id'],
+            evaluator=self.kwargs['evaluator_id']
+        ).pk
+        self.kwargs['pk'] = pk
+        return super(EvaluatorDelete, self).get_object()
 
     def get_context_data(self, **kwargs):
         context = super(EvaluatorDelete, self).get_context_data(**kwargs)
@@ -440,17 +455,23 @@ class EvaluatorDelete(DeleteView):
         )
 
 
-class SubmissionsList(ListView, LoginRequiredMixin):
+class SubmissionsList(SingleTableMixin, FilterView):
+    table_class = SubmissionsTable
     model = Submission
     template_name = 'submissions.html'
+
+    filterset_class = SubmissionFilter
 
     def get_context_data(self, **kwargs):
         context = super(SubmissionsList, self).get_context_data(**kwargs)
         event_id = self.kwargs['event_id']
         context['event_id'] = event_id
         event = Event.objects.get(id=event_id)
-        context['is_eb_user'] = self.request.user.social_auth.exists()
-        if context['is_eb_user']:
+        user_id = self.request.user.id
+        is_organizer = user_id == event.organizer.id
+        if (is_organizer):
+            context['is_organizer'] = True
+        if self.request.user.social_auth.exists():
             token = get_auth_token(self.request.user)
         else:
             token = get_access_token_of_event(event)
@@ -458,23 +479,21 @@ class SubmissionsList(ListView, LoginRequiredMixin):
         context['event'] = parse_events(eb_event)[0]
         context['evaluators_cont'] = EvaluatorEvent.objects.filter(
             event=event, status='accepted', ).count()
-        context['submissions'] = Submission.objects.filter(event_id=event_id)
-        evaluator = Evaluator.objects.filter(email=self.request.user.email)
-        if evaluator.exists():
-            context['eval_id'] = evaluator[0].id
-            context['submissions_with_review'] = []
-            context['submissions_without_review'] = []
-            for submission in context['submissions']:
-                aux = []
-                if Review.objects.filter(evaluator_id=context['eval_id'], submission_id=submission.id).exists():
-                    aux.append(submission)
-                    review = Review.objects.filter(
-                        evaluator_id=context['eval_id'], submission_id=submission.id).first()
-                    aux.append(review.aproved)
-                    context['submissions_with_review'].append(aux)
-                else:
-                    context['submissions_without_review'].append(submission)
+        if self.request.GET:
+            filter = SubmissionFilter(
+                self.request.GET,
+                queryset=Submission.objects.filter(event_id=event_id)
+            )
+            table = SubmissionsTable(filter.qs, is_organizer=is_organizer)
+        else:
+            table = SubmissionsTable(Submission.objects.filter(
+                event_id=event_id), is_organizer=is_organizer)
+        context['table'] = table
         return context
+
+
+class SubmissionView(TemplateView):
+    template_name = 'submission.html'
 
 
 @method_decorator(login_required, name='dispatch')
@@ -484,8 +503,10 @@ class ReviewView(FormView, LoginRequiredMixin):
 
     def get_context_data(self, **kwargs):
         context = super(ReviewView, self).get_context_data(**kwargs)
-        context['evaluator'] = Evaluator.objects.filter(email=self.request.user.email).first()
-        context['submissions'] = Submission.objects.filter(event_id=self.kwargs['submission_id']).first()
+        context['evaluator'] = Evaluator.objects.filter(
+            email=self.request.user.email).first()
+        context['submissions'] = Submission.objects.filter(
+            event_id=self.kwargs['submission_id']).first()
         event_id = self.kwargs['event_id']
         context['event_id'] = event_id
         event = Event.objects.get(id=event_id)

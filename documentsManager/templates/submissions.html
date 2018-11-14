@@ -1,4 +1,7 @@
 {% extends "base.html" %} 
+{% load render_table from django_tables2 %}
+{% load static %}
+
 
 {% block content %}
 {%include "partials/jumbotron.html" %} 
@@ -8,7 +11,7 @@
             <ul class="eds-breadcrumbs">
                 <li class="eds-breadcrumbs__item">
                     <a class="eds-breadcrumbs__item--link eds-text-bm eds-text-color--grey-600" href="/" data-spec="breadcrumbs-link">
-                        {% if is_eb_user %}
+                        {% if is_organizer %}
                         Managed Events
                         {% else %}
                         Events to Evaluate
@@ -23,7 +26,7 @@
                         </i>
                     </span>
                 </li>
-                {% if is_eb_user %}
+                {% if is_organizer %}
                 <li class="eds-breadcrumbs__item">
                     <a class="eds-breadcrumbs__item--link eds-text-bm eds-text-color--grey-600" href="{% url 'docs' event_id %}" data-spec="breadcrumbs-link">
                         {{ event.name }}
@@ -45,7 +48,7 @@
         </div>
     </div>
     <ul class="nav nav-tabs mb-3">
-        {% if is_eb_user %}
+        {% if is_organizer %}
         <li class="nav-item">
             <a class="nav-link" href="{% url 'docs' event_id %}">Requirements</a>
         </li>
@@ -65,217 +68,20 @@
         </li>
         {% endif %}
     </ul>
-    {% if is_eb_user %}
-    <div class="container" id='organizer-div'>
-        <div class="row pb-2">
-            <div class="col">
-                <h1>Submissions</h1>
+
+    <div class="row justify-content-end">
+        <form method="get" class="form-inline">
+            {{ filter.form.non_field_errors }}
+            <div class="form-group">
+                {{ filter.form.state.errors }}
+                <label for="{{ filter.form.state.name }}">State:</label>
+                {{ filter.form.state }}
             </div>
-        </div>
-        <table class="table table-striped">
-            <thead>
-                <tr class="text-center">
-                    <th scope="col">State</th>
-                    <th scope="col">ID</th>
-                    <th scope="col">Requirement</th>
-                    <th scope="col">Evaluators</th>
-                    <th scope="col">Evaluation</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% if submissions %}
-            {% for submission in submissions %}
-                <tr class="text-center">
-                    <td>
-                        <span class="badge evaluators_states">{{ submission.state }}</span>
-                    </td>
-                    <td>{{ submission.id }}</td>
-                    <td >{{ submission.filesubmission.description }}</td>
-                    <td>
-                        {% if evaluators_cont %}
-                        <a href="{% url 'evaluators' event_id %}"> {{ evaluators_cont }} evaluator{{ evaluators_cont|pluralize }}</a>
-                        {% else %}
-                        <a class="eds-text-color--ui-red" href="{% url 'evaluators' event_id %}"> No evaluators yet</a>
-                        {% endif %}
-                    </td>
-                    <td><button class="btn btn-primary btn-sm">Final Opinion</button></td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                    <tr class="eds-data-table-list-item">
-                        <td colspan="5" class="eds-data-table-list-item__column">
-                            <p>- You still don't have submissions from the attendees.</p>
-                        </td>
-                    </tr>
-                {% endif %}
-            </tbody>
-        </table>
+            <button type="submit" class="btn btn-info">Search</button>
+        </form>
     </div>
-    {% else %}
-    <div class="container hidden_div" id='evaluator-submissions-without-review'>
-        <div class="row pb-2">
-            <div class="col">
-                <h1>To Review</h1>
-            </div>
-        </div>
-        <table class="table table-striped">
-            <thead>
-                <tr class="text-center">
-                    <th scope="col">Status</th>
-                    <th scope="col">ID</th>
-                    <th scope="col">Requirement</th>
-                    <th scope="col">Preview/Download</th>
-                    <th scope="col">Evaluate</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% if submissions_without_review %}
-            {% for submission in submissions_without_review %}
-                <tr class="text-center">
-                    <td>
-                        <span class="badge evaluators_states">
-                            {% if submission.state == 'pending' or submission.state == 'evaluated' %}
-                                pending
-                            {% else %}
-                                evaluated
-                            {% endif %}
-                        </span>
-                    </td>
-                    <td>{{ submission.id }}</td>
-                    <td >{{ submission.textsubmission.description }}
-                        {{ submission.filesubmission.description }}</td>
-                    <td>
-                        <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
-                            <a href="#">
-                                <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
-                                    <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
-                                        <svg id="eds-icon--eye_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                            <path id="eds-icon--eye_base" fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M11.9 6.5C6.4 6.5 2 12.7 2 12.7s4.4 6.2 9.9 6.2 9.9-6.2 9.9-6.2-4.4-6.2-9.9-6.2zm0 11.3c-3.9 0-7.4-3.6-8.6-5.1 1.2-1.5 4.7-5.1 8.6-5.1 3.9 0 7.4 3.6 8.6 5.1-1.2 1.5-4.7 5.1-8.6 5.1"></path>
-                                            <path id="eds-icon--eye_circle" fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M11.9 9.1c-1.9 0-3.5 1.6-3.5 3.6s1.5 3.6 3.5 3.6 3.5-1.6 3.5-3.6-1.6-3.6-3.5-3.6zm0 6.1c-1.4 0-2.5-1.1-2.5-2.6 0-1.4 1.1-2.6 2.5-2.6s2.5 1.1 2.5 2.6-1.1 2.6-2.5 2.6z"></path>
-                                        </svg>
-                                    </i>
-                                </button>
-                            </a>
-                        </span>
-                        <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
-                            <a href="{{ submission.filesubmission.file.url }}">
-                                <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
-                                    <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
-                                        <svg id="eds-icon--download_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                            <path id="eds-icon--download_base" fill="#231F20" d="M16 16v1h5v4H3v-4h5v-1H2v6h20v-6z"></path>
-                                            <path fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M17.3 11.4l-4.8 4.7V2h-1v14.1l-4.8-4.7-.7.7 6 5.9 6-5.8z"></path>
-                                        </svg>
-                                    </i>
-                                </button>
-                            </a>
-                        </span>
-                    </td>
-                    <td>
-                        <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
-                            <a href="{% url 'review' event_id submission.id %}">
-                                <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
-                                    <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <g id="Clipboard" fill="none" fill-rule="evenodd">
-                                                <path d="M18 3h-3V2H9v1H6.052L6 4H4v18h16V4h-2V3zm-1 2H7V4v.026h2l1.027.004L10.025 3H14v1h3v1zM7 19V8H6v12h12V8h-1v11H7zm-2 2V5h1v-.159V6h12V5h1v16H5zm4-9v1h6v-1H9zm0-3v1h6V9H9zm0 6v1h6v-1H9z" id="Combined-Shape" fill="#45494E"/>
-                                            </g>
-                                        </svg>
-                                    </i>
-                                </button>
-                            </a>
-                        </span>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr class="eds-data-table-list-item">
-                    <td colspan="5" class="eds-data-table-list-item__column">
-                        <p> - Great Work!<small>It seems that you review all the submission yet.</small></p>
-                    </td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
-    <div class="container hidden_div" id='evaluator-submissions-with-review'>
-        <div class="row pb-2">
-            <div class="col">
-                <h1>Reviewed</h1>
-            </div>
-        </div>
-        <table class="table table-striped">
-            <thead>
-                <tr class="text-center">
-                    <th scope="col">Status</th>
-                    <th scope="col">ID</th>
-                    <th scope="col">Requirement</th>
-                    <th scope="col">Preview/Download</th>
-                    <th scope="col">Evaluate</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% if submissions_with_review %}
-            {% for submission in submissions_with_review %}
-                <tr class="text-center">
-                    <td>
-                        <span class="badge evaluators_states">
-                            {% if submission.0.state == 'pending' %}
-                                pending
-                            {% else %}
-                                evaluated
-                            {% endif %}
-                        </span>
-                    </td>
-                    <td>{{ submission.0.id }}</td>
-                    <td >{{ submission.0.filesubmission.description}}
-                    {{submission.0.textsubmission.description }}</td>
-                    <td>
-                        <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
-                            <a href="#">
-                                <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
-                                    <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
-                                        <svg id="eds-icon--eye_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                            <path id="eds-icon--eye_base" fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M11.9 6.5C6.4 6.5 2 12.7 2 12.7s4.4 6.2 9.9 6.2 9.9-6.2 9.9-6.2-4.4-6.2-9.9-6.2zm0 11.3c-3.9 0-7.4-3.6-8.6-5.1 1.2-1.5 4.7-5.1 8.6-5.1 3.9 0 7.4 3.6 8.6 5.1-1.2 1.5-4.7 5.1-8.6 5.1"></path>
-                                            <path id="eds-icon--eye_circle" fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M11.9 9.1c-1.9 0-3.5 1.6-3.5 3.6s1.5 3.6 3.5 3.6 3.5-1.6 3.5-3.6-1.6-3.6-3.5-3.6zm0 6.1c-1.4 0-2.5-1.1-2.5-2.6 0-1.4 1.1-2.6 2.5-2.6s2.5 1.1 2.5 2.6-1.1 2.6-2.5 2.6z"></path>
-                                        </svg>
-                                    </i>
-                                </button>
-                            </a>
-                        </span>
-                        <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
-                            <a href="{{ submission.filesubmission.file.url }}">
-                                <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
-                                    <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
-                                        <svg id="eds-icon--download_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                            <path id="eds-icon--download_base" fill="#231F20" d="M16 16v1h5v4H3v-4h5v-1H2v6h20v-6z"></path>
-                                            <path fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M17.3 11.4l-4.8 4.7V2h-1v14.1l-4.8-4.7-.7.7 6 5.9 6-5.8z"></path>
-                                        </svg>
-                                    </i>
-                                </button>
-                            </a>
-                        </span>
-                    </td>
-                    <td>
-                        {% if submission.1 %}
-                            <span class="badge evaluators_states">accepted</span>
-                        {% else %}
-                            <span class="badge evaluators_states">rejected</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr class="eds-data-table-list-item">
-                    <td colspan="5" class="eds-data-table-list-item__column">
-                        <p>- You still don't have submissions reviewed.</p>
-                    </td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
-    {% endif %}
+    {% render_table table 'partials/submissions_table.html' %}
+
 </div>
-{% load static %}
 <script src="{% static 'js/evaluators.js' %}"></script>
 {% endblock content %}
