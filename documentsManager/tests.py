@@ -908,10 +908,15 @@ class EvaluatorCreateReview(TestBase):
         )
         file_doc = FileDoc.objects.create(event=self.event)
         file = File(open('runtime.txt', 'rb'))
+        attendee = Attendee.objects.create(
+            email='prueba@ejemplo.com',
+            name='John Doe'
+        )
         file_submission = FileSubmission.objects.create(
             file_doc=file_doc,
             file=file,
             event=self.event,
+            attendee=attendee
         )
         self.submission = Submission.objects.get(id=file_submission.submission_ptr_id)
         User.objects.create_superuser(
@@ -1077,12 +1082,16 @@ class FormsTest(TestBase):
 
     def test_validate_files_submissions(self):
         event = Event.objects.create(eb_event_id=123, organizer=self.user)
+        attendee = Attendee.objects.create(
+            email='prueba@ejemplo.com',
+            name='John Doe'
+        )
         file_doc = FileDoc.objects.create(event=event)
         key = '{}_file'.format(file_doc.id)
         values = {
             key: ''
         }
-        result = validate_files_submissions(values, event.id)
+        result = validate_files_submissions(values, event.id, attendee.id)
         self.assertEqual(result, True)
 
     def test_Submission_Form(self):
@@ -1110,14 +1119,20 @@ class FormsTest(TestBase):
 
 
 class FileSubmissionTest(TestBase):
+
     def test_create_a_file_submission(self):
         event = Event.objects.create(eb_event_id=123, organizer=self.user)
         file_doc = FileDoc.objects.create(event=event)
         file = File(open('runtime.txt', 'rb'))
+        attendee = Attendee.objects.create(
+            email='prueba@ejemplo.com',
+            name='John Doe'
+        )
         file_submission = FileSubmission.objects.create(
             file_doc=file_doc,
             file=file,
             event=event,
+            attendee=attendee
         )
         result = isinstance(file_submission, FileSubmission)
         self.assertTrue(result)
