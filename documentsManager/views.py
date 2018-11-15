@@ -17,6 +17,7 @@ from django.views.generic import (
     CreateView,
     DeleteView,
     FormView,
+    DetailView,
     UpdateView,
 )
 from django.views.generic.base import TemplateView
@@ -39,13 +40,14 @@ from .forms import (
     ReviewForm,
 )
 from .models import (
-    FileDoc,
-    Event,
-    TextDoc,
+    AttendeeCode,
     Evaluator,
     EvaluatorEvent,
+    Event,
+    FileDoc,
+    Review,
     Submission,
-    AttendeeCode,
+    TextDoc,
 )
 from .tables import SubmissionsTable
 from .utils import (
@@ -460,7 +462,6 @@ class SubmissionsList(SingleTableMixin, FilterView):
     table_class = SubmissionsTable
     model = Submission
     template_name = 'submissions.html'
-
     filterset_class = SubmissionFilter
 
     def get_context_data(self, **kwargs):
@@ -493,8 +494,29 @@ class SubmissionsList(SingleTableMixin, FilterView):
         return context
 
 
-class SubmissionView(TemplateView):
+@method_decorator(login_required, name='dispatch')
+class SubmissionView(DetailView, LoginRequiredMixin):
+    model = Submission
     template_name = 'submission.html'
+    pk_url_kwarg = 'submission_id'
+
+    def get_context_data(self, **kwargs):
+        context = super(SubmissionView, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        context['event_id'] = event_id
+        event = Event.objects.get(id=event_id)
+        token = get_auth_token(self.request.user)
+        eb_event = get_one_event_api(token, event.eb_event_id)
+        context['event'] = parse_events(eb_event)[0]
+        context['reviews'] = Review.objects.filter(submission_id=self.object.id)
+        submission = Submission.objects.get(id=self.kwargs['submission_id'])
+        try:
+            submission.textsubmission
+            context['submission_type'] = 'TEXT'
+        except submission.DoesNotExist:
+            submission.filesubmission
+            context['submission_type'] = 'FILE'
+        return context
 
 
 @method_decorator(login_required, name='dispatch')
