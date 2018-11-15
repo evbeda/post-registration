@@ -185,9 +185,10 @@ def send_success_submission_email(attendee, docs):
     return mail_sended
 
 
-def validate_files_submissions(files, id_event):
+def validate_files_submissions(files, id_event, attendee_id):
     event = Event.objects.get(pk=id_event)
     file_docs = FileDoc.objects.filter(event=event)
+    attendee = Attendee.objects.get(pk=attendee_id)
     for file_doc in file_docs:
         name = '{}_file'.format(file_doc.id)
         if name not in files.keys():
@@ -196,6 +197,7 @@ def validate_files_submissions(files, id_event):
             file_doc=file_doc,
             file=files[name],
             event=event,
+            attendee=attendee
         )
     return True
 

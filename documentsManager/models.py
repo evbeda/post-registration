@@ -67,6 +67,67 @@ class Event(models.Model):
         db_table = 'Event'
 
 
+class Evaluator(models.Model):
+    name = models.CharField(max_length=20)
+    email = models.EmailField(unique=True)
+    event = models.ManyToManyField(Event, through='EvaluatorEvent')
+
+    def __str__(self):
+        return self.name
+
+    class Meta(object):
+        db_table = 'Evaluator'
+
+
+class EvaluatorEvent(models.Model):
+    STATES = (
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    )
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    evaluator = models.ForeignKey(Evaluator, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=STATES,
+        default='pending',
+    )
+    invitation_code = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
+
+    def __str__(self):
+        return self.evaluator.name
+
+    class Meta:
+        db_table = 'EvaluatorEvent'
+
+
+class Attendee(models.Model):
+    email = models.EmailField()
+    name = models.CharField(blank=False, max_length=255)
+    eb_user_id = models.CharField(max_length=100, null=False)
+
+    class Meta:
+        db_table = 'Attendee'
+
+
+class AttendeeCode(models.Model):
+    code = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
+    available = models.BooleanField(default=True)
+    attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('attendee', 'event')
+
+
 class FileType(models.Model):
     name = models.CharField(max_length=20)
     description = models.CharField(max_length=100, blank=True)
@@ -131,8 +192,8 @@ class Submission(models.Model):
     )
     state = models.CharField(max_length=20, choices=STATES, default='pending')
     date = models.DateField(default=timezone.now)
-    eb_user_id = models.CharField(max_length=100, null=False)
     event = models.ForeignKey(Event, blank=False)
+    attendee = models.ForeignKey(Attendee)
 
     class Meta(object):
         db_table = 'Submission'
@@ -160,53 +221,28 @@ class TextSubmission(Submission):
         db_table = 'TextSubmission'
 
 
-class Evaluator(models.Model):
-    name = models.CharField(max_length=20)
-    email = models.EmailField(unique=True)
-    event = models.ManyToManyField(Event, through='EvaluatorEvent')
-
-    def __str__(self):
-        return self.name
-
-    class Meta(object):
-        db_table = 'Evaluator'
-
-
-class EvaluatorEvent(models.Model):
-    STATES = (
-        ('pending', 'Pending'),
-        ('accepted', 'Accepted'),
-        ('rejected', 'Rejected'),
-    )
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    evaluator = models.ForeignKey(Evaluator, on_delete=models.CASCADE)
-    status = models.CharField(
-        max_length=20,
-        choices=STATES,
-        default='pending',
-    )
-    invitation_code = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        unique=True,
-    )
-
-    def __str__(self):
-        return self.evaluator.name
-
-    class Meta:
-        db_table = 'EvaluatorEvent'
-
-
 class Review(models.Model):
     evaluator = models.ForeignKey(Evaluator)
     submission = models.ForeignKey(Submission)
     date = models.DateField(default=timezone.now)
     aproved = models.BooleanField(unique=True)
+    comment = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
         unique_together = ('evaluator', 'submission')
         db_table = 'Review'
+
+
+class Result(models.Model):
+    date_time = models.DateTimeField(datetime.datetime.now())
+    aproved = models.BooleanField(unique=True)
+    comment = models.CharField(max_length=500, blank=True, null=True)
+    submission = models.OneToOneField(
+        Submission,
+    )
+
+    class Meta:
+        db_table = 'Result'
 
 
 class UserWebhook(models.Model):
@@ -218,25 +254,3 @@ class UserWebhook(models.Model):
 
     class Meta:
         db_table = 'UserWebhook'
-
-
-class Attendee(models.Model):
-    email = models.EmailField()
-    name = models.CharField(blank=False, max_length=255)
-
-    class Meta:
-        db_table = 'Attendee'
-
-
-class AttendeeCode(models.Model):
-    code = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        unique=True,
-    )
-    available = models.BooleanField(default=True)
-    attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('attendee', 'event')

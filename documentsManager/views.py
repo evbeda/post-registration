@@ -536,8 +536,10 @@ class ReviewView(FormView, LoginRequiredMixin):
 
     def add_review(self, form):
         new_review = form.save(commit=False)
-        new_review.submission = Submission.objects.get(id=self.kwargs['submission_id'])
-        new_review.evaluator = Evaluator.objects.get(email=self.request.user.email)
+        new_review.submission = Submission.objects.get(
+            id=self.kwargs['submission_id'])
+        new_review.evaluator = Evaluator.objects.get(
+            email=self.request.user.email)
         new_review.aproved = self.is_aprove
         new_review.save()
         return
@@ -554,8 +556,9 @@ class AcceptInvitationView(TemplateView):
         evaluator_event.status = 'accepted'
         evaluator_event.save()
         evaluator = Evaluator.objects.get(pk=evaluator_event.evaluator.id)
+        event = Event.objects.get(pk=evaluator_event.event.id)
         FROM = 'kaizendev18@gmail.com'
-        TO = 'martinvalles@eventbrite.com'
+        TO = event.organizer.email
         SUBJECT = 'A new Evaluator for your event has accepted.'
         html_content = render_to_string('email/new_evaluator.html', {
             'evaluator': evaluator})
