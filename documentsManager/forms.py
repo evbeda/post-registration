@@ -226,7 +226,8 @@ class SubmissionForm(Form):
         if len(self.files):
             files_validation = validate_files_submissions(
                 self.files,
-                self.data.get('event_id')
+                self.data.get('event_id'),
+                self.data.get('attendee_id'),
             )
         text_validation = validate_text_submissions(self.data.keys())
         if files_validation and text_validation:
