@@ -865,6 +865,112 @@ class EvaluatorUpdateTest(TestBase):
 
 
 @patch('documentsManager.views.get_one_event_api')
+class DocDeleteTest(TestBase):
+    def setUp(self):
+        super(DocDeleteTest, self).setUp()
+        self.event = self.create_event()
+        self.file_doc = FileDoc.objects.create(event=self.event)
+        self.text_doc = TextDoc.objects.create(event=self.event)
+
+    def test_text_doc_delete_view(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        self.client.get(
+            reverse(
+                'delete-textdoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.text_doc.id,
+                }
+            ),
+        )
+        response = self.client.post(
+            reverse(
+                'delete-textdoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.text_doc.id,
+                }
+            ),
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                'docs',
+                kwargs={'event_id': self.event.id}
+            )
+        )
+
+    def test_file_doc_delete_view(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        self.client.get(
+            reverse(
+                'delete-filedoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.file_doc.id,
+                }
+            ),
+        )
+        response = self.client.post(
+            reverse(
+                'delete-filedoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.file_doc.id,
+                }
+            ),
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                'docs',
+                kwargs={'event_id': self.event.id}
+            )
+        )
+
+
+@patch('documentsManager.views.get_one_event_api')
+class DocUpdateTest(TestBase):
+    def setUp(self):
+        super(DocUpdateTest, self).setUp()
+        self.event = self.create_event()
+        self.file_doc = FileDoc.objects.create(event=self.event, name='prueba')
+        self.text_doc = TextDoc.objects.create(event=self.event, name='prueba')
+
+    def test_text_doc_update_view(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        self.client.get(
+            reverse(
+                'edit-textdoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.text_doc.id,
+                }
+            ),
+        )
+        data = {
+            'name': 'CV',
+            'is_optional': 'on',
+            'measure': 'Words',
+            'min': '200',
+            'max': '300',
+        }
+        response = self.client.post(
+            reverse(
+                'edit-textdoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.text_doc.id,
+                }
+            ),
+            data,
+        )
+        self.assertEqual(response.status_code, 302)
+        self.text_doc.refresh_from_db()
+        self.assertEqual(self.text_doc.name, 'CV')
+
+
+@patch('documentsManager.views.get_one_event_api')
 class EvaluatorDeleteTest(TestBase):
 
     def setUp(self):
