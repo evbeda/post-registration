@@ -600,6 +600,141 @@ class SignUpView(TestBase):
         self.assertEqual(view.url_name, 'signup')
 
 
+class FileDocUpdateTest(TestBase):
+
+    def setUp(self):
+        super(FileDocUpdateTest, self).setUp()
+        file_type = FileType.objects.create(name='format')
+        self.event = self.create_event()
+        self.file_doc = FileDoc.objects.create(
+            name='test',
+            quantity=1,
+            is_optional=True,
+            event=self.event
+        )
+        self.file_doc.file_type.add(file_type)
+
+    def test_file_doc_response_status(self):
+        response = self.client.get(
+            reverse(
+                'edit-filedoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.file_doc.pk
+                }
+            )    
+        )
+        self.assertEquals(response.status_code, 200)
+
+    def test_file_doc_uses_correct_template(self):
+        response = self.client.get(
+            reverse(
+                'edit-filedoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.file_doc.pk
+                }
+            )    
+        )
+        self.assertTemplateUsed(response, 'file_doc_update_form.html')
+
+    def test_file_doc_response_content(self):
+        response = self.client.get(
+            reverse(
+                'edit-filedoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.file_doc.pk
+                }
+            )    
+        )
+        self.assertEqual(response.context_data['event_id'], str(self.event.id))
+
+
+class TextDocUpdateTest(TestBase):
+
+    def setUp(self):
+        super(TextDocUpdateTest, self).setUp()
+        self.event = self.create_event()
+        self.text_doc = TextDoc.objects.create(
+            name='test',
+            description='description',
+            is_optional=True,
+            measure='Words',
+            min='10',
+            max='50',
+            event=self.event,
+        )
+
+    def test_text_doc_response_status(self):
+        response = self.client.get(
+            reverse(
+                'edit-textdoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.text_doc.pk
+                }
+            )    
+        )
+        self.assertEquals(response.status_code, 200)
+
+    def test_text_doc_uses_correct_template(self):
+        response = self.client.get(
+            reverse(
+                'edit-textdoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.text_doc.pk
+                }
+            )    
+        )
+        self.assertTemplateUsed(response, 'text_doc_update_form.html')
+
+    def test_text_doc_response_content(self):
+        response = self.client.get(
+            reverse(
+                'edit-textdoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.text_doc.pk
+                }
+            )    
+        )
+        self.assertEqual(response.context_data['event_id'], str(self.event.id))
+
+    @patch('documentsManager.utils.Eventbrite.get')
+    def test_text_doc_success_redirect(self, mock_eventbrite_get):
+        mock_eventbrite_get.return_value = MOCK_EVENTS_API
+        data = {
+            'name':'updated name',
+            'description':'updated description',
+            'is_optional':True,
+            'measure':'Words',
+            'min':'20',
+            'max':'60',
+            'event':self.event,
+        }
+        response = self.client.post(
+            reverse(
+                'edit-textdoc',
+                kwargs={
+                    'event_id': self.event.id,
+                    'pk': self.text_doc.pk
+                }
+            ),
+            data   
+        )
+        self.assertRedirects(
+            response, 
+            reverse(
+                'docs',
+                kwargs={
+                    'event_id': self.event.id,
+                },
+            )
+        )
+
+
 class EvaluatorTest(TestBase):
 
     def setUp(self):
@@ -1249,6 +1384,79 @@ class OrganizerSubmission(TestBase):
             ),
         )
         self.assertEqual(response.context_data['object'].id, self.text.id)
+
+    @patch('documentsManager.views.get_one_event_api')
+    def test_submission_view_template(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        response = self.client.get(
+            reverse('submission', 
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.file.id
+                }
+            )
+        )
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'submission.html')
+
+    @patch('documentsManager.views.get_one_event_api')
+    def test_submission_view_name(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        view = resolve(reverse(
+            'submission',
+            kwargs={
+                'event_id': self.event.id,
+                'submission_id': self.file.id
+            }    
+            )
+        )
+        self.assertEqual(view.url_name, 'submission')
+
+    @patch('documentsManager.views.get_one_event_api')
+    def test_submission_context(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        review = Review.objects.create(
+            evaluator=self.evaluator,
+            submission=self.file,
+            aproved=True,
+            comment='Brief commentary'
+        )
+        response = self.client.get(
+            reverse('submission', 
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.file.id
+                }
+            )
+        )
+        self.assertContains(response, review.id)
+        self.assertEqual(response.context_data['event_id'], str(self.event.id))
+        self.assertEqual(response.context_data['submission_type'], 'FILE')
+
+    @patch('documentsManager.views.get_one_event_api')
+    def test_submission_reviews_in_context(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        review_01 = Review.objects.create(
+            evaluator=self.evaluator,
+            submission=self.file,
+            aproved=True,
+            comment='Brief commentary 01'
+        )
+        review_02 = Review.objects.create(
+            evaluator=self.create_evaluator(name='Evaluator 02', email='evaluator02@ejemplo.com'),
+            submission=self.file,
+            aproved=True,
+            comment='Brief commentary 02'
+        )
+        response = self.client.get(
+            reverse('submission', 
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.file.id
+                }
+            )
+        )
+        self.assertEqual(len(response.context_data['reviews']), 2)
 
 
 class AcceptInvitationViewTest(TestBase):

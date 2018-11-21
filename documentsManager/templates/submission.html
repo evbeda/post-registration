@@ -48,148 +48,188 @@
             </ul>
         </div>
     </div>
-    <ul class="nav nav-tabs mb-3">
-        <li class="nav-item">
-            <a class="nav-link active" id="information-nav">Information</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="reviews-nav">Reviews</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="evaluators-nav">Evaluators</a>
-        </li>
-    </ul>
-    <div class="container">
-        <div class="row justify-content-left" id='information-div'>
-            <div class="col-12 col-md-4 mt-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>ID: </strong>{{ object.id }}</h5>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>Date of Submission: </strong>{{ object.date }}</h5>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>Requirement: </strong>{{ object.filesubmission.description }}
-                                {{ object.textsubmission.description }}</h5>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>Autor: </strong> Attende 1</h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% if submission_type == 'TEXT' %}
-            <div class="col-12 col-md-4 mt-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>Preview: </strong></h5>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% elif submission_type == 'FILE' %}
-            <div class="col-12 col-md-4 mt-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>Download File: </strong><span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
-                                    <a href="{{ submission.filesubmission.file.url }}">
-                                        <button class="eds-btn--button eds-btn--none eds-btn--icon-only text-center" type="button">
-                                            <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
-                                                <svg id="eds-icon--download_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                                    <path id="eds-icon--download_base" fill="#231F20" d="M16 16v1h5v4H3v-4h5v-1H2v6h20v-6z"></path>
-                                                    <path fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M17.3 11.4l-4.8 4.7V2h-1v14.1l-4.8-4.7-.7.7 6 5.9 6-5.8z"></path>
-                                                </svg>
-                                            </i>
-                                        </button>
-                                    </a>
-                                </span></h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
+
+    <div class="card text-center">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="information-nav">Information</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="reviews-nav">Reviews</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="evaluators-nav">Evaluators</a>
+                </li>
+            </ul>
         </div>
-        <div class="row justify-content-left" id='reviews-div'>
-            <div class="col-12 col-md-4 mt-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>Review: </strong>{{ object.state }}</h5>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>Result: </strong>RESULTADO</h5>
+        <div class="card-body" id='information-div'>
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <h5 class="card-title"><strong>Requirement</strong></h5>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="card-title"><strong>ID</strong></h5>
+                </div>
+            </div>
+            <div class="row justify-content-center mb-4">
+                    <div class="col-md-4">
+                        <p class="card-text">
+                            {{ object.id }}
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="card-text">
+                            {{ object.filesubmission.description }}
+                            {{ object.textsubmission.description }}
+                        </p>
+                    </div>
+                </div>
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <h5 class="card-title"><strong>Autor</strong></h5>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="card-title"><strong>Date of Submission</strong></h5>
+                </div>
+            </div>
+            <div class="row justify-content-center mb-4">
+                <div class="col-md-4">
+                    <p class="card-text">
+                        {{ object.attendee }}
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    {{ object.date }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {% if submission_type == 'TEXT' %}
+                    <div class="col-12 col-md-4 mt-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row mb-2">
+                                    <div class="col text-left justify-content-center">
+                                        <h5><strong>Preview: </strong></h5>
+                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                                        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                                        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+                                        cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+                                        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    {% elif submission_type == 'FILE' %}
+                    <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                        <a href="{{ submission.filesubmission.file.url }}">
+                            <button class="eds-btn--button eds-btn--none eds-btn--icon-only text-center" type="button">
+                                <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                    <svg id="eds-icon--download_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path id="eds-icon--download_base" fill="#231F20" d="M16 16v1h5v4H3v-4h5v-1H2v6h20v-6z"></path>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" fill="#231F20" d="M17.3 11.4l-4.8 4.7V2h-1v14.1l-4.8-4.7-.7.7 6 5.9 6-5.8z"></path>
+                                    </svg>
+                                </i>
+                            </button>
+                        </a>
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-body" id='reviews-div'>
+            <div class="row justify-content-center mb-2">
+                <div class="col-md-4">
+                    <h5 class="card-title"><strong>Review</strong></h5>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="card-title">
+                        <strong>Result</strong>
+                    </h5>
+                </div>
+            </div>
+            <div class="row justify-content-center mb-2">
+                <div class="col-md-4">
+                    <p class="card-text">
+                        {% if object.state == "pending" %}
+                            <div tabindex="0" role="button" class="eds-tag eds-tag--interactive text-white bg-secondary">
+                                <span class="eds-tag__text eds-tag__item eds-text-bs eds-text-weight--heavy">
+                                    {{ object.state }}
+                                </span>
+                            </div>
+                        {% elif object.state == "accepted" %}
+                            <div tabindex="0" role="button" class="eds-tag eds-tag--interactive text-white bg-success">
+                                <span class="eds-tag__text eds-tag__item eds-text-bs eds-text-weight--heavy">
+                                    {{ object.state }}
+                                </span>
+                            </div>
+                        {% elif object.state == "rejected" %}
+                            <div tabindex="0" role="button" class="eds-tag eds-tag--interactive text-white bg-danger">
+                                <span class="eds-tag__text eds-tag__item eds-text-bs eds-text-weight--heavy">
+                                    {{ object.state }}
+                                </span>
+                            </div>
+                        {% elif object.state == "evaluated" %}
+                            <div tabindex="0" role="button" class="eds-tag eds-tag--interactive text-white bg-info">
+                                <span class="eds-tag__text eds-tag__item eds-text-bs eds-text-weight--heavy">
+                                    {{ object.state }}
+                                </span>
+                            </div>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p class="card-text">
+                        Hardcoded RESULTADO
+                    </p>
                 </div>
             </div>
             {% if reviews %}
-            {%for review in reviews %}
-            <div class="col-12 col-md-4 mt-4">
-                <div class="card">
+                {%for review in reviews %}
                     <div class="card-body">
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>Evaluator: </strong>{{ review.evaluator.name }}</h5>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>Review: </strong>{% if review.aproved %}Approve
-                                {% else %}Rejected{% endif %}</h5>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>Date of Review: </strong>{{ review.date }}</h5>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>Justify: </strong>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod.</h5>
+                        <div class="row justify-content-center">
+                            <div class="col-md-6">
+                                <div class="card text-left">
+                                    {% if review.aproved %}
+                                    <div class="card-header text-white bg-success">
+                                    {% else %}
+                                    <div class="card-header text-white bg-danger">
+                                    {% endif %}
+                                        <div class="row justify-content-between">
+                                            <div class="col">
+                                                {{ review.evaluator.name }}
+                                            </div>
+                                            <div class="col text-right">
+                                                {{ review.date }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            {% if review.aproved %}
+                                                Approved
+                                            {% else %}
+                                                Rejected
+                                            {% endif %}
+                                        </h5>
+                                        <p class="card-text">
+                                            {{ review.comment }}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            {% endfor %}
+                {% endfor %}
             {% endif %}
         </div>
-        <div class="row justify-content-left" id='evaluators-div'>
-            <div class="col-12 col-md-4 mt-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row mb-2">
-                            <div class="col text-left justify-content-center">
-                                <h5><strong>EVALUATORS</strong></h5>
-                            </div>
-                        </div>
-                    </div>
+        <div class="card-body" id='evaluators-div'>
+            <div class="row justify-content-center mb-2">
+                <div class="col">
+                    <h5><strong>EVALUATORS</strong></h5>
                 </div>
             </div>
         </div>

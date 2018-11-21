@@ -292,6 +292,7 @@ class LandingView(FormView):
         event = Event.objects.filter(pk=event_id).first()
         if 'code' in self.kwargs:
             context['code'] = self.kwargs['code']
+            context['attendee'] = AttendeeCode.objects.get(code=self.kwargs['code']).attendee
         if event:
             context['event'] = event
             eb_event = get_one_event_api(
@@ -508,7 +509,9 @@ class SubmissionView(DetailView, LoginRequiredMixin):
         token = get_auth_token(self.request.user)
         eb_event = get_one_event_api(token, event.eb_event_id)
         context['event'] = parse_events(eb_event)[0]
-        context['reviews'] = Review.objects.filter(submission_id=self.object.id)
+        context['reviews'] = Review.objects.filter(
+            submission_id=self.object.id
+        )
         submission = Submission.objects.get(id=self.kwargs['submission_id'])
         try:
             submission.textsubmission
