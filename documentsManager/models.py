@@ -110,6 +110,9 @@ class Attendee(models.Model):
     name = models.CharField(blank=False, max_length=255)
     eb_user_id = models.CharField(max_length=100, null=False)
 
+    def __str__(self):
+        return '{} ({})'.format(self.name, self.email)
+
     class Meta:
         db_table = 'Attendee'
 
@@ -225,7 +228,7 @@ class Review(models.Model):
     evaluator = models.ForeignKey(Evaluator)
     submission = models.ForeignKey(Submission)
     date = models.DateField(default=timezone.now)
-    aproved = models.BooleanField(unique=True)
+    aproved = models.BooleanField()
     comment = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:

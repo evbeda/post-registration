@@ -54,11 +54,6 @@ urlpatterns = [
         name='doc_form'
     ),
     url(
-        r'^event/(?P<event_id>\d+)/docs/file/(?P<pk>\d+)/edit/$',
-        FileDocUpdate.as_view(),
-        name="edit-filedoc"
-    ),
-    url(
         r'^event/(?P<event_id>\d+)/evaluator/add/$',
         EvaluatorCreate.as_view(),
         name='evaluator_create'
@@ -77,6 +72,11 @@ urlpatterns = [
         r'^event/(?P<event_id>\d+)/evaluators/$',
         EvaluatorList.as_view(),
         name='evaluators'
+    ),
+    url(
+        r'^event/(?P<event_id>\d+)/docs/file/(?P<pk>\d+)/edit/$',
+        FileDocUpdate.as_view(),
+        name="edit-filedoc"
     ),
     url(
         r'^event/(?P<event_id>\d+)/docs/text/(?P<pk>\d+)/edit/$',
