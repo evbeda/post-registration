@@ -1429,7 +1429,6 @@ class OrganizerSubmission(TestBase):
                 }
             )
         )
-        self.assertContains(response, review.id)
         self.assertEqual(response.context_data['event_id'], str(self.event.id))
         self.assertEqual(response.context_data['submission_type'], 'FILE')
 
