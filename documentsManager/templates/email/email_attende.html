@@ -16,13 +16,13 @@
                 <table>
                     <tr>
                         <td>
-                            <h3>{{ name }}: Thanks For Buying a ticket</h3>
-                            <p class="lead">We are glad for your visit to the {{ event.name }} event.</p>
+                            <h3>{{ name }}: Thanks For buying a ticket</h3>
+                            <p class="lead">We are glad to see you in the {{ event.name }} event.</p>
                             <p><img src="{{ event.logo }}" alt="event logo"/></p>
-                            <h3>You want to join us?</h3>
+                            <h3>But there is one more step...</h3>
                             <p class="callout">
-                                For complete your registration we need you to upload the submissions that we request for
-                                the event. Do it in the link below
+                                In order to complete your registration, you have to upload the required documentation to be evaluated by our committee.
+                                You can do it clicking in the button below.
                             </p>
                             <a href="{{ host }}{% url 'landing' id code %}" target=”_blank”
                                class="btn">Complete registration</a>
