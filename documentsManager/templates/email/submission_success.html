@@ -16,16 +16,19 @@
                 <table>
                     <tr>
                         <td>
-                            <h3>Your submission was succesful uploaded</h3>
+                            <h3>Your submission was succesfully uploaded.</h3>
+                            <p>Uploaded files:</p>
+                            <ul class="list-group list-group-flush">
                             {% for doc in docs %}
-                                <p class="lead">Your {{ doc.name }} was succesful uploaded</p>
+                                <li class="list-group-item">Your {{ doc.name }} was succesful uploaded</li>
                             {% endfor %}
+                            </ul>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <p class="callout">
-                                We will contact you shortly to inform you of the final decision on your submissions
+                                We will contact you soon to let you know the final decision made by our committee.
                             </p>
                         </td>
                     </tr>
