@@ -229,7 +229,7 @@ class Review(models.Model):
     submission = models.ForeignKey(Submission)
     date = models.DateField(default=timezone.now)
     aproved = models.BooleanField()
-    comment = models.CharField(max_length=500, blank=True, null=True)
+    justification = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
         unique_together = ('evaluator', 'submission')

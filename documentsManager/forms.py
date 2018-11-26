@@ -281,9 +281,21 @@ class EvaluatorForm(ModelForm):
 
 
 class ReviewForm(forms.ModelForm):
+
     class Meta:
         model = Review
-        fields = []
+        fields = [
+            'justification',
+        ]
+        labels = {
+            'justification': _('Justification'),
+        }
+        widgets = {
+            'justification': Textarea(
+                attrs={
+                    'rows': 3,
+                    'class': 'form-control'}),
+        }
 
     def is_valid(self):
         valid = super(ReviewForm, self).is_valid()

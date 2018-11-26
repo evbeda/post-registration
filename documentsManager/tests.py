@@ -1269,6 +1269,26 @@ class EvaluatorCreateReview(TestBase):
         review = Review.objects.filter(evaluator=self.evaluator, submission=self.file).first()
         self.assertTrue(review.aproved)
 
+    @patch('documentsManager.views.get_one_event_api')
+    def test_evaluator_not_valid(self, mock_get_one_event_api):
+        mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
+        comment = 501 * 'a'
+        r = {
+            'approve': 'Approve',
+            'justification': comment,
+        }
+        response = self.client.post(
+            reverse(
+                'review',
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.file.id,
+                }
+            ),
+            r,
+        )
+        self.assertFalse(response.context_data['form'].is_valid())
+
     def test_evaluator_reject_file_submission(self):
         r = {
             'reject': 'Reject',
@@ -1419,7 +1439,7 @@ class OrganizerSubmission(TestBase):
             evaluator=self.evaluator,
             submission=self.file,
             aproved=True,
-            comment='Brief commentary'
+            justification='Brief commentary'
         )
         response = self.client.get(
             reverse('submission', 
@@ -1439,13 +1459,13 @@ class OrganizerSubmission(TestBase):
             evaluator=self.evaluator,
             submission=self.file,
             aproved=True,
-            comment='Brief commentary 01'
+            justification='Brief commentary 01'
         )
         review_02 = Review.objects.create(
             evaluator=self.create_evaluator(name='Evaluator 02', email='evaluator02@ejemplo.com'),
             submission=self.file,
             aproved=True,
-            comment='Brief commentary 02'
+            justification='Brief commentary 02'
         )
         response = self.client.get(
             reverse('submission', 
