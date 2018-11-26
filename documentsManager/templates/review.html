@@ -41,19 +41,24 @@
                 <div class="col-10 col-md-4">
                     <div class="card mt-3">
                         <div class="card-body errors">
-                            <form method="post">
-                            {% csrf_token %}
-                            <h3>What is your decision after reviewing the submission?</h3>
-                            <hr>
-                            <div class="row">
-                                <div class="col text-center">
-                                    <input type="submit" class="btn btn-success" value="Approve" name="approve">
+                            <form action="" method='post'>
+                                {% csrf_token %}
+                                <div class="doc_req_text">
+                                    {{ form.non_field_errors }}
+                                    <div class="form-group">
+                                        {{ form.justification.errors }}
+                                        <label class="form-check-label" for="{{ form.justification.id_for_label }}">{{ form.justification.label }}:</label>
+                                        {{ form.justification }}
+                                    </div>
+                                    <div class="row justify-content-center align-items-center mt-3">
+                                        <div class="col-4 col-lg-6 text-right">
+                                            <input type='submit' name='approve' value="Approve" class="eds-btn eds-btn--submit eds-btn--fill w-100" />
+                                        </div>
+                                        <div class="col-4 col-lg-6 text-right">
+                                            <input type='submit' name='reject' value="Reject" class="eds-btn eds-btn--submit eds-btn--fill w-100" />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col text-center">
-                                    <input type="submit" class="btn btn-danger" value="Reject" name="reject">
-                                </div>
-                            </div>
-
                             </form>
                         </div>
                     </div>

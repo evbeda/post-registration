@@ -39,6 +39,7 @@
 							{{ table.columns.requirement.header }}
 						{% endif %}
 					</th>
+					{% if table.is_organizer %}
 					<th {{ table.columns.reviews.attrs.th.as_html }} scope='col'>
 						{% if table.columns.reviews.orderable %}
 							<a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">{{ table.columns.reviews.header }}</a>
@@ -53,6 +54,7 @@
 						{{ table.columns.evaluators.header }}
 						{% endif %}
 					</th>
+					{% endif %}
 					<th {{ table.columns.actions.attrs.th.as_html }} scope='col'>
 						{% if table.columns.actions.orderable %}
 							<a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">{{ table.columns.actions.header }}</a>

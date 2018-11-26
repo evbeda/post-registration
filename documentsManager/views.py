@@ -25,9 +25,18 @@ from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 from multi_form_view import MultiFormView
 
-from documentsManager.utils import evaluator_events, parse_events, get_auth_token, get_all_events_api, \
-    get_events_with_venues_api, get_one_event_api, filter_managed_event, filter_no_managed_event, update_dates, \
-    get_access_token_of_event
+from documentsManager.utils import (
+    evaluator_events,
+    parse_events,
+    get_auth_token,
+    get_all_events_api,
+    get_events_with_venues_api,
+    get_one_event_api,
+    filter_managed_event,
+    filter_no_managed_event,
+    update_dates,
+    get_access_token_of_event,
+)
 from .filters import SubmissionFilter
 from .forms import (
     EvaluatorForm,
@@ -49,7 +58,11 @@ from .models import (
     Submission,
     TextDoc,
 )
-from .tables import SubmissionsTable
+from .tables import (
+    SubmissionsTable,
+    SubmissionsTableOrganizer,
+    SubmissionsTableEvaluator,
+)
 from .utils import (
     create_order_webhook_from_view,
 )
@@ -478,19 +491,41 @@ class SubmissionsList(SingleTableMixin, FilterView):
             token = get_auth_token(self.request.user)
         else:
             token = get_access_token_of_event(event)
+            evaluator = Evaluator.objects.get(email=self.request.user.email)
         eb_event = get_one_event_api(token, event.eb_event_id)
         context['event'] = parse_events(eb_event)[0]
         context['evaluators_cont'] = EvaluatorEvent.objects.filter(
-            event=event, status='accepted', ).count()
+            event=event,
+            status='accepted',
+        ).count()
         if self.request.GET:
             filter = SubmissionFilter(
                 self.request.GET,
-                queryset=Submission.objects.filter(event_id=event_id)
+                queryset=Submission.objects.filter(event_id=event_id),
             )
-            table = SubmissionsTable(filter.qs, is_organizer=is_organizer)
+            if is_organizer:
+                table = SubmissionsTableOrganizer(
+                    filter.qs,
+                    is_organizer=is_organizer,
+                )
+            else:
+                table = SubmissionsTableEvaluator(
+                    filter.qs,
+                    is_organizer=is_organizer,
+                    evaluator=evaluator,
+                )
         else:
-            table = SubmissionsTable(Submission.objects.filter(
-                event_id=event_id), is_organizer=is_organizer)
+            if is_organizer:
+                table = SubmissionsTableOrganizer(
+                    Submission.objects.filter(event_id=event_id),
+                    is_organizer=is_organizer,
+                )
+            else:
+                table = SubmissionsTableEvaluator(
+                    Submission.objects.filter(event_id=event_id),
+                    is_organizer=is_organizer,
+                    evaluator=evaluator,
+                )
         context['table'] = table
         return context
 
