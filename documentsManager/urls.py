@@ -22,6 +22,7 @@ from .views import (
     DeclineInvitationView,
     ReviewView,
     SubmissionView,
+    ResultCreate,
 )
 
 urlpatterns = [
@@ -110,7 +111,7 @@ urlpatterns = [
     ),
     url(
         r'event/(?P<event_id>\d+)/submissions/(?P<submission_id>\d+)/close/$',
-        SubmissionsList.as_view(),
+        ResultCreate.as_view(),
         name='close_submission'
     ),
     url(

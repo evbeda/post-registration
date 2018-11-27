@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <h5 class="card-title text-center mb-4">Final Review</h5>
+                        <h6 class="card-subtitle mb-3 text-muted">Define your final review for this submission.</h6>
+                        {% for field in form %}
+                            <div class="form-group">
+                                {{ field.errors }}
+                                <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                <p class="help">{{ field.help_text|safe }}</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        <div class="row justify-content-center text-center">
+                            <div class="col-md-6">
+                                <input type="submit" value="Approve" class="btn btn-success" name="approve_btn" />
+                                <input type="submit" value="Reject" class="btn btn-danger" name="reject_btn" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

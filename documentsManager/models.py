@@ -228,7 +228,7 @@ class Review(models.Model):
     evaluator = models.ForeignKey(Evaluator)
     submission = models.ForeignKey(Submission)
     date = models.DateField(default=timezone.now)
-    aproved = models.BooleanField()
+    approved = models.BooleanField()
     justification = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
@@ -237,11 +237,14 @@ class Review(models.Model):
 
 
 class Result(models.Model):
-    date_time = models.DateTimeField(datetime.datetime.now())
-    aproved = models.BooleanField(unique=True)
-    comment = models.CharField(max_length=500, blank=True, null=True)
+    date_time = models.DateTimeField(default=timezone.now)
+    approved = models.NullBooleanField(default=False)
+    justification = models.CharField(max_length=500, blank=True, null=True)
     submission = models.OneToOneField(
         Submission,
+        blank=True,
+        null=True,
+        unique=True
     )
 
     class Meta:

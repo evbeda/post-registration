@@ -12,7 +12,8 @@ from django.forms import (
     ModelForm,
     ModelMultipleChoiceField,
     NumberInput,
-    Select, TextInput,
+    Select,
+    TextInput,
     Textarea,
     DateInput,
 )
@@ -36,6 +37,8 @@ from .models import (
     User,
     EvaluatorEvent,
     Review,
+    Result,
+    Submission,
 )
 
 
@@ -302,3 +305,28 @@ class ReviewForm(forms.ModelForm):
         if not valid:
             return valid
         return True
+
+class ResultForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(ResultForm, self).__init__(*args, **kwargs)
+        self.is_approved = None
+        self.submission_id = None
+
+    class Meta:
+        model = Result
+        fields = ['justification']
+        widgets = {
+            'justification': TextInput(attrs={
+                'class': 'form-control',
+            }),
+        }
+
+    def save(self):
+        result = super(ResultForm, self).save(commit=False)
+        result.approved = self.is_approved
+        submission = Submission.objects.get(id=self.submission_id)
+        submission.state = 'accepted' if self.is_approved else 'rejected'
+        submission.save()
+        result.submission = submission
+        return result.save()
