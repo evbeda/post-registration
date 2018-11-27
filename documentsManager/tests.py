@@ -624,7 +624,7 @@ class FileDocUpdateTest(TestBase):
                 }
             )    
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_file_doc_uses_correct_template(self):
         response = self.client.get(
@@ -676,7 +676,7 @@ class TextDocUpdateTest(TestBase):
                 }
             )    
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_text_doc_uses_correct_template(self):
         response = self.client.get(
@@ -746,7 +746,7 @@ class EvaluatorTest(TestBase):
 
     def test_evaluator_string_representation(self):
         evaluator = self.create_evaluator()
-        self.assertEquals(str(evaluator), evaluator.name)
+        self.assertEqual(str(evaluator), evaluator.name)
 
     def test_evaluator_verbose_name_plural(self):
         self.assertEqual(
@@ -840,14 +840,14 @@ class EvaluatorListTest(TestBase):
         self.create_evaluator()
         response = self.client.get(
             reverse('evaluators', kwargs={'event_id': event.id}))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_evaluator_uses_correct_template(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
         event = self.create_event()
         response = self.client.get(
             reverse('evaluators', kwargs={'event_id': event.id}))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'evaluators_grid.html')
 
     def test_evaluator_list_response_content(self, mock_get_one_event_api):
@@ -880,13 +880,13 @@ class EvaluatorCreateTest(TestBase):
         self.create_evaluator()
         response = self.client.get(
             reverse('evaluator_create', kwargs={'event_id': event.id}))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_evaluator_uses_correct_template(self):
         event = self.create_event()
         response = self.client.get(
             reverse('evaluator_create', kwargs={'event_id': event.id}))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'evaluator_form.html')
 
     @patch('documentsManager.forms.render_to_string')
@@ -935,7 +935,7 @@ class EvaluatorUpdateTest(TestBase):
                 }
             ),
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_evaluator_update_context(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
@@ -1125,7 +1125,7 @@ class EvaluatorDeleteTest(TestBase):
                 }
             ),
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_evaluator_delete_context(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
@@ -1267,7 +1267,7 @@ class EvaluatorCreateReview(TestBase):
             r,
         )
         review = Review.objects.filter(evaluator=self.evaluator, submission=self.file).first()
-        self.assertTrue(review.aproved)
+        self.assertTrue(review.approved)
 
     @patch('documentsManager.views.get_one_event_api')
     def test_evaluator_not_valid(self, mock_get_one_event_api):
@@ -1304,7 +1304,7 @@ class EvaluatorCreateReview(TestBase):
             r,
         )
         review = Review.objects.filter(evaluator=self.evaluator, submission=self.file).first()
-        self.assertFalse(review.aproved)
+        self.assertFalse(review.approved)
         self.assertEqual(self.file.filesubmission.description(), 'name_prueba')
 
     def test_evaluator_reject_text_submission(self):
@@ -1322,7 +1322,7 @@ class EvaluatorCreateReview(TestBase):
             r,
         )
         review = Review.objects.filter(evaluator=self.evaluator, submission=self.text).first()
-        self.assertFalse(review.aproved)
+        self.assertFalse(review.approved)
         self.assertEqual(self.text.textsubmission.description(), 'description_prueba')
 
     @patch('documentsManager.views.get_one_event_api')
@@ -1416,7 +1416,7 @@ class OrganizerSubmission(TestBase):
                 }
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'submission.html')
 
     @patch('documentsManager.views.get_one_event_api')
@@ -1438,7 +1438,7 @@ class OrganizerSubmission(TestBase):
         review = Review.objects.create(
             evaluator=self.evaluator,
             submission=self.file,
-            aproved=True,
+            approved=True,
             justification='Brief commentary'
         )
         response = self.client.get(
@@ -1458,13 +1458,13 @@ class OrganizerSubmission(TestBase):
         review_01 = Review.objects.create(
             evaluator=self.evaluator,
             submission=self.file,
-            aproved=True,
+            approved=True,
             justification='Brief commentary 01'
         )
         review_02 = Review.objects.create(
             evaluator=self.create_evaluator(name='Evaluator 02', email='evaluator02@ejemplo.com'),
             submission=self.file,
-            aproved=True,
+            approved=True,
             justification='Brief commentary 02'
         )
         response = self.client.get(
@@ -1514,6 +1514,69 @@ class DeclineInvitationViewTest(TestBase):
         )
         evaluator_event.refresh_from_db()
         self.assertEqual(evaluator_event.status, 'rejected')
+
+
+class ResultCreateTest(TestBase):
+
+    def setUp(self):
+        super(ResultCreateTest, self).setUp()
+        self.event = self.create_event()
+        file_doc = FileDoc.objects.create(event=self.event, name='name_prueba')
+        text_doc = TextDoc.objects.create(event=self.event, description='description_prueba')
+        file = File(open('runtime.txt', 'rb'))
+        attendee = Attendee.objects.create(
+            email='prueba@ejemplo.com',
+            name='John Doe'
+        )
+        self.file_submission = FileSubmission.objects.create(
+            file_doc=file_doc,
+            file=file,
+            event=self.event,
+            attendee=attendee
+        )
+        self.text_submission = TextSubmission.objects.create(
+            text_doc=text_doc,
+            content='content',
+            event=self.event,
+            attendee=attendee
+        )
+
+    def test_result_create_view_name(self):
+        view = resolve(
+            reverse(
+                'close_submission',
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.file_submission.id,
+                }
+            )
+        )
+        self.assertEqual(view.url_name, 'close_submission')
+
+    def test_review_create_response_status(self):
+        response = self.client.get(
+            reverse(
+                'close_submission',
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.file_submission.id,
+                }
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_result_uses_correct_template(self):
+        response = self.client.get(
+            reverse(
+                'close_submission',
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.file_submission.id,
+                }
+            )    
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'result_form.html')
 
 
 class FormsTest(TestBase):
@@ -1741,7 +1804,7 @@ class DashboardView(TestBase):
 
     def test_home_resolve_home_not_args(self, mock_create_order_webhook_from_view):
         found = resolve('/')
-        self.assertEquals(found.args, ())
+        self.assertEqual(found.args, ())
 
     def test_home_url_name(self, mock_create_order_webhook_from_view):
         found = resolve('/')

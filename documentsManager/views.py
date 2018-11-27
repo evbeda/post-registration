@@ -47,6 +47,7 @@ from .forms import (
     SubmissionForm,
     EvaluationDateForm,
     ReviewForm,
+    ResultForm,
 )
 from .models import (
     AttendeeCode,
@@ -57,6 +58,7 @@ from .models import (
     Review,
     Submission,
     TextDoc,
+    Result,
 )
 from .tables import (
     SubmissionsTable,
@@ -600,7 +602,7 @@ class ReviewView(FormView, LoginRequiredMixin):
             id=self.kwargs['submission_id'])
         new_review.evaluator = Evaluator.objects.get(
             email=self.request.user.email)
-        new_review.aproved = self.is_aprove
+        new_review.approved = self.is_aprove
         new_review.save()
         return
 
@@ -641,3 +643,33 @@ class DeclineInvitationView(View):
         evaluator_event.status = 'rejected'
         evaluator_event.save()
         return HttpResponse('GET request!')
+
+
+class ResultCreate(CreateView):
+    model = Result
+    template_name = 'result_form.html'
+    form_class = ResultForm
+
+    def post(self, request, **kwargs):
+        form = ResultForm(request.POST)
+        submission_id = self.kwargs['submission_id']
+        if form.is_valid():
+            form.submission_id = submission_id
+            if request.POST.get("approve_btn", ""):
+                form.is_approved = True
+            elif request.POST.get("reject_btn", ""):
+                form.is_approved = False
+            else:
+                form.is_approved = None
+
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def get_success_url(self):
+        return reverse(
+            'submissions',
+            kwargs={
+                'event_id': self.kwargs['event_id'],
+            },
+        )
