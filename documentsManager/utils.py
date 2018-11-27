@@ -185,6 +185,28 @@ def send_success_submission_email(attendee, docs):
     return mail_sended
 
 
+def send_evaluator_decision_to_organizer(event_id, new_review):
+    to = Event.objects.get(id=event_id).organizer.email
+    context = {
+        'review': new_review,
+    }
+    subject = 'An evaluator made a review'
+    from_email = EMAIL_HOST_USER
+    template_name = 'email/evaluator_review.html'
+    html_message = render_to_string(
+        template_name,
+        context,
+    )
+    text_content = strip_tags(html_message)
+    return mail.send_mail(
+        subject,
+        text_content,
+        from_email,
+        [to],
+        html_message=html_message
+    )
+
+
 def validate_files_submissions(files, id_event, attendee_id):
     event = Event.objects.get(pk=id_event)
     file_docs = FileDoc.objects.filter(event=event)

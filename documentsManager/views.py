@@ -36,7 +36,7 @@ from documentsManager.utils import (
     filter_no_managed_event,
     update_dates,
     get_access_token_of_event,
-)
+    send_evaluator_decision_to_organizer)
 from .filters import SubmissionFilter
 from .forms import (
     EvaluatorForm,
@@ -604,6 +604,7 @@ class ReviewView(FormView, LoginRequiredMixin):
             email=self.request.user.email)
         new_review.approved = self.is_aprove
         new_review.save()
+        send_evaluator_decision_to_organizer(self.kwargs['event_id'], new_review)
         return
 
 
