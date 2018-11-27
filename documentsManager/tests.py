@@ -56,6 +56,7 @@ from documentsManager.utils import (
     filter_managed_event,
     filter_no_managed_event,
     add_event,
+    send_evaluator_decision_to_organizer,
 )
 from post_registration import settings
 from post_registration.settings import get_env_variable
@@ -1451,6 +1452,16 @@ class OrganizerSubmission(TestBase):
         )
         self.assertEqual(response.context_data['event_id'], str(self.event.id))
         self.assertEqual(response.context_data['submission_type'], 'FILE')
+
+    def test_send_evaluator_decision_to_organizer(self):
+        review = Review.objects.create(
+            evaluator=self.evaluator,
+            submission=self.file,
+            approved=True,
+            justification='Brief commentary'
+        )
+        result = send_evaluator_decision_to_organizer(self.event.id, review)
+        self.assertTrue(result)
 
     @patch('documentsManager.views.get_one_event_api')
     def test_submission_reviews_in_context(self, mock_get_one_event_api):

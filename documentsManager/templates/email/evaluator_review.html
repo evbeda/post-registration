@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+{% load inlinecss %}
+{% inlinecss "css/email.css" %}
+<html>
+<head>
+    <meta content="width=device-width" name="viewport"/>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <title>Thanks For Buying a ticket</title>
+</head>
+<body bgcolor="#FFFFFF">
+<table class="body-wrap">
+    <tr>
+        <td></td>
+        <td bgcolor="#FFFFFF" class="container">
+            <div class="content">
+                <table>
+                    <tr>
+                        <td>
+                            <h3>A review was made in your event. </h3>
+                            <p><img alt="event logo" src="{{ review.submission.event.logo }}"/></p>
+                            <p class="lead">The submission {{ review.submission.id }}
+                                was marked as: {% if review.approved %}Aproved{% else %} Rejected {% endif %}</p>
+                            <a class="btn" href="{{ host }}{% url 'submissions' review.submission.event.id %}"
+                               target=”_blank”>See full review here</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+        <td></td>
+    </tr>
+</table>
+<table class="footer-wrap">
+    <tr>
+        <td></td>
+        <td class="container">
+            <div class="content">
+                <table>
+                    <tr>
+                        <td align="center">
+                            <p>
+                                <a href="#">Terms</a> |
+                                <a href="#">Privacy</a> |
+                                <a href="#">
+                                    <em>Unsubscribe</em>
+                                </a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+        <td></td>
+    </tr>
+</table>
+</body>
+</html>
+{% endinlinecss %}
