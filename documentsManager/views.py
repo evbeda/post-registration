@@ -541,7 +541,7 @@ class SubmissionView(DetailView, LoginRequiredMixin):
         event_id = self.kwargs['event_id']
         context['event_id'] = event_id
         event = Event.objects.get(id=event_id)
-        token = get_auth_token(self.request.user)
+        token = get_access_token_of_event(event)
         eb_event = get_one_event_api(token, event.eb_event_id)
         context['event'] = parse_events(eb_event)[0]
         context['reviews'] = Review.objects.filter(

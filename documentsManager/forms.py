@@ -43,7 +43,7 @@ class FileDocForm(ModelForm):
     file_type = ModelMultipleChoiceField(
         queryset=FileType.objects.all(),
         required=False,
-        widget=CheckboxSelectMultiple(attrs={'class': 'form-check-input'})
+        widget=CheckboxSelectMultiple()
     )
 
     class Meta:
