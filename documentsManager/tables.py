@@ -1,8 +1,9 @@
+import django_tables2 as tables
 from django.urls import reverse
 from django.utils.html import format_html
-import django_tables2 as tables
-from .models import Submission, Review
+
 from documentsManager.models import EvaluatorEvent
+from .models import Submission, Review
 
 
 class SubmissionsTable(tables.Table):

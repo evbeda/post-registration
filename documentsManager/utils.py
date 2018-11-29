@@ -13,13 +13,23 @@ from django.views.decorators.csrf import csrf_exempt
 from eventbrite import Eventbrite
 from social_django.models import UserSocialAuth
 
-from documentsManager.models import TextDoc, FileDoc, FileSubmission, Evaluator, EvaluatorEvent
 from post_registration.settings import EMAIL_HOST_USER
 from .app_settings import (
     URL_ENDPOINT,
     WH_ACTIONS,
 )
-from .models import UserWebhook, Event, AttendeeCode, Attendee
+from .models import (
+    TextDoc,
+    FileDoc,
+    FileSubmission,
+    Evaluator,
+    EvaluatorEvent,
+    TextSubmission,
+    UserWebhook,
+    Event,
+    AttendeeCode,
+    Attendee,
+)
 
 
 def get_data(body, domain):
@@ -224,8 +234,10 @@ def validate_files_submissions(files, id_event, attendee_id):
     return True
 
 
-def validate_text_submissions(text_fields):
-    for text_field in text_fields:
+def validate_text_submissions(text_fields, id_event, attende_id):
+    event = Event.objects.get(pk=id_event)
+    attendee = Attendee.objects.get(pk=attende_id)
+    for text_field in text_fields.keys():
         if '_text' in text_field:
             text_id = text_field.replace('_text', '')
             text_doc = TextDoc.objects.get(pk=text_id)
@@ -234,6 +246,13 @@ def validate_text_submissions(text_fields):
                 quantity = len(text_field.split(' '))
             if not (quantity < text_doc.min or quantity > text_doc.max):
                 return False
+            text_doc = TextDoc.objects.get(id=text_id)
+            TextSubmission.objects.create(
+                text_doc=text_doc,
+                content=text_fields[text_field],
+                event=event,
+                attendee=attendee
+            )
     return True
 
 
