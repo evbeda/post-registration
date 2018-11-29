@@ -11,8 +11,9 @@ from django.test import Client
 from django.test import TestCase
 from social_django.models import UserSocialAuth
 
-from documentsManager.apps import DocumentsmanagerConfig
-from documentsManager.forms import (
+from post_registration import settings
+from .apps import DocumentsmanagerConfig
+from .forms import (
     EventForm,
     TextDocForm,
     SignUpForm,
@@ -20,7 +21,7 @@ from documentsManager.forms import (
     EvaluationDateForm,
     SubmissionForm,
 )
-from documentsManager.models import (
+from .models import (
     Event,
     TextDoc,
     FileType,
@@ -36,7 +37,7 @@ from documentsManager.models import (
     Attendee,
     AttendeeCode,
 )
-from documentsManager.utils import (
+from .utils import (
     social_user_exists,
     get_data,
     webhook_available_to_process,
@@ -58,8 +59,6 @@ from documentsManager.utils import (
     add_event,
     send_evaluator_decision_to_organizer,
 )
-from post_registration import settings
-from post_registration.settings import get_env_variable
 
 MOCK_EVENTS_API = {
     'name': {
@@ -228,6 +227,10 @@ MOCK_EVENTS_API_2 = {
 
 class TestBase(TestCase):
     def setUp(self):
+        self.attendee = Attendee.objects.create(
+            email='prueba@ejemplo.com',
+            name='John Doe'
+        )
         self.client = Client()
         self.user = User.objects.create_superuser(
             email='kaizen@email.com',
@@ -456,13 +459,13 @@ class DocumentsmanagerConfigTest(TestCase):
 class SettingsTest(TestCase):
     def test_env_exists(self):
         env_var = 'SOCIAL_AUTH_EVENTBRITE_KEY'
-        result = get_env_variable(env_var)
+        result = settings.get_env_variable(env_var)
         self.assertTrue(result)
 
     def test_env_not_exists(self):
         env_var = 'SOCIAL_AUTH_EVENTBRITE_KEY_FALSE'
         with self.assertRaises(ImproperlyConfigured) as context:
-            get_env_variable(env_var)
+            settings.get_env_variable(env_var)
         expected = 'Set the SOCIAL_AUTH_EVENTBRITE_KEY_FALSE environment variable'
         self.assertTrue(expected in str(context.exception))
 
@@ -1677,7 +1680,7 @@ class FormsTest(TestBase):
         text_fields = {
             key: 'a a a a a a a a a a'
         }
-        result = validate_text_submissions(text_fields)
+        result = validate_text_submissions(text_fields, event.id, self.attendee.id)
         self.assertTrue(result)
         self.assertEqual(str(text_doc), 'example')
 
@@ -1688,21 +1691,17 @@ class FormsTest(TestBase):
         text_fields = {
             key: 'a a a a a'
         }
-        result = validate_text_submissions(text_fields)
+        result = validate_text_submissions(text_fields, event.id, self.attendee.id)
         self.assertFalse(result)
 
     def test_validate_files_submissions(self):
         event = Event.objects.create(eb_event_id=123, organizer=self.user)
-        attendee = Attendee.objects.create(
-            email='prueba@ejemplo.com',
-            name='John Doe'
-        )
         file_doc = FileDoc.objects.create(event=event, name='example')
         key = '{}_file'.format(file_doc.id)
         values = {
             key: ''
         }
-        result = validate_files_submissions(values, event.id, attendee.id)
+        result = validate_files_submissions(values, event.id, self.attendee.id)
         self.assertTrue(result)
         self.assertEqual(str(file_doc), 'example')
 
@@ -1734,6 +1733,8 @@ class FormsTest(TestBase):
         form = SubmissionForm({
             key: 'a a a a a a a a a a',
             'code': attende_code.code,
+            'event_id': event.id,
+            'attendee_id': attendee.id,
         })
         self.assertEqual(form.is_valid(), True)
 

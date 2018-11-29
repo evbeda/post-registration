@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.mail import EmailMultiAlternatives
 from django.forms import (
@@ -16,18 +15,13 @@ from django.forms import (
     TextInput,
     Textarea,
     DateInput,
+    EmailInput,
 )
-from django.forms.widgets import EmailInput
 from django.template.base import logger
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
 
-from documentsManager.utils import (
-    notify_attendee_from_attende_code,
-    validate_files_submissions,
-    validate_text_submissions,
-)
 from .models import (
     Evaluator,
     Event,
@@ -39,6 +33,11 @@ from .models import (
     Review,
     Result,
     Submission,
+)
+from .utils import (
+    notify_attendee_from_attende_code,
+    validate_files_submissions,
+    validate_text_submissions,
 )
 
 
@@ -232,7 +231,11 @@ class SubmissionForm(Form):
                 self.data.get('event_id'),
                 self.data.get('attendee_id'),
             )
-        text_validation = validate_text_submissions(self.data.keys())
+        text_validation = validate_text_submissions(
+            self.data,
+            self.data.get('event_id'),
+            self.data.get('attendee_id'),
+        )
         if files_validation and text_validation:
             notify_attendee_from_attende_code(self.data.get('code'))
         return files_validation and text_validation
@@ -283,7 +286,7 @@ class EvaluatorForm(ModelForm):
         pass
 
 
-class ReviewForm(forms.ModelForm):
+class ReviewForm(ModelForm):
 
     class Meta:
         model = Review
@@ -306,7 +309,8 @@ class ReviewForm(forms.ModelForm):
             return valid
         return True
 
-class ResultForm(forms.ModelForm):
+
+class ResultForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ResultForm, self).__init__(*args, **kwargs)
