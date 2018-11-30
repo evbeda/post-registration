@@ -48,7 +48,6 @@
             </ul>
         </div>
     </div>
-
     <div class="card text-center">
         <div class="card-header">
             <ul class="nav nav-tabs card-header-tabs">
@@ -183,10 +182,31 @@
                 </div>
                 <div class="col-md-4">
                     <p class="card-text">
-                        Sin Resultado
+                        {% if not result %}
+                            <div tabindex="0" role="button" class="eds-tag eds-tag--interactive text-white bg-secondary">
+                                <span class="eds-tag__text eds-tag__item eds-text-bs eds-text-weight--heavy">
+                                    pending
+                                </span>
+                            </div>
+                        {% elif result.approved %}
+                            <div tabindex="0" role="button" class="eds-tag eds-tag--interactive text-white bg-success">
+                                <span class="eds-tag__text eds-tag__item eds-text-bs eds-text-weight--heavy">
+                                    accepted
+                                </span>
+                            </div>
+                        {% else %}
+                            <div tabindex="0" role="button" class="eds-tag eds-tag--interactive text-white bg-danger">
+                                <span class="eds-tag__text eds-tag__item eds-text-bs eds-text-weight--heavy">
+                                    rejected
+                                </span>
+                            </div>
+                        {% endif %}
                     </p>
                 </div>
             </div>
+            {% if not result %}
+                {%include "result_form.html" %}
+            {% endif %}
             {% if reviews %}
                 {%for review in reviews %}
                     <div class="card-body">

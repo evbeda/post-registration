@@ -1,13 +1,10 @@
-{% extends "base.html" %}
-
-{% block content %}
+ <div class="card-body">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <form method="POST">
+                    <form method="POST" action="{% url 'close_submission' event_id submission.id %}">
                         {% csrf_token %}
-                        <h5 class="card-title text-center mb-4">Final Review</h5>
                         <h6 class="card-subtitle mb-3 text-muted">Define your final review for this submission.</h6>
                         {% for field in form %}
                             <div class="form-group">
@@ -21,8 +18,10 @@
                         {% endfor %}
                         <div class="row justify-content-center text-center">
                             <div class="col-md-6">
-                                <input type="submit" value="Approve" class="btn btn-success" name="approve_btn" />
-                                <input type="submit" value="Reject" class="btn btn-danger" name="reject_btn" />
+                                <input type='submit' name='approve_btn' value="Approve" class="eds-btn eds-btn--submit eds-btn--fill" />
+                            </div>
+                            <div class="col-md-6">
+                                <input type='submit' name='reject_btn' value="Reject" class="eds-btn eds-btn--submit eds-btn--fill" />
                             </div>
                         </div>
                     </form>
@@ -30,4 +29,4 @@
             </div>
         </div>
     </div>
-{% endblock content %}
+</div>

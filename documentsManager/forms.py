@@ -299,8 +299,10 @@ class ReviewForm(ModelForm):
         widgets = {
             'justification': Textarea(
                 attrs={
-                    'rows': 3,
-                    'class': 'form-control'}),
+                    'rows': 6,
+                    'class': 'form-control',
+                },
+            ),
         }
 
     def is_valid(self):
@@ -321,9 +323,12 @@ class ResultForm(ModelForm):
         model = Result
         fields = ['justification']
         widgets = {
-            'justification': TextInput(attrs={
-                'class': 'form-control',
-            }),
+            'justification': Textarea(
+                attrs={
+                    'rows': 4,
+                    'class': 'form-control',
+                },
+            ),
         }
 
     def save(self):
