@@ -16,8 +16,8 @@ from django.views import View
 from django.views.generic import (
     CreateView,
     DeleteView,
-    FormView,
     DetailView,
+    FormView,
     UpdateView,
 )
 from django.views.generic.base import TemplateView
@@ -27,27 +27,28 @@ from multi_form_view import MultiFormView
 
 from documentsManager.utils import (
     evaluator_events,
-    parse_events,
-    get_auth_token,
+    get_access_token_of_event,
     get_all_events_api,
+    get_auth_token,
     get_events_with_venues_api,
     get_one_event_api,
-    filter_managed_event,
     filter_no_managed_event,
+    filter_managed_event,
+    parse_events,
+    send_evaluator_decision_to_organizer,
     update_dates,
-    get_access_token_of_event,
-    send_evaluator_decision_to_organizer)
+)
 from .filters import SubmissionFilter
 from .forms import (
+    EvaluationDateForm,
     EvaluatorForm,
     EventForm,
     FileDocForm,
-    TextDocForm,
+    ResultForm,
+    ReviewForm,
     SignUpForm,
     SubmissionForm,
-    EvaluationDateForm,
-    ReviewForm,
-    ResultForm,
+    TextDocForm,
 )
 from .models import (
     AttendeeCode,
@@ -62,8 +63,8 @@ from .models import (
 )
 from .tables import (
     SubmissionsTable,
-    SubmissionsTableOrganizer,
     SubmissionsTableEvaluator,
+    SubmissionsTableOrganizer,
 )
 from .utils import (
     create_order_webhook_from_view,
@@ -556,6 +557,8 @@ class SubmissionView(DetailView, LoginRequiredMixin):
         except submission.DoesNotExist:
             submission.filesubmission
             context['submission_type'] = 'FILE'
+        context['form'] = ResultForm
+        context['result'] = Result.objects.filter(submission=self.object.id).first()
         return context
 
 
@@ -569,7 +572,7 @@ class ReviewView(FormView, LoginRequiredMixin):
         context['evaluator'] = Evaluator.objects.filter(
             email=self.request.user.email).first()
         context['submissions'] = Submission.objects.filter(
-            event_id=self.kwargs['submission_id']).first()
+            id=self.kwargs['submission_id']).first()
         event_id = self.kwargs['event_id']
         context['event_id'] = event_id
         event = Event.objects.get(id=event_id)
@@ -604,6 +607,8 @@ class ReviewView(FormView, LoginRequiredMixin):
             email=self.request.user.email)
         new_review.approved = self.is_aprove
         new_review.save()
+        new_review.submission.state = 'evaluated'
+        new_review.submission.save()
         send_evaluator_decision_to_organizer(self.kwargs['event_id'], new_review)
         return
 
@@ -646,10 +651,12 @@ class DeclineInvitationView(View):
         return HttpResponse('GET request!')
 
 
-class ResultCreate(CreateView):
+@method_decorator(login_required, name='dispatch')
+class ResultCreate(CreateView, LoginRequiredMixin):
     model = Result
-    template_name = 'result_form.html'
+    template_name = 'submissions.html'
     form_class = ResultForm
+    pk_url_kwarg = 'event_id'
 
     def post(self, request, **kwargs):
         form = ResultForm(request.POST)
@@ -660,9 +667,6 @@ class ResultCreate(CreateView):
                 form.is_approved = True
             elif request.POST.get("reject_btn", ""):
                 form.is_approved = False
-            else:
-                form.is_approved = None
-
             return self.form_valid(form)
         else:
             return self.form_invalid(form)

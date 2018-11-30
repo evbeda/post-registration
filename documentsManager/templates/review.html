@@ -1,5 +1,4 @@
 {% extends "base.html" %} 
-
 {% block content %}
 {%include "partials/jumbotron.html" %} 
 <div class="container">
@@ -34,33 +33,37 @@
         </div>
     </div>
     <div class="content">
-        <h2>Review Submission</h2>
+        <h2>Give your opinion</h2>
         <hr class="eds-divider__hr eds-bg-color--grey-200 eds-divider--horizontal" data-spec="divider-hr" aria-hidden="true" />
-        <div class="container signup-container">
-            <div class="row justify-content-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-10 col-md-2 mt-3">
+                    <div class="card-body errors">
+                        <label>ID: <small>{{ submissions.id }}</small></label>
+                        <label>TYPE: <small>{{ submissions.filesubmission.description }}{{ submissions.textsubmission.description }}</small></label>
+                    </div>
+                </div>
                 <div class="col-10 col-md-4">
-                    <div class="card mt-3">
-                        <div class="card-body errors">
-                            <form action="" method='post'>
-                                {% csrf_token %}
-                                <div class="doc_req_text">
-                                    {{ form.non_field_errors }}
-                                    <div class="form-group">
-                                        {{ form.justification.errors }}
-                                        <label class="form-check-label" for="{{ form.justification.id_for_label }}">{{ form.justification.label }}:</label>
-                                        {{ form.justification }}
+                    <div class="card-body errors">
+                        <form method='post'>
+                            {% csrf_token %}
+                            <div class="doc_req_text">
+                                {{ form.non_field_errors }}
+                                <div class="form-group">
+                                    {{ form.justification.errors }}
+                                    <label class="form-check-label" for="{{ form.justification.id_for_label }}">{{ form.justification.label }}:</label>
+                                    {{ form.justification }}
+                                </div>
+                                <div class="row justify-content-center align-items-center mt-3">
+                                    <div class="col-4 col-lg-6 text-right">
+                                        <input type='submit' name='approve' value="Approve" class="eds-btn eds-btn--submit eds-btn--fill w-100" />
                                     </div>
-                                    <div class="row justify-content-center align-items-center mt-3">
-                                        <div class="col-4 col-lg-6 text-right">
-                                            <input type='submit' name='approve' value="Approve" class="eds-btn eds-btn--submit eds-btn--fill w-100" />
-                                        </div>
-                                        <div class="col-4 col-lg-6 text-right">
-                                            <input type='submit' name='reject' value="Reject" class="eds-btn eds-btn--submit eds-btn--fill w-100" />
-                                        </div>
+                                    <div class="col-4 col-lg-6 text-right">
+                                        <input type='submit' name='reject' value="Reject" class="eds-btn eds-btn--submit eds-btn--fill w-100" />
                                     </div>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

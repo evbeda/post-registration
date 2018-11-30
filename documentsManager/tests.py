@@ -14,50 +14,51 @@ from social_django.models import UserSocialAuth
 from post_registration import settings
 from .apps import DocumentsmanagerConfig
 from .forms import (
-    EventForm,
-    TextDocForm,
-    SignUpForm,
     EvaluatorForm,
     EvaluationDateForm,
+    EventForm,
+    SignUpForm,
     SubmissionForm,
+    TextDocForm,
 )
 from .models import (
-    Event,
-    TextDoc,
-    FileType,
-    FileDoc,
-    Evaluator,
-    User,
-    EvaluatorEvent,
-    FileSubmission,
-    TextSubmission,
-    Review,
-    Submission,
-    UserWebhook,
     Attendee,
     AttendeeCode,
+    Evaluator,
+    EvaluatorEvent,
+    Event,
+    FileDoc,
+    FileSubmission,
+    FileType,
+    Result,
+    Review,
+    Submission,
+    TextDoc,
+    TextSubmission,
+    User,
+    UserWebhook,
 )
 from .utils import (
-    social_user_exists,
-    get_data,
-    webhook_available_to_process,
-    get_social_user,
-    send_email_to_attende,
-    create_order_webhook_from_view,
-    get_access_token_form_user_id,
-    get_eventbrite_data,
-    get_parsed_event,
+    add_event,
     create_attendee_code,
-    notify_attendee_from_attende_code,
-    get_docs_from_event,
-    send_success_submission_email,
-    validate_files_submissions,
-    validate_text_submissions,
-    get_auth_token,
+    create_order_webhook_from_view,
     filter_managed_event,
     filter_no_managed_event,
-    add_event,
+    get_access_token_form_user_id,
+    get_auth_token,
+    get_eventbrite_data,
+    get_data,
+    get_docs_from_event,
+    get_parsed_event,
+    get_social_user,
+    notify_attendee_from_attende_code,
+    send_email_to_attende,
     send_evaluator_decision_to_organizer,
+    send_success_submission_email,
+    social_user_exists,
+    validate_files_submissions,
+    validate_text_submissions,
+    webhook_available_to_process,
 )
 
 MOCK_EVENTS_API = {
@@ -626,7 +627,7 @@ class FileDocUpdateTest(TestBase):
                     'event_id': self.event.id,
                     'pk': self.file_doc.pk
                 }
-            )    
+            )
         )
         self.assertEqual(response.status_code, 200)
 
@@ -638,7 +639,7 @@ class FileDocUpdateTest(TestBase):
                     'event_id': self.event.id,
                     'pk': self.file_doc.pk
                 }
-            )    
+            )
         )
         self.assertTemplateUsed(response, 'file_doc_update_form.html')
 
@@ -650,7 +651,7 @@ class FileDocUpdateTest(TestBase):
                     'event_id': self.event.id,
                     'pk': self.file_doc.pk
                 }
-            )    
+            )
         )
         self.assertEqual(response.context_data['event_id'], str(self.event.id))
 
@@ -678,7 +679,7 @@ class TextDocUpdateTest(TestBase):
                     'event_id': self.event.id,
                     'pk': self.text_doc.pk
                 }
-            )    
+            )
         )
         self.assertEqual(response.status_code, 200)
 
@@ -690,7 +691,7 @@ class TextDocUpdateTest(TestBase):
                     'event_id': self.event.id,
                     'pk': self.text_doc.pk
                 }
-            )    
+            )
         )
         self.assertTemplateUsed(response, 'text_doc_update_form.html')
 
@@ -702,7 +703,7 @@ class TextDocUpdateTest(TestBase):
                     'event_id': self.event.id,
                     'pk': self.text_doc.pk
                 }
-            )    
+            )
         )
         self.assertEqual(response.context_data['event_id'], str(self.event.id))
 
@@ -710,13 +711,13 @@ class TextDocUpdateTest(TestBase):
     def test_text_doc_success_redirect(self, mock_eventbrite_get):
         mock_eventbrite_get.return_value = MOCK_EVENTS_API
         data = {
-            'name':'updated name',
-            'description':'updated description',
-            'is_optional':True,
-            'measure':'Words',
-            'min':'20',
-            'max':'60',
-            'event':self.event,
+            'name': 'updated name',
+            'description': 'updated description',
+            'is_optional': True,
+            'measure': 'Words',
+            'min': '20',
+            'max': '60',
+            'event': self.event,
         }
         response = self.client.post(
             reverse(
@@ -726,10 +727,10 @@ class TextDocUpdateTest(TestBase):
                     'pk': self.text_doc.pk
                 }
             ),
-            data   
+            data,
         )
         self.assertRedirects(
-            response, 
+            response,
             reverse(
                 'docs',
                 kwargs={
@@ -1413,7 +1414,8 @@ class OrganizerSubmission(TestBase):
     def test_submission_view_template(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
         response = self.client.get(
-            reverse('submission', 
+            reverse(
+                'submission',
                 kwargs={
                     'event_id': self.event.id,
                     'submission_id': self.file.id
@@ -1426,12 +1428,13 @@ class OrganizerSubmission(TestBase):
     @patch('documentsManager.views.get_one_event_api')
     def test_submission_view_name(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
-        view = resolve(reverse(
-            'submission',
-            kwargs={
-                'event_id': self.event.id,
-                'submission_id': self.file.id
-            }    
+        view = resolve(
+            reverse(
+                'submission',
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.file.id
+                }
             )
         )
         self.assertEqual(view.url_name, 'submission')
@@ -1439,14 +1442,15 @@ class OrganizerSubmission(TestBase):
     @patch('documentsManager.views.get_one_event_api')
     def test_submission_context(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
-        review = Review.objects.create(
+        Review.objects.create(
             evaluator=self.evaluator,
             submission=self.file,
             approved=True,
             justification='Brief commentary'
         )
         response = self.client.get(
-            reverse('submission', 
+            reverse(
+                'submission',
                 kwargs={
                     'event_id': self.event.id,
                     'submission_id': self.file.id
@@ -1469,20 +1473,21 @@ class OrganizerSubmission(TestBase):
     @patch('documentsManager.views.get_one_event_api')
     def test_submission_reviews_in_context(self, mock_get_one_event_api):
         mock_get_one_event_api.return_value = [MOCK_EVENTS_API]
-        review_01 = Review.objects.create(
+        Review.objects.create(
             evaluator=self.evaluator,
             submission=self.file,
             approved=True,
             justification='Brief commentary 01'
         )
-        review_02 = Review.objects.create(
+        Review.objects.create(
             evaluator=self.create_evaluator(name='Evaluator 02', email='evaluator02@ejemplo.com'),
             submission=self.file,
             approved=True,
             justification='Brief commentary 02'
         )
         response = self.client.get(
-            reverse('submission', 
+            reverse(
+                'submission',
                 kwargs={
                     'event_id': self.event.id,
                     'submission_id': self.file.id
@@ -1528,69 +1533,6 @@ class DeclineInvitationViewTest(TestBase):
         )
         evaluator_event.refresh_from_db()
         self.assertEqual(evaluator_event.status, 'rejected')
-
-
-class ResultCreateTest(TestBase):
-
-    def setUp(self):
-        super(ResultCreateTest, self).setUp()
-        self.event = self.create_event()
-        file_doc = FileDoc.objects.create(event=self.event, name='name_prueba')
-        text_doc = TextDoc.objects.create(event=self.event, description='description_prueba')
-        file = File(open('runtime.txt', 'rb'))
-        attendee = Attendee.objects.create(
-            email='prueba@ejemplo.com',
-            name='John Doe'
-        )
-        self.file_submission = FileSubmission.objects.create(
-            file_doc=file_doc,
-            file=file,
-            event=self.event,
-            attendee=attendee
-        )
-        self.text_submission = TextSubmission.objects.create(
-            text_doc=text_doc,
-            content='content',
-            event=self.event,
-            attendee=attendee
-        )
-
-    def test_result_create_view_name(self):
-        view = resolve(
-            reverse(
-                'close_submission',
-                kwargs={
-                    'event_id': self.event.id,
-                    'submission_id': self.file_submission.id,
-                }
-            )
-        )
-        self.assertEqual(view.url_name, 'close_submission')
-
-    def test_review_create_response_status(self):
-        response = self.client.get(
-            reverse(
-                'close_submission',
-                kwargs={
-                    'event_id': self.event.id,
-                    'submission_id': self.file_submission.id,
-                }
-            )
-        )
-        self.assertEqual(response.status_code, 200)
-
-    def test_result_uses_correct_template(self):
-        response = self.client.get(
-            reverse(
-                'close_submission',
-                kwargs={
-                    'event_id': self.event.id,
-                    'submission_id': self.file_submission.id,
-                }
-            )    
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'result_form.html')
 
 
 class FormsTest(TestBase):
@@ -1983,3 +1925,88 @@ class AttendeeCodeTest(TestBase):
         notify_attendee_from_attende_code(attendee_code.code)
         attendee_updated = AttendeeCode.objects.get(id=attendee_code.id)
         self.assertEqual(attendee_updated.available, False)
+
+
+class ResultCreateTest(TestBase):
+
+    def setUp(self):
+        super(ResultCreateTest, self).setUp()
+        self.event = self.create_event()
+        file_doc = FileDoc.objects.create(event=self.event, name='name_prueba')
+        text_doc = TextDoc.objects.create(event=self.event, description='description_prueba')
+        file = File(open('runtime.txt', 'rb'))
+        attendee = Attendee.objects.create(
+            email='prueba@ejemplo.com',
+            name='John Doe'
+        )
+        self.file_submission = FileSubmission.objects.create(
+            file_doc=file_doc,
+            file=file,
+            event=self.event,
+            attendee=attendee
+        )
+        self.text_submission = TextSubmission.objects.create(
+            text_doc=text_doc,
+            content='content',
+            event=self.event,
+            attendee=attendee
+        )
+
+    def test_result_create_view_name(self):
+        view = resolve(
+            reverse(
+                'close_submission',
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.file_submission.id,
+                }
+            )
+        )
+        self.assertEqual(view.url_name, 'close_submission')
+
+    def test_review_create_approve(self):
+        comment = 500 * 'a'
+        data = {
+            'approve_btn': 'Approve',
+            'justification': comment,
+        }
+        self.client.post(
+            reverse(
+                'close_submission',
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.file_submission.id,
+                }
+            ),
+            data,
+        )
+        result = Result.objects.filter(submission=self.file_submission).first()
+        self.assertTrue(result.approved)
+
+    @patch('documentsManager.utils.Eventbrite.get')
+    def test_review_create_reject(self, mock_api_evb):
+        mock_api_evb.return_value = MOCK_EVENTS_API
+        data = {
+            'reject_btn': 'Rejected',
+        }
+        response = self.client.post(
+            reverse(
+                'close_submission',
+                kwargs={
+                    'event_id': self.event.id,
+                    'submission_id': self.file_submission.id,
+                }
+            ),
+            data,
+        )
+        result = Result.objects.filter(submission=self.file_submission).first()
+        self.assertFalse(result.approved)
+        self.assertRedirects(
+            response,
+            reverse(
+                'submissions',
+                kwargs={
+                    'event_id': self.event.id,
+                }
+            )
+        )
