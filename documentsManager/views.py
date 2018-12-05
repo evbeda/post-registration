@@ -161,17 +161,22 @@ class DocsView(FormView, LoginRequiredMixin):
         eb_event = get_one_event_api(get_auth_token(
             self.request.user), event.eb_event_id)
         view_event = parse_events(eb_event)
-        event = view_event[0]
-        event['eb_event_start'] = eb_event[0]['start']['utc']
-        event['id'] = event_id
-        context['event'] = event
+        view_event[0]['eb_event_start'] = eb_event[0]['start']['utc']
+        view_event[0]['id'] = event_id
+        context['event'] = view_event[0]
+        context['event_id'] = event_id
+        user_id = self.request.user.id
+        is_organizer = user_id == event.organizer.id
+        if is_organizer:
+            context['is_organizer'] = True
         context['docs_file'] = FileDoc.objects.filter(event__id=event_id)
         context['docs_text'] = TextDoc.objects.filter(event__id=event_id)
         context['attendee_url'] = self.request.get_host() + reverse(
             'preview',
             kwargs={
                 'event_id': event_id
-            }, )
+            },
+        )
         return context
 
     def post(self, request, *args, **kwargs):
@@ -348,7 +353,12 @@ class EvaluatorList(FormView, LoginRequiredMixin):
             get_auth_token(self.request.user),
             event.eb_event_id
         )
+        user_id = self.request.user.id
+        is_organizer = user_id == event.organizer.id
+        if is_organizer:
+            context['is_organizer'] = True
         view_event = parse_events(eb_event)
+        context['event_id'] = event_id
         context['event'] = view_event[0]
         context['event_model'] = event
         context['evaluator_events'] = EvaluatorEvent.objects.filter(

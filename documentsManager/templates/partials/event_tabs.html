@@ -1,0 +1,18 @@
+<ul class="nav nav-tabs mb-3">
+        {% if is_organizer %}
+        <li class="nav-item">
+            <a class="nav-link {{ requirements_tab_is_active|yesno:'active,' }}" href="{% url 'docs' event_id %}">Requirements</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ evaluators_tab_is_active|yesno:'active,' }}" href="{% url 'evaluators' event_id %}">Evaluators</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ submissions_tab_is_active|yesno:'active,' }}" href="{% url 'submissions' event_id %}">Submissions</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+            <a class="nav-link" role="button" aria-haspopup="true" aria-expanded="false" href="{% url 'submissions' event_id %}">Submissions </a>
+        </li>
+        {% endif %}
+        
+</ul>
