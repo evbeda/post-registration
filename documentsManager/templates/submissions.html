@@ -47,23 +47,8 @@
             </ul>
         </div>
     </div>
-    <ul class="nav nav-tabs mb-3">
-        {% if is_organizer %}
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'docs' event_id %}">Requirements</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'evaluators' event_id %}">Evaluators</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link active" href="{% url 'submissions' event_id %}">Submissions</a>
-        </li>
-        {% else %}
-        <li class="nav-item">
-            <a class="nav-link active" role="button" aria-haspopup="true" aria-expanded="false" href="{% url 'submissions' event_id %}">Submissions </a>
-        </li>
-        {% endif %}
-    </ul>
+
+    {% include "partials/event_tabs.html" with submissions_tab_is_active=True %}
 
     <div class="row justify-content-end">
         <form method="get" class="form-inline">
