@@ -1,21 +1,45 @@
-<ul class="nav nav-tabs mb-3">
-        {% if is_organizer %}
-        <li class="nav-item">
-            <a class="nav-link {{ requirements_tab_is_active|yesno:'active,' }}" href="{% url 'docs' event_id %}">Requirements</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ evaluators_tab_is_active|yesno:'active,' }}" href="{% url 'evaluators' event_id %}">Evaluators</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ submissions_tab_is_active|yesno:'active,' }}" href="{% url 'submissions' event_id %}">Submissions</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ results_tab_is_active|yesno:'active,' }}" href="{% url 'results' event_id %}">Results</a>
-        </li>
-        {% else %}
-        <li class="nav-item">
-            <a class="nav-link" role="button" aria-haspopup="true" aria-expanded="false" href="{% url 'submissions' event_id %}">Submissions </a>
-        </li>
-        {% endif %}
-        
-</ul>
+<div class="eds-tabs">
+    <document-fragment tabIndex="-1">
+        <ul class="eds-tabs__navigation eds-l-pad-vert-3 eds-l-mar-bot-3" role="tablist">
+            {% if is_organizer %}
+            <li id="tab0" class="eds-tabs__item eds-l-pad-hor-2 eds-l-md-pad-hor-3 eds-l-mw-pad-hor-4 eds-l-ln-pad-hor-4 eds-l-lg-pad-hor-4 eds-l-lw-pad-hor-4 {{ requirements_tab_is_active|yesno:'eds-tabs__item--selected,' }}" role="tab" aria-selected="true" aria-controls="panel0">
+                <a href="{% url 'docs' event_id %}">
+                    <button data-spec="tab-link--0" data-automation="tab-link--0" tabindex="0" class="eds-btn--button eds-btn--none eds-tabs__item-link eds-l-pad-vert-3" type="button">
+                        <span class="eds-text-weight--heavy">Requirements</span>
+                    </button>
+                </a>
+            </li>
+            <li id="tab1" class="eds-tabs__item eds-l-pad-hor-2 eds-l-md-pad-hor-3 eds-l-mw-pad-hor-4 eds-l-ln-pad-hor-4 eds-l-lg-pad-hor-4 eds-l-lw-pad-hor-4 {{ evaluators_tab_is_active|yesno:'eds-tabs__item--selected,' }}" role="tab" aria-selected="false">
+                <a href="{% url 'evaluators' event_id %}">
+                    <button data-spec="tab-link--1" data-automation="tab-link--1" tabindex="-1" class="eds-btn--button eds-btn--none eds-tabs__item-link eds-l-pad-vert-3" type="button">
+                        <span class="eds-text-weight--heavy">Evaluators</span>
+                    </button>
+                </a>
+            </li>
+            <li id="tab2" class="eds-tabs__item eds-l-pad-hor-2 eds-l-md-pad-hor-3 eds-l-mw-pad-hor-4 eds-l-ln-pad-hor-4 eds-l-lg-pad-hor-4 eds-l-lw-pad-hor-4 {{ submissions_tab_is_active|yesno:'eds-tabs__item--selected,' }}" role="tab" aria-selected="false">
+                <a href="{% url 'submissions' event_id %}">
+                    <button data-spec="tab-link--2" data-automation="tab-link--2" tabindex="-1" class="eds-btn--button eds-btn--none eds-tabs__item-link eds-l-pad-vert-3" type="button">
+                        <span class="eds-text-weight--heavy">Submissions</span>
+                    </button>
+                </a>
+            </li>
+            <li id="tab3" class="eds-tabs__item eds-l-pad-hor-2 eds-l-md-pad-hor-3 eds-l-mw-pad-hor-4 eds-l-ln-pad-hor-4 eds-l-lg-pad-hor-4 eds-l-lw-pad-hor-4 {{ results_tab_is_active|yesno:'eds-tabs__item--selected,' }}" role="tab" aria-selected="false">
+                <a href="{% url 'results' event_id %}">
+                    <button data-spec="tab-link--3" data-automation="tab-link--3" tabindex="-1" class="eds-btn--button eds-btn--none eds-tabs__item-link eds-l-pad-vert-3" type="button">
+                        <span class="eds-text-weight--heavy">Results</span>
+                    </button>
+                </a>
+            </li>
+            {% else %}
+                <li id="tab4" class="eds-tabs__item eds-l-pad-hor-2 eds-l-md-pad-hor-3 eds-l-mw-pad-hor-4 eds-l-ln-pad-hor-4 eds-l-lg-pad-hor-4 eds-l-lw-pad-hor-4 eds-tabs__item--selected" role="tab" aria-selected="false">
+                    <a href="{% url 'submissions' event_id %}">
+                        <button data-spec="tab-link--3" data-automation="tab-link--4" tabindex="-1" class="eds-btn--button eds-btn--none eds-tabs__item-link eds-l-pad-vert-3" type="button">
+                            <span class="eds-text-weight--heavy">Submissions</span>
+                        </button>
+                    </a>
+                </li>
+            {% endif %}
+            <hr class="eds-divider__hr eds-bg-color--grey-200 eds-divider--horizontal" data-spec="divider-hr" aria-hidden="true"/>
+        </ul>
+    </document-fragment>
+</div>
