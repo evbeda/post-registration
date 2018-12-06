@@ -339,3 +339,17 @@ class ResultForm(ModelForm):
         submission.save()
         result.submission = submission
         return result.save()
+
+class ResultUpdateForm(ModelForm):
+
+    class Meta:
+        model = Result
+        fields = ['justification', 'approved']
+        widgets = {
+            'justification': Textarea(
+                attrs={
+                    'rows': 4,
+                    'class': 'form-control',
+                },
+            ),
+        }

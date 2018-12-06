@@ -19,6 +19,7 @@ from django.views.generic import (
     DetailView,
     FormView,
     UpdateView,
+    ListView,
 )
 from django.views.generic.base import TemplateView
 from django_filters.views import FilterView
@@ -49,6 +50,7 @@ from .forms import (
     SignUpForm,
     SubmissionForm,
     TextDocForm,
+    ResultUpdateForm,
 )
 from .models import (
     AttendeeCode,
@@ -354,8 +356,7 @@ class EvaluatorList(FormView, LoginRequiredMixin):
             event.eb_event_id
         )
         user_id = self.request.user.id
-        is_organizer = user_id == event.organizer.id
-        if is_organizer:
+        if user_id == event.organizer.id:
             context['is_organizer'] = True
         view_event = parse_events(eb_event)
         context['event_id'] = event_id
@@ -498,7 +499,7 @@ class SubmissionsList(SingleTableMixin, FilterView):
         event = Event.objects.get(id=event_id)
         user_id = self.request.user.id
         is_organizer = user_id == event.organizer.id
-        if (is_organizer):
+        if is_organizer:
             context['is_organizer'] = True
         if self.request.user.social_auth.exists():
             token = get_auth_token(self.request.user)
@@ -623,6 +624,81 @@ class ReviewView(FormView, LoginRequiredMixin):
         return
 
 
+@method_decorator(login_required, name='dispatch')
+class ResultsView(ListView):
+    template_name = "results.html"
+    context_object_name = 'results_list'
+
+    def get_queryset(self):
+        return Result.objects.filter(submission__event__id=self.kwargs['event_id'])
+
+    def get_context_data(self, **kwargs):
+        context = super(ResultsView, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        context['event_id'] = event_id
+        event = Event.objects.get(id=event_id)
+        user_id = self.request.user.id
+        if user_id == event.organizer.id:
+            context['is_organizer'] = True
+        if self.request.user.social_auth.exists():
+            token = get_auth_token(self.request.user)
+        else:
+            token = get_access_token_of_event(event)
+        eb_event = get_one_event_api(token, event.eb_event_id)
+        context['event'] = parse_events(eb_event)[0]
+        return context
+    
+
+@method_decorator(login_required, name='dispatch')
+class ResultCreate(CreateView, LoginRequiredMixin):
+    model = Result
+    template_name = 'submissions.html'
+    form_class = ResultForm
+    pk_url_kwarg = 'event_id'
+
+    def post(self, request, **kwargs):
+        form = ResultForm(request.POST)
+        submission_id = self.kwargs['submission_id']
+        if form.is_valid():
+            form.submission_id = submission_id
+            if request.POST.get("approve_btn", ""):
+                form.is_approved = True
+            elif request.POST.get("reject_btn", ""):
+                form.is_approved = False
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def get_success_url(self):
+        return reverse(
+            'submissions',
+            kwargs={
+                'event_id': self.kwargs['event_id'],
+            },
+        )
+
+
+@method_decorator(login_required, name='dispatch')
+class ResultUpdate(UpdateView):
+    model = Result
+    template_name = 'result_update.html'
+    form_class = ResultUpdateForm
+
+    def get_context_data(self, **kwargs):
+        context = super(ResultUpdate, self).get_context_data(**kwargs)
+        event_id = self.kwargs['event_id']
+        context['event_id'] = event_id
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            'results',
+            kwargs={
+                'event_id': self.kwargs['event_id'],
+            },
+        )
+
+
 class AcceptInvitationView(TemplateView):
     template_name = "thanks.html"
 
@@ -659,32 +735,3 @@ class DeclineInvitationView(View):
         evaluator_event.status = 'rejected'
         evaluator_event.save()
         return HttpResponse('GET request!')
-
-
-@method_decorator(login_required, name='dispatch')
-class ResultCreate(CreateView, LoginRequiredMixin):
-    model = Result
-    template_name = 'submissions.html'
-    form_class = ResultForm
-    pk_url_kwarg = 'event_id'
-
-    def post(self, request, **kwargs):
-        form = ResultForm(request.POST)
-        submission_id = self.kwargs['submission_id']
-        if form.is_valid():
-            form.submission_id = submission_id
-            if request.POST.get("approve_btn", ""):
-                form.is_approved = True
-            elif request.POST.get("reject_btn", ""):
-                form.is_approved = False
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def get_success_url(self):
-        return reverse(
-            'submissions',
-            kwargs={
-                'event_id': self.kwargs['event_id'],
-            },
-        )

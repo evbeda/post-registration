@@ -1,0 +1,143 @@
+{% extends "base.html" %} 
+{% load render_table from django_tables2 %}
+{% load static %}
+
+{% block content %}
+    {%include "partials/jumbotron.html" %} 
+
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col">
+                <ul class="eds-breadcrumbs">
+                    <li class="eds-breadcrumbs__item">
+                        <a class="eds-breadcrumbs__item--link eds-text-bm eds-text-color--grey-600"
+                        href="/"
+                        data-spec="breadcrumbs-link">Managed Events</a>
+                        <span class="eds-l-mar-hor-1">
+                        <i class="eds-vector-image eds-icon--xsmall eds-vector-image--grey-400" data-spec="icon"
+                        aria-hidden="true">
+                            <svg id="eds-icon--chevron-right-chunky_svg" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24">
+                                <path id="eds-icon--chevron-right-chunky_base"
+                                    fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M10.2 17l5-5-5-5-1.4 1.4 3.6 3.6-3.6 3.6z">
+                                </path>
+                            </svg>
+                        </i>
+                    </span>
+                    </li>
+                    <li class="eds-breadcrumbs__item">
+                        <a class="eds-breadcrumbs__item--link eds-text-bm eds-text-color--grey-600" href="{% url 'docs' event_id %}" data-spec="breadcrumbs-link">
+                            {{ event.name }}
+                        </a>
+                        <span class="eds-l-mar-hor-1">
+                            <i class="eds-vector-image eds-icon--xsmall eds-vector-image--grey-400" data-spec="icon" aria-hidden="true">
+                                <svg id="eds-icon--chevron-right-chunky_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path id="eds-icon--chevron-right-chunky_base" fill-rule="evenodd" clip-rule="evenodd" d="M10.2 17l5-5-5-5-1.4 1.4 3.6 3.6-3.6 3.6z">
+                                    </path>
+                                </svg>
+                            </i>
+                        </span>
+                    </li>
+                    <li class="eds-breadcrumbs__item">
+                        <span data-spec="breadcrumbs-active" class="eds-text-bm eds-text-color--grey-900">Results</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% include "partials/event_tabs.html" with results_tab_is_active=True %}
+        <div class="row">
+            <div class="col">
+                <div class="eds-data-table mb-5">
+                    <div class="eds-data-table__wrapper">
+                        <table class="eds-data-table__main eds-l-mar-vert-2" data-spec="data-table-main">
+                            <thead>
+                                <tr data-spec="data-table-header" class="eds-data-table-header">
+                                    <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                                        <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                            <span class="eds-text-bm">ID</span><span class="eds-data-table-header__column__icon"></span>
+                                        </button>
+                                    </th>
+                                    <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                                        <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                            <span class="eds-text-bm">Status</span><span class="eds-data-table-header__column__icon"></span>
+                                        </button>
+                                    </th>
+                                    <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                                        <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                            <span class="eds-text-bm">Title</span>
+                                            <span class="eds-data-table-header__column__icon"></span>
+                                        </button>
+                                    </th>
+                                    <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                                        <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                            <span class="eds-text-bm">Author(s)</span><span class="eds-data-table-header__column__icon"></span>
+                                        </button>
+                                    </th>
+                                    <th class="eds-data-table-header__column" data-spec="data-table-header-column">
+                                        <button class="eds-btn--button eds-btn--none eds-data-table-header__column-button" type="button">
+                                            <span class="eds-text-bm">Actions</span>
+                                            <span class="eds-data-table-header__column__icon"></span>
+                                        </button>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="eds-table-list">
+                            {% if results_list %}
+                                {% for result in results_list %}
+                                <tr class="eds-data-table-list-item">
+                                    <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ result.id }}</td>
+                                    <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
+                                        {% if result.approved %}
+                                            <span class="badge badge-success">
+                                                Approved
+                                            </span>
+                                        {% else %}
+                                            <span class="badge badge-danger">
+                                                Rejected
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
+                                        {{ result.submission.filesubmission.file_doc.name }}
+                                        {{ result.submission.textsubmission.text_doc.name }}
+                                    </td>
+                                    <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">{{ result.submission.attendee.name }}</td>
+                                    <td class="eds-data-table-list-item__column" data-spec="data-table-list-item-column">
+                                        <span class="eds-icon-button eds-icon-button--active eds-icon-button--brand">
+                                            <a href="{% url 'result_update' event_id result.id%}">
+                                                <button class="eds-btn--button eds-btn--none eds-btn--icon-only" type="button">
+                                                    <i class="eds-vector-image eds-icon--small" data-spec="icon" aria-hidden="true">
+                                                        <svg id="eds-icon--pencil_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                            <path id="eds-icon--pencil_base" fill-rule="evenodd" clip-rule="evenodd" d="M4 17.7L6.3 20l-2.9.6.6-2.9zm.3-1L15.4 5.6l3 3L7.3 19.7l-3-3zM16.1 4.9l1.4-1.4 3 3-1.4 1.4-3-3zM17.5 2L3.2 16.4 2 22l5.6-1.2L22 6.5 17.5 2z"
+                                                            />
+                                                            <g id="eds-icon--pencil_dashes" fill-rule="evenodd" clip-rule="evenodd">
+                                                                <path d="M12 21h2v1h-2zm4 0h2v1h-2zm4 0h2v1h-2z" />
+                                                            </g>
+                                                        </svg>
+                                                    </i>
+                                                </button>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr class="eds-data-table-list-item">
+                                    <td colspan="5" class="eds-data-table-list-item__column">
+                                        - To add a new <b>files requirement</b> click on <b>'New Submission'</b>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="eds-g-cell eds-g-cell-12-12">
+                        <div class="eds-align--right"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock content %}
