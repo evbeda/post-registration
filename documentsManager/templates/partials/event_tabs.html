@@ -9,6 +9,9 @@
         <li class="nav-item">
             <a class="nav-link {{ submissions_tab_is_active|yesno:'active,' }}" href="{% url 'submissions' event_id %}">Submissions</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {{ results_tab_is_active|yesno:'active,' }}" href="{% url 'results' event_id %}">Results</a>
+        </li>
         {% else %}
         <li class="nav-item">
             <a class="nav-link" role="button" aria-haspopup="true" aria-expanded="false" href="{% url 'submissions' event_id %}">Submissions </a>

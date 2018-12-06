@@ -25,8 +25,20 @@
                 </span>
                 </li>
                 <li class="eds-breadcrumbs__item">
-                <span data-spec="breadcrumbs-active"
-                      class="eds-text-bm eds-text-color--grey-900">{{ event.name }}</span>
+                    <a class="eds-breadcrumbs__item--link eds-text-bm eds-text-color--grey-600" href="{% url 'docs' event_id %}" data-spec="breadcrumbs-link">
+                        {{ event.name }}
+                    </a>
+                    <span class="eds-l-mar-hor-1">
+                        <i class="eds-vector-image eds-icon--xsmall eds-vector-image--grey-400" data-spec="icon" aria-hidden="true">
+                            <svg id="eds-icon--chevron-right-chunky_svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path id="eds-icon--chevron-right-chunky_base" fill-rule="evenodd" clip-rule="evenodd" d="M10.2 17l5-5-5-5-1.4 1.4 3.6 3.6-3.6 3.6z">
+                                </path>
+                            </svg>
+                        </i>
+                    </span>
+                </li>
+                <li class="eds-breadcrumbs__item">
+                    <span data-spec="breadcrumbs-active" class="eds-text-bm eds-text-color--grey-900">Requirements</span>
                 </li>
             </ul>
         </div>

@@ -23,6 +23,8 @@ from .views import (
     SuccessView,
     TextDocDelete,
     TextDocUpdate,
+    ResultsView,
+    ResultUpdate,
 )
 
 urlpatterns = [
@@ -128,6 +130,16 @@ urlpatterns = [
         r'event/(?P<event_id>\d+)/submissions/(?P<submission_id>\d+)/review/$',
         ReviewView.as_view(),
         name='review'
+    ),
+    url(
+        r'event/(?P<event_id>\d+)/results/(?P<pk>\d+)/edit/$',
+        ResultUpdate.as_view(),
+        name='result_update'
+    ),
+    url(
+        r'event/(?P<event_id>\d+)/results/$',
+        ResultsView.as_view(),
+        name='results'
     ),
     url(
         r'signup/$',
