@@ -49,20 +49,20 @@
     </div>
 
     {% include "partials/event_tabs.html" with submissions_tab_is_active=True %}
-
-    <div class="row justify-content-end">
-        <form method="get" class="form-inline">
-            {{ filter.form.non_field_errors }}
-            <div class="form-group">
-                {{ filter.form.state.errors }}
-                <label for="{{ filter.form.state.name }}">State:</label>
-                {{ filter.form.state }}
-            </div>
-            <button type="submit" class="btn btn-info">Search</button>
-        </form>
+    <div id="panel2" class="eds-tabs__content" role="tabpanel" aria-labelledby="tab2">
+        <div class="row justify-content-end">
+            <form method="get" class="form-inline">
+                {{ filter.form.non_field_errors }}
+                <div class="form-group">
+                    {{ filter.form.state.errors }}
+                    <label for="{{ filter.form.state.name }}">State:</label>
+                    {{ filter.form.state }}
+                </div>
+                <button type="submit" class="btn btn-info">Search</button>
+            </form>
+        </div>
+        {% render_table table 'partials/submissions_table.html' %}
     </div>
-    {% render_table table 'partials/submissions_table.html' %}
-
 </div>
 <script src="{% static 'js/evaluators.js' %}"></script>
 {% endblock content %}
