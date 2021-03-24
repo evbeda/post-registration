@@ -98,7 +98,7 @@ query-string==1.0.2
 request==1.0.2
 requests==2.20.1
 requests-oauthlib==1.0.0
-rsa==4.0
+rsa==4.1
 selenium==3.141.0
 simplegeneric==0.8.1
 six==1.11.0
