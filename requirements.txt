@@ -93,7 +93,7 @@ python-coveralls==2.9.1
 python-dateutil==2.7.3
 python3-openid==3.1.0
 pytz==2018.5
-PyYAML==3.13
+PyYAML==5.4
 query-string==1.0.2
 request==1.0.2
 requests==2.20.1
